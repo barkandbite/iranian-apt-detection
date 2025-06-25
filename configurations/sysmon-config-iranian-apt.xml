@@ -1,0 +1,168 @@
+<Sysmon schemaversion="4.81">
+  <!--
+    Sysmon Configuration for Iranian APT Detection
+    Version: 1.0
+    Last Updated: 2025-06-25
+    
+    This configuration enhances detection of Iranian threat actor TTPs
+  -->
+  <HashAlgorithms>md5,sha256</HashAlgorithms>
+  <EventFiltering>
+    <!-- Process Creation - Event ID 1 -->
+    <ProcessCreate onmatch="include">
+      <!-- Remote Access Tools -->
+      <Image condition="contains any">ngrok;ligolo;meshcentral;anydesk;teamviewer;plink</Image>
+      <CommandLine condition="contains any">ngrok;ligolo;anydesk;meshcentral</CommandLine>
+      
+      <!-- PowerShell Suspicious Usage -->
+      <CommandLine condition="contains all">powershell;-enc</CommandLine>
+      <CommandLine condition="contains all">powershell;-e </CommandLine>
+      <CommandLine condition="contains all">powershell;hidden</CommandLine>
+      <CommandLine condition="contains all">powershell;bypass</CommandLine>
+      <CommandLine condition="contains all">powershell;downloadstring</CommandLine>
+      <CommandLine condition="contains all">powershell;iex</CommandLine>
+      
+      <!-- Credential Dumping -->
+      <CommandLine condition="contains any">mimikatz;sekurlsa;lsadump;hashdump</CommandLine>
+      <CommandLine condition="contains all">reg;save;sam</CommandLine>
+      <CommandLine condition="contains all">reg;save;security</CommandLine>
+      <CommandLine condition="contains all">reg;save;system</CommandLine>
+      
+      <!-- Shadow Copy Deletion -->
+      <CommandLine condition="contains all">vssadmin;delete;shadows</CommandLine>
+      <CommandLine condition="contains all">wmic;shadowcopy;delete</CommandLine>
+      <CommandLine condition="contains all">bcdedit;recoveryenabled;no</CommandLine>
+      
+      <!-- Event Log Clearing -->
+      <CommandLine condition="contains all">wevtutil;cl</CommandLine>
+      <CommandLine condition="contains">clear-eventlog</CommandLine>
+      
+      <!-- Service Creation -->
+      <CommandLine condition="contains all">sc;create</CommandLine>
+      <CommandLine condition="contains all">sc;config;binpath</CommandLine>
+      
+      <!-- Network Reconnaissance -->
+      <Image condition="contains any">nmap.exe;masscan.exe;zmap.exe;shodan</Image>
+      <CommandLine condition="contains all">netstat;-an</CommandLine>
+      <CommandLine condition="contains all">arp;-a</CommandLine>
+      
+      <!-- Exchange/Outlook Exploitation -->
+      <CommandLine condition="contains all">outlook.exe;/safe</CommandLine>
+      <CommandLine condition="contains all">outlook.exe;/recycle</CommandLine>
+      <ParentImage condition="is">C:\Windows\System32\inetsrv\w3wp.exe</ParentImage>
+      <ParentCommandLine condition="contains any">MSExchangeOWAAppPool;MSExchangeECPAppPool;MSExchangeAutodiscoverAppPool</ParentCommandLine>
+      
+      <!-- Exchange Management Shell -->
+      <CommandLine condition="contains any">New-MailboxExportRequest;New-ManagementRoleAssignment;Set-OabVirtualDirectory</CommandLine>
+      <CommandLine condition="contains all">powershell;Exchange</CommandLine>
+      
+      <!-- Known Iranian Tools -->
+      <Image condition="contains any">havoc;hanifnet;hxlibrary;neoexpressrat;systembc;tickler</Image>
+    </ProcessCreate>
+
+    <!-- Network Connection - Event ID 3 -->
+    <NetworkConnect onmatch="include">
+      <!-- Remote Access Ports -->
+      <DestinationPort>20256</DestinationPort> <!-- Unitronics PLC -->
+      <DestinationPort>5985</DestinationPort> <!-- WinRM -->
+      <DestinationPort>5986</DestinationPort> <!-- WinRM HTTPS -->
+      
+      <!-- C2 Domains -->
+      <DestinationHostname condition="contains any">ngrok.io;localhost.run;githubapp;gupdate.net</DestinationHostname>
+      
+      <!-- Suspicious Processes -->
+      <Image condition="contains any">powershell.exe;cmd.exe;rundll32.exe;regsvr32.exe</Image>
+    </NetworkConnect>
+
+    <!-- Image Load - Event ID 7 -->
+    <ImageLoad onmatch="include">
+      <!-- Credential Theft DLLs -->
+      <ImageLoaded condition="contains any">vaultcli.dll;samlib.dll;wdigest.dll</ImageLoaded>
+      <Image condition="contains any">mimikatz;pwdump;hashdump</Image>
+    </ImageLoad>
+
+    <!-- Remote Thread Creation - Event ID 8 -->
+    <CreateRemoteThread onmatch="include">
+      <!-- Process Injection -->
+      <TargetImage condition="contains any">lsass.exe;winlogon.exe;services.exe;svchost.exe</TargetImage>
+      <SourceImage condition="excludes all">System;chrome.exe;firefox.exe;teams.exe</SourceImage>
+    </CreateRemoteThread>
+
+    <!-- Process Access - Event ID 10 -->
+    <ProcessAccess onmatch="include">
+      <!-- LSASS Access -->
+      <TargetImage>C:\Windows\System32\lsass.exe</TargetImage>
+      <GrantedAccess condition="contains any">0x1410;0x1010;0x1438;0x143a;0x1418</GrantedAccess>
+    </ProcessAccess>
+
+    <!-- File Creation - Event ID 11 -->
+    <FileCreate onmatch="include">
+      <!-- Web Shells -->
+      <TargetFilename condition="contains all">inetpub;.aspx</TargetFilename>
+      <TargetFilename condition="contains all">wwwroot;.aspx</TargetFilename>
+      <TargetFilename condition="contains all">htdocs;.php</TargetFilename>
+      <TargetFilename condition="end with">.jsp</TargetFilename>
+      
+      <!-- Suspicious Extensions in Web Directories -->
+      <TargetFilename condition="contains all">inetpub;.exe</TargetFilename>
+      <TargetFilename condition="contains all">wwwroot;.dll</TargetFilename>
+      
+      <!-- Known Malware -->
+      <TargetFilename condition="contains any">havoc;hanifnet;hxlibrary;neoexpressrat;systembc;meshcentral</TargetFilename>
+      
+      <!-- Exchange/Outlook Files -->
+      <TargetFilename condition="contains all">Exchange Server;.aspx</TargetFilename>
+      <TargetFilename condition="contains all">inetpub\wwwroot\aspnet_client;.aspx</TargetFilename>
+      <TargetFilename condition="contains">outlook.pst</TargetFilename>
+      <TargetFilename condition="contains">outlook.ost</TargetFilename>
+      
+      <!-- Ransomware Notes -->
+      <TargetFilename condition="contains any">readme.txt;decrypt.txt;restore.txt;how_to_recover</TargetFilename>
+      
+      <!-- Credential Files -->
+      <TargetFilename condition="end with">sam.save</TargetFilename>
+      <TargetFilename condition="end with">security.save</TargetFilename>
+      <TargetFilename condition="end with">system.save</TargetFilename>
+      <TargetFilename condition="end with">ntds.dit</TargetFilename>
+      <TargetFilename condition="contains">lsass.dmp</TargetFilename>
+    </FileCreate>
+
+    <!-- Registry Events - Event ID 12,13,14 -->
+    <RegistryEvent onmatch="include">
+      <!-- Persistence Keys -->
+      <TargetObject condition="contains any">\CurrentVersion\Run;\CurrentVersion\RunOnce;Winlogon\Shell;Winlogon\Userinit</TargetObject>
+      
+      <!-- Service Creation -->
+      <TargetObject condition="contains all">Services;ImagePath</TargetObject>
+      <TargetObject condition="contains all">Services;Start</TargetObject>
+      
+      <!-- Security Bypasses -->
+      <TargetObject condition="contains any">DisableAntiSpyware;DisableRealtimeMonitoring;DisableBehaviorMonitoring</TargetObject>
+    </RegistryEvent>
+
+    <!-- Process Termination - Event ID 5 -->
+    <ProcessTerminate onmatch="include">
+      <!-- Security Software -->
+      <Image condition="contains any">MsMpEng.exe;MsSense.exe;SenseCncProxy.exe</Image>
+    </ProcessTerminate>
+
+    <!-- DNS Query - Event ID 22 -->
+    <DnsQuery onmatch="include">
+      <!-- Suspicious Domains -->
+      <QueryName condition="contains any">ngrok.io;localhost.run;githubapp;gupdate.net;pastebin;discord</QueryName>
+      
+      <!-- DNS Tunneling Patterns -->
+      <QueryName condition="regex">^[a-f0-9]{32,}\.</QueryName>
+      <QueryName condition="regex">^[a-zA-Z0-9+/]{40,}\.</QueryName>
+    </DnsQuery>
+
+    <!-- WMI Events - Event ID 19,20,21 -->
+    <WmiEvent onmatch="include">
+      <!-- Remote WMI -->
+      <Operation>Remote</Operation>
+      
+      <!-- WMI Persistence -->
+      <EventNamespace condition="contains">subscription</EventNamespace>
+    </WmiEvent>
+  </EventFiltering>
+</Sysmon>
