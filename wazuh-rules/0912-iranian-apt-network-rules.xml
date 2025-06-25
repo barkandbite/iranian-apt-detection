@@ -1,0 +1,238 @@
+<!--
+  Wazuh Rules for Iranian APT Network Detection
+  Version: 1.0
+  Last Updated: 2025-06-25
+  
+  This ruleset detects network-based indicators associated with Iranian threat actors
+  including C2 communication patterns, data exfiltration, and scanning activities.
+-->
+
+<group name="iranian_apt,network_detection,">
+
+  <!-- C2 Communication Patterns -->
+  <rule id="100940" level="14">
+    <if_group>firewall</if_group>
+    <srcport>20256</srcport>
+    <description>Iranian APT: Unitronics PLC default port communication detected</description>
+    <mitre>
+      <id>T1571</id>
+      <id>T1095</id>
+    </mitre>
+    <group>attack,command_control,scada,</group>
+  </rule>
+
+  <rule id="100941" level="14">
+    <if_group>web_log</if_group>
+    <regex>User-Agent.*\(compatible\s*;\s*$\)|User-Agent.*Python|User-Agent.*curl|User-Agent.*wget</regex>
+    <status>200</status>
+    <description>Iranian APT: Suspicious automated tool user-agent detected</description>
+    <mitre>
+      <id>T1071.001</id>
+      <id>T1595</id>
+    </mitre>
+    <group>attack,reconnaissance,</group>
+  </rule>
+
+  <!-- Data Exfiltration Patterns -->
+  <rule id="100942" level="14">
+    <if_group>firewall</if_group>
+    <protocol>tcp</protocol>
+    <dstport>443|8443|8080</dstport>
+    <action>allow</action>
+    <bytes_sent type="pcre2">^[5-9]\d{6,}|^[1-9]\d{7,}</bytes_sent>
+    <description>Iranian APT: Large data transfer to external host detected (>5MB)</description>
+    <mitre>
+      <id>T1041</id>
+      <id>T1048</id>
+    </mitre>
+    <group>attack,exfiltration,pci_dss_11.4,</group>
+  </rule>
+
+  <rule id="100943" level="15" frequency="5" timeframe="300">
+    <if_matched_sid>100942</if_matched_sid>
+    <same_dst_ip />
+    <description>Iranian APT: Multiple large data transfers to same destination - possible exfiltration</description>
+    <mitre>
+      <id>T1041</id>
+      <id>T1567</id>
+    </mitre>
+    <group>attack,exfiltration,pci_dss_11.4,gdpr_IV_32.2,</group>
+  </rule>
+
+  <!-- Cobalt Strike Detection -->
+  <rule id="100944" level="15">
+    <if_group>ids</if_group>
+    <regex>Cobalt Strike|cobaltstrike|beacon\.dll|artifact\.exe</regex>
+    <description>Iranian APT: Cobalt Strike beacon detected</description>
+    <mitre>
+      <id>T1001</id>
+      <id>T1095</id>
+    </mitre>
+    <group>attack,command_control,cobalt_strike,</group>
+  </rule>
+
+  <rule id="100945" level="14">
+    <if_group>firewall,web_log</if_group>
+    <url type="pcre2">/[a-zA-Z0-9]{1,4}$|/pixel\.gif$|/g\.gif$|/p\.gif$</url>
+    <status>200</status>
+    <description>Iranian APT: Potential Cobalt Strike C2 communication pattern</description>
+    <mitre>
+      <id>T1071.001</id>
+      <id>T1132</id>
+    </mitre>
+    <group>attack,command_control,</group>
+  </rule>
+
+  <!-- Scanning and Reconnaissance -->
+  <rule id="100946" level="13" frequency="50" timeframe="60">
+    <if_group>firewall</if_group>
+    <action>drop|deny|reject</action>
+    <same_src_ip />
+    <description>Iranian APT: Port scanning detected from $(src_ip)</description>
+    <mitre>
+      <id>T1046</id>
+      <id>T1595.001</id>
+    </mitre>
+    <group>attack,reconnaissance,pci_dss_11.4,</group>
+  </rule>
+
+  <rule id="100947" level="14">
+    <if_group>firewall</if_group>
+    <dstport>445|3389|22|23|21|1433|3306</dstport>
+    <action>allow</action>
+    <src_ip>!192.168.0.0/16,!10.0.0.0/8,!172.16.0.0/12</src_ip>
+    <description>Iranian APT: External access to sensitive service on port $(dstport)</description>
+    <mitre>
+      <id>T1021</id>
+      <id>T1133</id>
+    </mitre>
+    <group>attack,initial_access,</group>
+  </rule>
+
+  <!-- DNS Tunneling Detection -->
+  <rule id="100948" level="14">
+    <if_group>sysmon_event_22</if_group>
+    <field name="win.eventdata.queryName" type="pcre2">^[a-f0-9]{32,}\.|^[a-zA-Z0-9+/]{40,}\.</field>
+    <description>Iranian APT: Possible DNS tunneling detected - suspicious query pattern</description>
+    <mitre>
+      <id>T1071.004</id>
+      <id>T1048.003</id>
+    </mitre>
+    <group>attack,command_control,</group>
+  </rule>
+
+  <!-- Known Iranian C2 Infrastructure Patterns -->
+  <rule id="100949" level="15">
+    <if_group>sysmon_event_22,firewall,web_log</if_group>
+    <regex>apps\.gist\.githubapp|gupdate\.net|microsoft-update\.net|windows-update\.org</regex>
+    <description>Iranian APT: Known C2 infrastructure domain detected</description>
+    <mitre>
+      <id>T1071.001</id>
+      <id>T1102.002</id>
+    </mitre>
+    <group>attack,command_control,pci_dss_11.4,</group>
+  </rule>
+
+  <!-- Encrypted Channel Detection -->
+  <rule id="100950" level="13">
+    <if_group>firewall</if_group>
+    <protocol>tcp</protocol>
+    <dstport>!80,!443,!22,!3389</dstport>
+    <regex>TLS|SSL|encrypted</regex>
+    <description>Iranian APT: Encrypted communication on non-standard port $(dstport)</description>
+    <mitre>
+      <id>T1573</id>
+      <id>T1571</id>
+    </mitre>
+    <group>attack,command_control,</group>
+  </rule>
+
+  <!-- BitCoin Activity Detection -->
+  <rule id="100951" level="14">
+    <if_group>web_log,sysmon_event_22</if_group>
+    <regex>bitcoin|btc|bc1q|blockchain\.info|coinbase</regex>
+    <description>Iranian APT: Cryptocurrency-related activity detected - possible ransomware</description>
+    <mitre>
+      <id>T1486</id>
+      <id>T1657</id>
+    </mitre>
+    <group>attack,ransomware,</group>
+  </rule>
+
+  <!-- Ngrok/Tunneling Detection -->
+  <rule id="100952" level="15">
+    <if_group>firewall,sysmon_event_3</if_group>
+    <regex>ngrok\.io|\.ngrok\.com|tunnels\.api\.tunnels|localhost\.run</regex>
+    <description>Iranian APT: Reverse tunnel service detected - $(url)</description>
+    <mitre>
+      <id>T1090.001</id>
+      <id>T1572</id>
+    </mitre>
+    <group>attack,command_control,pci_dss_11.4,</group>
+  </rule>
+
+  <!-- Off-Hours Activity -->
+  <rule id="100953" level="13">
+    <if_group>firewall</if_group>
+    <time>22:00-06:00</time>
+    <weekday>saturday|sunday</weekday>
+    <action>allow</action>
+    <protocol>tcp</protocol>
+    <bytes_sent type="pcre2">^[1-9]\d{5,}</bytes_sent>
+    <description>Iranian APT: Suspicious off-hours network activity detected</description>
+    <mitre>
+      <id>T1029</id>
+      <id>T1048</id>
+    </mitre>
+    <group>attack,exfiltration,</group>
+  </rule>
+
+  <!-- Exchange/Outlook Network Activity -->
+  <rule id="100955" level="15">
+    <if_group>web_log</if_group>
+    <url type="pcre2">/owa/auth/.*\.aspx|/ecp/.*\.aspx|/aspnet_client/.*\.aspx</url>
+    <status>200|201</status>
+    <description>Iranian APT: Suspicious Exchange web shell access pattern</description>
+    <mitre>
+      <id>T1505.003</id>
+      <id>T1190</id>
+    </mitre>
+    <group>attack,webshell,exchange,</group>
+  </rule>
+
+  <rule id="100956" level="14">
+    <if_group>firewall</if_group>
+    <protocol>tcp</protocol>
+    <srcport>445|139</srcport>
+    <program_name>outlook.exe</program_name>
+    <description>Iranian APT: Outlook initiating SMB connection - possible CVE-2023-23397</description>
+    <mitre>
+      <id>T1187</id>
+      <id>T1557</id>
+    </mitre>
+    <group>attack,credential_relay,</group>
+  </rule>
+
+  <rule id="100957" level="15">
+    <if_group>web_log</if_group>
+    <regex>POST.*\/owa\/auth\/Current\/.*themes|POST.*\/ecp\/default\.flt</regex>
+    <description>Iranian APT: Exchange ProxyLogon exploitation pattern detected</description>
+    <mitre>
+      <id>T1190</id>
+      <id>T1203</id>
+    </mitre>
+    <group>attack,exploit,exchange,</group>
+  </rule>
+
+  <!-- Combined Network Indicators -->
+  <rule id="100954" level="16" frequency="5" timeframe="600">
+    <if_matched_sid>100941,100945,100948,100949,100952</if_matched_sid>
+    <description>Iranian APT: Multiple C2 indicators detected - active compromise likely</description>
+    <mitre>
+      <id>T1102</id>
+      <id>T1095</id>
+    </mitre>
+    <group>attack,command_control,pci_dss_11.4,gdpr_IV_35.7.d,</group>
+  </rule>
+
+</group>

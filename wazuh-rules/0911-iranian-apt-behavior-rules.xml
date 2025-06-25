@@ -1,0 +1,240 @@
+<!--
+  Wazuh Rules for Iranian APT Behavioral Detection
+  Version: 1.0
+  Last Updated: 2025-06-25
+  
+  This ruleset detects behavioral patterns associated with Iranian threat actors
+  including tool usage, persistence mechanisms, and lateral movement techniques.
+-->
+
+<group name="iranian_apt,behavior_detection,">
+
+  <!-- Remote Access Tool Detection -->
+  <rule id="100920" level="14">
+    <if_group>sysmon_event_1</if_group>
+    <field name="win.eventdata.image" type="pcre2">(?i)(anydesk|ngrok|ligolo|meshcentral|meshagent)\.exe</field>
+    <description>Iranian APT: Remote access tool execution detected - $(win.eventdata.image)</description>
+    <mitre>
+      <id>T1219</id>
+      <id>T1072</id>
+    </mitre>
+    <group>attack,remote_access,pci_dss_10.6.1,gdpr_IV_35.7.d,</group>
+  </rule>
+
+  <rule id="100921" level="14">
+    <if_group>windows</if_group>
+    <match>AnyDesk|ngrok|Ligolo|MeshCentral|plink.exe</match>
+    <description>Iranian APT: Remote tunneling tool activity detected</description>
+    <mitre>
+      <id>T1572</id>
+      <id>T1090</id>
+    </mitre>
+    <group>attack,command_control,</group>
+  </rule>
+
+  <!-- Web Shell Detection -->
+  <rule id="100922" level="15">
+    <if_group>web_scan</if_group>
+    <regex>\.jsp\?cmd=|\.aspx\?cmd=|eval\(|system\(|shell_exec|passthru</regex>
+    <description>Iranian APT: Web shell command execution attempt detected</description>
+    <mitre>
+      <id>T1505.003</id>
+      <id>T1059</id>
+    </mitre>
+    <group>attack,webshell,pci_dss_11.4,gdpr_IV_35.7.d,</group>
+  </rule>
+
+  <rule id="100923" level="15">
+    <if_group>sysmon_event_11</if_group>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?i)(wwwroot|inetpub|apache|nginx|httpd).*(\.jsp|\.aspx|\.php|\.asp)</field>
+    <field name="win.eventdata.image" negate="yes">w3wp.exe|httpd.exe|nginx.exe</field>
+    <description>Iranian APT: Suspicious web shell file creation - $(win.eventdata.targetFilename)</description>
+    <mitre>
+      <id>T1505.003</id>
+      <id>T1027</id>
+    </mitre>
+    <group>attack,webshell,</group>
+  </rule>
+
+  <!-- Known Iranian APT Backdoor Names -->
+  <rule id="100924" level="15">
+    <if_group>sysmon_event_1</if_group>
+    <field name="win.eventdata.image" type="pcre2">(?i)(havoc|hanifnet|hxlibrary|neoexpressrat|systembc|tickler)</field>
+    <description>Iranian APT: Known backdoor execution detected - $(win.eventdata.image)</description>
+    <mitre>
+      <id>T1055</id>
+      <id>T1106</id>
+    </mitre>
+    <group>attack,backdoor,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- Persistence Mechanisms -->
+  <rule id="100925" level="14">
+    <if_sid>5706</if_sid>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(schtasks|at\.exe).*(powershell|cmd|rundll32|regsvr32)</field>
+    <description>Iranian APT: Scheduled task persistence mechanism detected</description>
+    <mitre>
+      <id>T1053.005</id>
+      <id>T1059</id>
+    </mitre>
+    <group>attack,persistence,pci_dss_10.6.1,</group>
+  </rule>
+
+  <rule id="100926" level="14">
+    <if_group>sysmon_event_13</if_group>
+    <field name="win.eventdata.targetObject" type="pcre2">(?i)\\CurrentVersion\\Run|\\CurrentVersion\\RunOnce</field>
+    <field name="win.eventdata.details" type="pcre2">(?i)(powershell|cmd\.exe|rundll32|regsvr32|mshta)</field>
+    <description>Iranian APT: Registry run key persistence detected</description>
+    <mitre>
+      <id>T1547.001</id>
+      <id>T1112</id>
+    </mitre>
+    <group>attack,persistence,</group>
+  </rule>
+
+  <!-- Credential Harvesting -->
+  <rule id="100927" level="15">
+    <if_group>sysmon_event_1</if_group>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(mimikatz|sekurlsa|lsadump|hashdump|credential)</field>
+    <description>Iranian APT: Credential dumping tool execution detected</description>
+    <mitre>
+      <id>T1003</id>
+      <id>T1555</id>
+    </mitre>
+    <group>attack,credential_access,pci_dss_10.6.1,gdpr_IV_32.2,</group>
+  </rule>
+
+  <rule id="100928" level="14">
+    <if_sid>5706</if_sid>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)reg.*(sam|security|system).*save</field>
+    <description>Iranian APT: Registry hive export for credential theft detected</description>
+    <mitre>
+      <id>T1003.002</id>
+      <id>T1552.002</id>
+    </mitre>
+    <group>attack,credential_access,</group>
+  </rule>
+
+  <!-- Lateral Movement -->
+  <rule id="100929" level="14">
+    <if_group>authentication_success</if_group>
+    <field name="win.eventdata.logonType">3|10</field>
+    <field name="win.eventdata.authenticationPackageName">NTLM</field>
+    <time>01:00-05:00</time>
+    <description>Iranian APT: Suspicious off-hours lateral movement detected</description>
+    <mitre>
+      <id>T1021</id>
+      <id>T1078</id>
+    </mitre>
+    <group>attack,lateral_movement,</group>
+  </rule>
+
+  <rule id="100930" level="14">
+    <if_group>sysmon_event_1</if_group>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(psexec|wmic.*process|winrs|enter-pssession)</field>
+    <description>Iranian APT: Remote execution tool usage detected</description>
+    <mitre>
+      <id>T1021.006</id>
+      <id>T1047</id>
+    </mitre>
+    <group>attack,lateral_movement,</group>
+  </rule>
+
+  <!-- Defense Evasion -->
+  <rule id="100931" level="14">
+    <if_sid>5104</if_sid>
+    <field name="win.eventdata.product" type="pcre2">(?i)(defender|antivirus|endpoint protection|symantec|mcafee|kaspersky)</field>
+    <field name="win.eventdata.state">stopped|disabled</field>
+    <description>Iranian APT: Security software disabled - $(win.eventdata.product)</description>
+    <mitre>
+      <id>T1562.001</id>
+      <id>T1089</id>
+    </mitre>
+    <group>attack,defense_evasion,pci_dss_10.6.1,</group>
+  </rule>
+
+  <rule id="100932" level="14">
+    <if_group>windows</if_group>
+    <match>powershell.exe</match>
+    <regex>-enc|-encodedcommand|hidden|bypass|noprofile</regex>
+    <description>Iranian APT: Obfuscated PowerShell execution detected</description>
+    <mitre>
+      <id>T1059.001</id>
+      <id>T1027</id>
+    </mitre>
+    <group>attack,defense_evasion,</group>
+  </rule>
+
+  <!-- Network Reconnaissance -->
+  <rule id="100933" level="13">
+    <if_sid>5706</if_sid>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(nmap|masscan|zmap|shodan|netstat.*-an|arp.*-a)</field>
+    <description>Iranian APT: Network reconnaissance tool execution detected</description>
+    <mitre>
+      <id>T1046</id>
+      <id>T1018</id>
+    </mitre>
+    <group>attack,reconnaissance,</group>
+  </rule>
+
+  <!-- Suspicious Domain Activity -->
+  <rule id="100934" level="14">
+    <if_group>sysmon_event_22</if_group>
+    <field name="win.eventdata.queryName" type="pcre2">(?i)(\.ir$|\.tk$|\.ml$|\.ga$|githubapp|discord|pastebin)</field>
+    <description>Iranian APT: Suspicious domain resolution - $(win.eventdata.queryName)</description>
+    <mitre>
+      <id>T1071.001</id>
+      <id>T1102</id>
+    </mitre>
+    <group>attack,command_control,</group>
+  </rule>
+
+  <!-- Exchange/Outlook Exploitation -->
+  <rule id="100936" level="15">
+    <if_group>sysmon_event_11</if_group>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?i)(\\inetpub\\wwwroot\\aspnet_client|\\Exchange Server\\.*\.aspx|\\owa\\auth)</field>
+    <description>Iranian APT: Suspicious file creation in Exchange directory - $(win.eventdata.targetFilename)</description>
+    <mitre>
+      <id>T1505.003</id>
+      <id>T1190</id>
+    </mitre>
+    <group>attack,webshell,exchange,</group>
+  </rule>
+
+  <rule id="100937" level="14">
+    <if_group>sysmon_event_1</if_group>
+    <field name="win.eventdata.parentImage">w3wp.exe</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(cmd\.exe|powershell|whoami|net user|ipconfig)</field>
+    <description>Iranian APT: Exchange web process spawning suspicious child - $(win.eventdata.image)</description>
+    <mitre>
+      <id>T1505.003</id>
+      <id>T1059</id>
+    </mitre>
+    <group>attack,webshell,exchange,</group>
+  </rule>
+
+  <rule id="100938" level="15">
+    <if_group>sysmon_event_3</if_group>
+    <field name="win.eventdata.image">outlook.exe</field>
+    <field name="win.eventdata.destinationPort">445|139</field>
+    <field name="win.eventdata.destinationIp" negate="yes">^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)</field>
+    <description>Iranian APT: Outlook connecting to external SMB - potential CVE-2023-23397</description>
+    <mitre>
+      <id>T1187</id>
+      <id>T1557.001</id>
+    </mitre>
+    <group>attack,credential_access,outlook,</group>
+  </rule>
+
+  <!-- Combined Indicators -->
+  <rule id="100935" level="16" frequency="3" timeframe="300">
+    <if_matched_sid>100920,100921,100924,100927,100930</if_matched_sid>
+    <description>Iranian APT: Multiple attack stages detected - likely active compromise</description>
+    <mitre>
+      <id>T1486</id>
+      <id>T1490</id>
+    </mitre>
+    <group>attack,active_compromise,pci_dss_11.4,gdpr_IV_35.7.d,</group>
+  </rule>
+
+</group>

@@ -1,0 +1,206 @@
+<!--
+  Wazuh Rules for Iranian APT File Integrity Monitoring
+  Version: 1.0
+  Last Updated: 2025-06-25
+  
+  This ruleset detects file system activities associated with Iranian threat actors
+  including web shell deployment, tool staging, and persistence mechanisms.
+-->
+
+<group name="iranian_apt,fim_detection,">
+
+  <!-- Web Shell File Creation -->
+  <rule id="100960" level="15">
+    <if_sid>550,553,554</if_sid>
+    <field name="file" type="pcre2">(?i)\.(jsp|jspx|aspx|asp|php|cfm)$</field>
+    <field name="file" type="pcre2">(?i)(shell|cmd|exec|upload|backdoor|c99|r57|b374k|wso)</field>
+    <description>Iranian APT: Suspicious web shell file created - $(file)</description>
+    <mitre>
+      <id>T1505.003</id>
+      <id>T1027</id>
+    </mitre>
+    <group>attack,webshell,pci_dss_11.5,gdpr_IV_35.7.d,</group>
+  </rule>
+
+  <rule id="100961" level="15">
+    <if_sid>550,553,554</if_sid>
+    <field name="file" type="pcre2">(?i)(wwwroot|inetpub|htdocs|www|public_html|webapps)/.*\.(txt|jpg|png|gif|ico)$</field>
+    <match>type="added"</match>
+    <description>Iranian APT: Suspicious file with double extension in web directory - $(file)</description>
+    <mitre>
+      <id>T1036.007</id>
+      <id>T1505.003</id>
+    </mitre>
+    <group>attack,webshell,</group>
+  </rule>
+
+  <!-- Iranian APT Tool Drops -->
+  <rule id="100962" level="15">
+    <if_sid>550,553,554</if_sid>
+    <field name="file" type="pcre2">(?i)(havoc|hanifnet|hxlibrary|neoexpressrat|systembc|tickler|meshcentral|ngrok|plink)</field>
+    <description>Iranian APT: Known malicious tool dropped - $(file)</description>
+    <mitre>
+      <id>T1105</id>
+      <id>T1608.001</id>
+    </mitre>
+    <group>attack,malware,pci_dss_11.5,</group>
+  </rule>
+
+  <rule id="100963" level="14">
+    <if_sid>550,553,554</if_sid>
+    <field name="file" type="pcre2">(?i)(temp|tmp|appdata\\local\\temp|/tmp|/var/tmp).*\.(exe|dll|ps1|bat|cmd|vbs|jar)$</field>
+    <description>Iranian APT: Executable dropped in temporary directory - $(file)</description>
+    <mitre>
+      <id>T1105</id>
+      <id>T1059</id>
+    </mitre>
+    <group>attack,suspicious_file,</group>
+  </rule>
+
+  <!-- Configuration File Tampering -->
+  <rule id="100964" level="14">
+    <if_sid>550,553</if_sid>
+    <field name="file" type="pcre2">(?i)(web\.config|applicationhost\.config|httpd\.conf|nginx\.conf|.htaccess)</field>
+    <description>Iranian APT: Web server configuration file modified - $(file)</description>
+    <mitre>
+      <id>T1562.004</id>
+      <id>T1222</id>
+    </mitre>
+    <group>attack,config_changed,pci_dss_11.5,</group>
+  </rule>
+
+  <!-- Persistence File Locations -->
+  <rule id="100965" level="14">
+    <if_sid>550,553,554</if_sid>
+    <field name="file" type="pcre2">(?i)(startup|run|runonce|winlogon|services)</field>
+    <field name="file" type="pcre2">(?i)\.(exe|dll|bat|ps1|vbs)$</field>
+    <description>Iranian APT: File created in persistence location - $(file)</description>
+    <mitre>
+      <id>T1547.001</id>
+      <id>T1543.003</id>
+    </mitre>
+    <group>attack,persistence,</group>
+  </rule>
+
+  <!-- Credential Theft Files -->
+  <rule id="100966" level="15">
+    <if_sid>550,553,554</if_sid>
+    <field name="file" type="pcre2">(?i)(sam\.save|security\.save|system\.save|ntds\.dit|lsass\.dmp|mimikatz)</field>
+    <description>Iranian APT: Credential theft artifact detected - $(file)</description>
+    <mitre>
+      <id>T1003</id>
+      <id>T1552</id>
+    </mitre>
+    <group>attack,credential_theft,pci_dss_11.5,gdpr_IV_32.2,</group>
+  </rule>
+
+  <!-- Log Deletion/Tampering -->
+  <rule id="100967" level="14">
+    <if_sid>553,554</if_sid>
+    <field name="file" type="pcre2">(?i)(\.log$|\.evtx$|/var/log/|windows\\system32\\winevt\\logs)</field>
+    <match>type="deleted"</match>
+    <description>Iranian APT: Log file deletion detected - $(file)</description>
+    <mitre>
+      <id>T1070.001</id>
+      <id>T1070</id>
+    </mitre>
+    <group>attack,log_clear,pci_dss_10.2.7,</group>
+  </rule>
+
+  <!-- Ransomware Indicators -->
+  <rule id="100968" level="15">
+    <if_sid>550,553,554</if_sid>
+    <field name="file" type="pcre2">(?i)(readme.*\.txt|decrypt.*\.txt|restore.*\.txt|how.*recover|\.locked|\.encrypted|\.enc)</field>
+    <description>Iranian APT: Ransomware indicator file detected - $(file)</description>
+    <mitre>
+      <id>T1486</id>
+      <id>T1490</id>
+    </mitre>
+    <group>attack,ransomware,pci_dss_11.5,</group>
+  </rule>
+
+  <!-- Shadow Copy Deletion Scripts -->
+  <rule id="100969" level="15">
+    <if_sid>550,553,554</if_sid>
+    <field name="file" type="pcre2">(?i)\.(bat|cmd|ps1)$</field>
+    <match>vssadmin|wbadmin|bcdedit|wmic shadowcopy</match>
+    <description>Iranian APT: Shadow copy deletion script detected - $(file)</description>
+    <mitre>
+      <id>T1490</id>
+      <id>T1059</id>
+    </mitre>
+    <group>attack,ransomware,</group>
+  </rule>
+
+  <!-- Staging Directories -->
+  <rule id="100970" level="14">
+    <if_sid>550,553,554</if_sid>
+    <field name="file" type="pcre2">(?i)(programdata|public|perflogs|recycle\.bin).*\.(zip|rar|7z|tar|gz)$</field>
+    <description>Iranian APT: Compressed file in unusual location - possible staging - $(file)</description>
+    <mitre>
+      <id>T1074.001</id>
+      <id>T1560</id>
+    </mitre>
+    <group>attack,collection,</group>
+  </rule>
+
+  <!-- Email Collection -->
+  <rule id="100971" level="14">
+    <if_sid>550,553,554</if_sid>
+    <field name="file" type="pcre2">(?i)\.(pst|ost|eml|msg)$</field>
+    <field name="file" type="pcre2">(?i)(temp|tmp|programdata|public)</field>
+    <description>Iranian APT: Email archive in suspicious location - $(file)</description>
+    <mitre>
+      <id>T1114.001</id>
+      <id>T1074</id>
+    </mitre>
+    <group>attack,collection,</group>
+  </rule>
+
+  <!-- Exchange Web Shell Detection -->
+  <rule id="100973" level="15">
+    <if_sid>550,553,554</if_sid>
+    <field name="file" type="pcre2">(?i)(\\Exchange Server\\|\\inetpub\\wwwroot\\aspnet_client\\|\\owa\\|\\ecp\\).*\.aspx$</field>
+    <description>Iranian APT: Suspicious ASPX file in Exchange directory - $(file)</description>
+    <mitre>
+      <id>T1505.003</id>
+      <id>T1190</id>
+    </mitre>
+    <group>attack,webshell,exchange,pci_dss_11.5,</group>
+  </rule>
+
+  <rule id="100974" level="14">
+    <if_sid>550,553,554</if_sid>
+    <field name="file" type="pcre2">(?i)\\ProgramData\\.*outlook.*\.(exe|dll|vbs|ps1)$</field>
+    <description>Iranian APT: Suspicious Outlook-related file in ProgramData - $(file)</description>
+    <mitre>
+      <id>T1566.001</id>
+      <id>T1204.002</id>
+    </mitre>
+    <group>attack,outlook,</group>
+  </rule>
+
+  <rule id="100975" level="15">
+    <if_sid>550,553,554</if_sid>
+    <field name="file" type="pcre2">(?i)(lsass.*\.dmp|procdump.*\.exe|out\.dat|debug\.bin)</field>
+    <match>type="added"</match>
+    <description>Iranian APT: Process memory dump file created - $(file)</description>
+    <mitre>
+      <id>T1003.001</id>
+      <id>T1005</id>
+    </mitre>
+    <group>attack,credential_theft,pci_dss_11.5,</group>
+  </rule>
+
+  <!-- Combined FIM Indicators -->
+  <rule id="100972" level="16" frequency="5" timeframe="300">
+    <if_matched_sid>100960,100961,100962,100963,100966</if_matched_sid>
+    <description>Iranian APT: Multiple suspicious file operations detected</description>
+    <mitre>
+      <id>T1055</id>
+      <id>T1105</id>
+    </mitre>
+    <group>attack,multiple_attacks,pci_dss_11.5,</group>
+  </rule>
+
+</group>
