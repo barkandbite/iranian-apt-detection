@@ -1,0 +1,302 @@
+<!--
+  Wazuh Rules for Iranian APT Unique Behavioral Detection
+  Version: 1.0
+  Last Updated: 2025-06-27
+  
+  This ruleset detects unique behaviors specific to Iranian threat actors including
+  DNS hijacking, time-based patterns, Persian language artifacts, and secondary objectives
+-->
+
+<group name="iranian_apt,unique_behaviors,">
+
+  <!-- DNS Hijacking Detection -->
+  <rule id="101000" level="14">
+    <if_group>sysmon_event_22</if_group>
+    <field name="win.eventdata.queryName">acme-v02.api.letsencrypt.org</field>
+    <description>Iranian APT: Let's Encrypt query - possible DNS hijacking preparation</description>
+    <mitre>
+      <id>T1584.002</id>
+      <id>T1583.004</id>
+    </mitre>
+    <group>attack,dns_hijacking,</group>
+  </rule>
+
+  <rule id="101001" level="15">
+    <if_sid>101000</if_sid>
+    <field name="win.eventdata.queryName" type="pcre2">(?i)(microsoft|google|outlook|office365|gov)\.</field>
+    <description>Iranian APT: Suspicious domain resolution after Let's Encrypt - DNS hijacking likely</description>
+    <mitre>
+      <id>T1584.002</id>
+      <id>T1557</id>
+    </mitre>
+    <group>attack,dns_hijacking,critical,</group>
+  </rule>
+
+  <!-- Time-Based Activity Patterns (Iran UTC+3:30) -->
+  <rule id="101002" level="13">
+    <if_group>authentication_success</if_group>
+    <time>02:00-10:00</time>
+    <weekday>monday|tuesday|wednesday|thursday</weekday>
+    <field name="win.eventdata.ipAddress" negate="yes">^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)</field>
+    <description>Iranian APT: External authentication during Tehran business hours (9 AM - 5 PM IRST)</description>
+    <mitre>
+      <id>T1078</id>
+      <id>T1133</id>
+    </mitre>
+    <group>attack,time_anomaly,</group>
+  </rule>
+
+  <rule id="101003" level="14" frequency="10" timeframe="3600">
+    <if_matched_sid>101002</if_matched_sid>
+    <same_source_ip />
+    <description>Iranian APT: Multiple authentications during Tehran business hours from same IP</description>
+    <mitre>
+      <id>T1078</id>
+      <id>T1110</id>
+    </mitre>
+    <group>attack,time_anomaly,behavioral,</group>
+  </rule>
+
+  <!-- Persian/Farsi Language Artifacts -->
+  <rule id="101004" level="14">
+    <if_group>web_log</if_group>
+    <regex>Accept-Language:.*fa-IR|Accept-Language:.*fa</regex>
+    <field name="srcip" negate="yes">^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)</field>
+    <description>Iranian APT: Farsi language preference in web request from external IP</description>
+    <mitre>
+      <id>T1071.001</id>
+    </mitre>
+    <group>attack,language_artifact,</group>
+  </rule>
+
+  <rule id="101005" level="15">
+    <if_group>sysmon_event_11</if_group>
+    <field name="win.eventdata.targetFilename" type="pcre2">[\u0600-\u06FF]</field>
+    <description>Iranian APT: File created with Persian/Farsi characters - $(win.eventdata.targetFilename)</description>
+    <mitre>
+      <id>T1027</id>
+      <id>T1036</id>
+    </mitre>
+    <group>attack,language_artifact,</group>
+  </rule>
+
+  <!-- Cryptocurrency Mining Detection -->
+  <rule id="101006" level="14">
+    <if_group>sysmon_event_3</if_group>
+    <field name="win.eventdata.destinationPort">3333|5555|7777|8888|9999|14444|45560|45700</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)(xmrig|minerd|cpuminer|WinRing0x64)</field>
+    <description>Iranian APT: Cryptocurrency mining connection detected - $(win.eventdata.image)</description>
+    <mitre>
+      <id>T1496</id>
+    </mitre>
+    <group>attack,cryptomining,</group>
+  </rule>
+
+  <rule id="101007" level="15">
+    <if_group>sysmon_event_1</if_group>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(--donate-level\s*0|--cpu-priority|--threads|pool\.minexmr|xmrpool)</field>
+    <description>Iranian APT: XMRig cryptocurrency miner execution with specific parameters</description>
+    <mitre>
+      <id>T1496</id>
+      <id>T1106</id>
+    </mitre>
+    <group>attack,cryptomining,</group>
+  </rule>
+
+  <!-- DNS Tunneling with Iranian Patterns -->
+  <rule id="101008" level="14">
+    <if_group>sysmon_event_22</if_group>
+    <field name="win.eventdata.queryName" type="pcre2">^(cmd|exec|download|upload)[0-9]{2,8}\.</field>
+    <field name="win.eventdata.queryType">16</field>
+    <description>Iranian APT: DNS TXT record C2 pattern detected (Lyceum/Hexane)</description>
+    <mitre>
+      <id>T1071.004</id>
+      <id>T1132.001</id>
+    </mitre>
+    <group>attack,dns_tunnel,</group>
+  </rule>
+
+  <rule id="101009" level="15" frequency="20" timeframe="300">
+    <if_group>sysmon_event_22</if_group>
+    <field name="win.eventdata.queryName" type="pcre2">^[a-f0-9]{8}\.[a-f0-9]{8}\.[a-f0-9]{8}\.</field>
+    <same_source_ip />
+    <description>Iranian APT: DNS A record data exfiltration pattern detected</description>
+    <mitre>
+      <id>T1048.003</id>
+      <id>T1041</id>
+    </mitre>
+    <group>attack,data_exfiltration,</group>
+  </rule>
+
+  <!-- HYPERSCRAPE Email Theft Tool -->
+  <rule id="101010" level="15">
+    <if_group>web_log</if_group>
+    <url>mail.google.com|mail.yahoo.com|outlook.live.com</url>
+    <regex>ui=html</regex>
+    <regex>User-Agent:.*MSIE [56]\.|Firefox/[1-3]\.|Chrome/[1-2][0-9]\.</regex>
+    <description>Iranian APT: HYPERSCRAPE tool accessing webmail with outdated browser</description>
+    <mitre>
+      <id>T1114.002</id>
+      <id>T1539</id>
+    </mitre>
+    <group>attack,email_theft,apt35,</group>
+  </rule>
+
+  <rule id="101011" level="15">
+    <if_group>sysmon_event_3</if_group>
+    <field name="win.eventdata.destinationHostname" type="pcre2">(?i)(mail\.google\.com|mail\.yahoo\.com|outlook\.live\.com)</field>
+    <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)(chrome|firefox|msedge|outlook|iexplore)</field>
+    <description>Iranian APT: Non-browser process accessing webmail - possible HYPERSCRAPE</description>
+    <mitre>
+      <id>T1114.002</id>
+    </mitre>
+    <group>attack,email_theft,</group>
+  </rule>
+
+  <!-- PowerLess Backdoor Detection -->
+  <rule id="101012" level="15">
+    <if_group>sysmon_event_7</if_group>
+    <field name="win.eventdata.image" negate="yes">powershell.exe</field>
+    <field name="win.eventdata.imageLoaded" type="pcre2">(?i)(system\.management\.automation\.dll|microsoft\.powershell)</field>
+    <description>Iranian APT: PowerShell loaded by non-PowerShell process - PowerLess backdoor</description>
+    <mitre>
+      <id>T1059.001</id>
+      <id>T1106</id>
+    </mitre>
+    <group>attack,powerless,phosphorus,</group>
+  </rule>
+
+  <!-- Passive Implant Detection (No Outbound C2) -->
+  <rule id="101013" level="14">
+    <if_group>firewall</if_group>
+    <action>allow</action>
+    <protocol>tcp</protocol>
+    <srcip negate="yes">^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)</srcip>
+    <dstport>80|443|8080|8443</dstport>
+    <direction>inbound</direction>
+    <time>22:00-06:00</time>
+    <description>Iranian APT: Inbound connection to web service during off-hours - passive implant check</description>
+    <mitre>
+      <id>T1571</id>
+      <id>T1205</id>
+    </mitre>
+    <group>attack,passive_implant,unc1860,</group>
+  </rule>
+
+  <!-- Telegram and KeePass Targeting -->
+  <rule id="101014" level="14">
+    <if_group>sysmon_event_11</if_group>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?i)telegram.*\.(json|dat|key)|\.kdbx$</field>
+    <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)(telegram|keepass)</field>
+    <description>Iranian APT: Suspicious access to Telegram/KeePass files - $(win.eventdata.targetFilename)</description>
+    <mitre>
+      <id>T1552.001</id>
+      <id>T1005</id>
+    </mitre>
+    <group>attack,credential_theft,</group>
+  </rule>
+
+  <rule id="101015" level="15">
+    <if_group>sysmon_event_3</if_group>
+    <field name="win.eventdata.destinationHostname">api.telegram.org</field>
+    <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)telegram</field>
+    <description>Iranian APT: Non-Telegram process accessing Telegram API - data theft likely</description>
+    <mitre>
+      <id>T1041</id>
+      <id>T1567.002</id>
+    </mitre>
+    <group>attack,data_exfiltration,</group>
+  </rule>
+
+  <!-- Email-Based C2 (BladedFeline) -->
+  <rule id="101016" level="15">
+    <if_group>sysmon_event_3</if_group>
+    <field name="win.eventdata.destinationPort">25|587|465</field>
+    <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)(outlook|thunderbird|mail)</field>
+    <description>Iranian APT: Non-email client making SMTP connection - possible email C2</description>
+    <mitre>
+      <id>T1071.003</id>
+      <id>T1132</id>
+    </mitre>
+    <group>attack,email_c2,bladedfeline,</group>
+  </rule>
+
+  <!-- Wiper Preparation Detection -->
+  <rule id="101017" level="14">
+    <if_group>sysmon_event_1</if_group>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(wmic.*shadowcopy.*get|vssadmin.*list.*shadows|Get-WmiObject.*Win32_ShadowCopy)</field>
+    <description>Iranian APT: Shadow copy enumeration - possible wiper preparation</description>
+    <mitre>
+      <id>T1490</id>
+      <id>T1082</id>
+    </mitre>
+    <group>attack,wiper_prep,</group>
+  </rule>
+
+  <rule id="101018" level="15" frequency="5" timeframe="300">
+    <if_matched_sid>101017</if_matched_sid>
+    <description>Iranian APT: Multiple shadow copy operations - wiper attack imminent</description>
+    <mitre>
+      <id>T1490</id>
+      <id>T1485</id>
+    </mitre>
+    <group>attack,wiper_imminent,critical,</group>
+  </rule>
+
+  <!-- Supply Chain and Watering Hole -->
+  <rule id="101019" level="14">
+    <if_group>web_log</if_group>
+    <status>302</status>
+    <regex>Location:.*\/(news|khabar|irna|fars|tasnim|presstv)</regex>
+    <description>Iranian APT: Redirect to Persian news site - possible watering hole</description>
+    <mitre>
+      <id>T1189</id>
+      <id>T1608.004</id>
+    </mitre>
+    <group>attack,watering_hole,</group>
+  </rule>
+
+  <!-- Log4Shell with Mining Payloads -->
+  <rule id="101020" level="15">
+    <if_group>web_log</if_group>
+    <regex>\${jndi:ldap://|${jndi:rmi://|\${jndi:dns://</regex>
+    <url>/dana-na/|/api/v1/|/clients/MyCRL|/ssl-vpn/</url>
+    <description>Iranian APT: Log4Shell attempt on known Iranian-targeted services</description>
+    <mitre>
+      <id>T1190</id>
+      <id>T1203</id>
+    </mitre>
+    <group>attack,log4shell,</group>
+  </rule>
+
+  <rule id="101021" level="16">
+    <if_matched_sid>101020</if_matched_sid>
+    <match>51.89.181.64|185.174.100|91.92.109</match>
+    <description>Iranian APT: Log4Shell with known Iranian C2 infrastructure</description>
+    <mitre>
+      <id>T1190</id>
+      <id>T1496</id>
+    </mitre>
+    <group>attack,log4shell,cryptomining,critical,</group>
+  </rule>
+
+  <!-- Behavioral Correlation Rules -->
+  <rule id="101022" level="16" frequency="3" timeframe="3600">
+    <if_matched_sid>101000,101006,101008</if_matched_sid>
+    <description>Iranian APT: Multiple unique Iranian techniques detected - active campaign</description>
+    <mitre>
+      <id>T1204</id>
+    </mitre>
+    <group>attack,correlation,campaign,</group>
+  </rule>
+
+  <rule id="101023" level="17" frequency="2" timeframe="7200">
+    <if_matched_sid>101003,101022</if_matched_sid>
+    <description>Iranian APT: Time-correlated multi-stage attack - nation-state activity confirmed</description>
+    <mitre>
+      <id>T1204</id>
+    </mitre>
+    <group>attack,nation_state,critical,</group>
+  </rule>
+
+</group>
