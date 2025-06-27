@@ -1,0 +1,183 @@
+# Bark&Bite Security - Iranian APT Detection Rules
+# Version: 2.0
+# Last Updated: 2025-06-26
+# Copyright: Bark&Bite Security - Premium Threat Detection
+#
+# This enhanced ruleset detects network traffic associated with Iranian threat actors
+# including Pioneer Kitten, Lemon Sandstorm, BladedFeline, UNC1860, and emerging groups
+# Optimized for extremely high accuracy with minimal false positives
+
+#==============================================================================
+# CVE EXPLOITATION DETECTION - INITIAL ACCESS
+#==============================================================================
+
+# CVE-2024-24919: Check Point Security Gateway (Pioneer Kitten, Lemon Sandstorm)
+# Enhanced with specific exploitation patterns and response codes
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT CVE-2024-24919 Check Point Exploitation"; flow:to_server,established; content:"POST"; http_method; content:"/clients/MyCRL"; http_uri; fast_pattern; content:".."; http_uri; pcre:"/\/clients\/MyCRL[^\s]*\.\..*\/(etc\/passwd|windows\/win\.ini|etc\/shadow)/i"; flowbits:set,iranian.checkpoint; reference:cve,2024-24919; classtype:attempted-admin; sid:2000001; rev:2; metadata:bark_bite iranian_apt pioneer_kitten high_confidence;)
+
+# Check Point exploitation success indicator
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Check Point Data Exfiltration Success"; flow:to_client,established; flowbits:isset,iranian.checkpoint; content:"200"; http_stat_code; content:"root:"; http_server_body; depth:100; reference:cve,2024-24919; classtype:successful-admin; sid:2000002; rev:2; metadata:bark_bite iranian_apt data_theft critical;)
+
+# CVE-2024-3400: Palo Alto PAN-OS (Pioneer Kitten primary vector)
+# Refined to reduce false positives with stricter pattern matching
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT CVE-2024-3400 PAN-OS Command Injection"; flow:to_server,established; content:"POST"; http_method; content:"/ssl-vpn/hipreport.esp"; http_uri; content:"Cookie"; http_header; pcre:"/SESSID=[^;]*(%2F|\.\.|%00|%0a)/i"; flowbits:set,iranian.panos; reference:cve,2024-3400; classtype:attempted-admin; sid:2000003; rev:2; metadata:bark_bite iranian_apt pioneer_kitten critical;)
+
+# PAN-OS post-exploitation web shell drop
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT PAN-OS Web Shell Installation"; flow:to_client,established; flowbits:isset,iranian.panos; content:"200"; http_stat_code; content:"session_start()"; http_server_body; content:"eval("; distance:0; within:500; reference:cve,2024-3400; classtype:successful-admin; sid:2000004; rev:2; metadata:bark_bite iranian_apt web_shell critical;)
+
+# CVE-2023-3519: Citrix NetScaler (Lemon Sandstorm, UNC1860)
+# Enhanced with specific Iranian payload patterns
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT Citrix CVE-2023-3519 Exploitation"; flow:to_server,established; content:"POST"; http_method; content:"/pcidss/report"; http_uri; content:"Content-Type|3a 20|application/x-www-form-urlencoded"; http_header; content:"username="; http_client_body; depth:20; pcre:"/template=(\.\.\/){2,}|nspi_expr.*python\.import/i"; flowbits:set,iranian.citrix; reference:cve,2023-3519; classtype:attempted-admin; sid:2000005; rev:2; metadata:bark_bite iranian_apt lemon_sandstorm high_confidence;)
+
+# CVE-2022-1388: F5 BIG-IP (Pioneer Kitten, ransomware collaboration)
+# Tightened to match exact Iranian exploitation patterns
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT F5 BIG-IP CVE-2022-1388 Auth Bypass"; flow:to_server,established; content:"POST"; http_method; content:"/mgmt/"; http_uri; content:"X-F5-Auth-Token|3a|"; http_header; content:!"Authorization|3a|"; http_header; content:"Connection|3a|"; http_header; content:"X-F5-Auth-Token"; distance:0; within:50; flowbits:set,iranian.f5; reference:cve,2022-1388; classtype:attempted-admin; sid:2000006; rev:2; metadata:bark_bite iranian_apt pioneer_kitten critical;)
+
+# F5 command execution with Iranian tool patterns
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT F5 Command Execution"; flow:to_server,established; flowbits:isset,iranian.f5; content:"{\"command\":\"run\""; http_client_body; pcre:"/utilCmdArgs\"\s*:\s*\"[^\"]*(-c|sh|bash|wget|curl|nc|python)/i"; reference:cve,2022-1388; classtype:attempted-admin; sid:2000007; rev:2; metadata:bark_bite iranian_apt command_execution critical;)
+
+# CVE-2024-21887: Ivanti Connect Secure (Multiple Iranian groups)
+# Enhanced with chain detection
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT Ivanti CVE-2024-21887 Chain Start"; flow:to_server,established; content:"GET"; http_method; content:"/dana-na/"; http_uri; content:"../"; http_uri; pcre:"/\/(dana-na|dana-cached)\/[^\/]*\.\.\/[^\/]*\.\.\/[^\/]+\.(lua|xml|conf)/i"; flowbits:set,iranian.ivanti.auth; reference:cve,2023-46805; classtype:attempted-admin; sid:2000008; rev:2; metadata:bark_bite iranian_apt chain_exploit stage1;)
+
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT Ivanti Command Injection Chain Complete"; flow:to_server,established; flowbits:isset,iranian.ivanti.auth; content:"POST"; http_method; content:"/api/v1/"; http_uri; pcre:"/[\$\(\)`;&\|].*\/(sh|bash|cmd|powershell)/i"; reference:cve,2024-21887; classtype:attempted-admin; sid:2000009; rev:2; metadata:bark_bite iranian_apt chain_exploit stage2 critical;)
+
+# CVE-2021-26855: Exchange ProxyLogon (Lemon Sandstorm, APT35)
+# Refined with Iranian-specific web shell patterns
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT Exchange ProxyLogon SSRF"; flow:to_server,established; content:"POST"; http_method; content:"/owa/auth/Current/"; http_uri; content:"Cookie|3a 20|X-AnonResource-Backend="; http_header; pcre:"/X-AnonResource-Backend=[^\/]+\/[^:]+:(444|443)/"; flowbits:set,iranian.exchange; reference:cve,2021-26855; classtype:attempted-admin; sid:2000010; rev:2; metadata:bark_bite iranian_apt lemon_sandstorm critical;)
+
+# Iranian Exchange web shell patterns (TWOFACE, GLASSTOKEN variants)
+alert http any any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT Exchange Web Shell Upload"; flow:to_server,established; flowbits:isset,iranian.exchange; content:"POST"; http_method; pcre:"/\/(owa|ecp|aspnet_client)\/[^\/]+\.aspx/i"; content:"<%"; http_client_body; content:"eval"; distance:0; within:100; nocase; reference:cve,2021-26855; classtype:successful-admin; sid:2000011; rev:2; metadata:bark_bite iranian_apt web_shell critical;)
+
+# CVE-2020-1472: Zerologon (Multiple groups for ransomware access)
+# Enhanced with better legitimate traffic filtering
+alert tcp $EXTERNAL_NET any -> $HOME_NET 135:139 (msg:"Bark&Bite - Iranian APT Zerologon Exploitation Attempt"; flow:to_server,established; content:"|00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|"; depth:16; offset:8; content:"|00 00 00 00 00 00 00 00|"; distance:0; within:8; threshold:type both, track by_src, count 5, seconds 10; reference:cve,2020-1472; classtype:attempted-admin; sid:2000012; rev:2; metadata:bark_bite iranian_apt privilege_escalation high_confidence;)
+
+# CVE-2023-23397: Outlook NTLM Relay (APT35/Charming Kitten specialty)
+# Improved to catch encrypted variants
+alert tcp $HOME_NET any -> $EXTERNAL_NET 445 (msg:"Bark&Bite - Iranian APT Outlook CVE-2023-23397 NTLM Relay"; flow:to_server,established; content:"SMB"; depth:3; content:"NTLMSSP"; content:"outlook.exe"; distance:0; within:200; nocase; flowbits:set,iranian.outlook.relay; reference:cve,2023-23397; classtype:credential-theft; sid:2000013; rev:2; metadata:bark_bite iranian_apt apt35 credential_theft critical;)
+
+# Outlook connecting to Iranian-controlled infrastructure
+alert tcp $HOME_NET any -> ![$HOME_NET,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16] 445 (msg:"Bark&Bite - Iranian APT Outlook External SMB Connection"; flow:to_server,established; flowbits:isset,iranian.outlook.relay; content:"|ff 53 4d 42|"; depth:4; threshold:type limit, track by_src, count 1, seconds 3600; reference:cve,2023-23397; classtype:credential-theft; sid:2000014; rev:2; metadata:bark_bite iranian_apt credential_relay critical;)
+
+#==============================================================================
+# IRANIAN C2 INFRASTRUCTURE AND TOOLS
+#==============================================================================
+
+# BladedFeline C2 (8+ year persistence specialist)
+# Email-based C2 through compromised Exchange
+alert tcp $HOME_NET any -> $EXTERNAL_NET 25 (msg:"Bark&Bite - Iranian APT BladedFeline Email C2 Beacon"; flow:to_server,established; content:"MAIL FROM|3a|"; content:"noreply@"; distance:0; within:50; content:"Subject|3a 20|"; content:"|42 61 73 65 36 34|"; distance:0; within:100; threshold:type both, track by_src, count 3, seconds 3600; classtype:trojan-activity; sid:2000015; rev:1; metadata:bark_bite iranian_apt bladedfeline covert_channel;)
+
+# UNC1860 Passive Implant Detection (No outbound C2!)
+# Detects inbound connections to passive backdoors
+alert tcp $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT UNC1860 Passive Implant Check-in"; flow:to_server,established; content:"|16 03|"; depth:2; content:"|01|"; offset:5; depth:1; pcre:"/\x00\x00.{2}[\x01-\x40]/"; flowbits:noalert; flowbits:set,iranian.passive.tls; classtype:trojan-activity; sid:2000016; rev:1; metadata:bark_bite iranian_apt unc1860 passive_implant;)
+
+alert tcp $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT UNC1860 Passive Implant Commands"; flow:to_server,established; flowbits:isset,iranian.passive.tls; content:"|17 03|"; depth:2; pcre:"/\x17\x03[\x00-\x03].{2}(list|upload|download|exec|cmd)/i"; classtype:trojan-activity; sid:2000017; rev:1; metadata:bark_bite iranian_apt unc1860 backdoor critical;)
+
+# Ngrok Tunneling (Pioneer Kitten, Lemon Sandstorm favorite)
+# Enhanced to catch setup phase
+alert dns $HOME_NET any -> any 53 (msg:"Bark&Bite - Iranian APT Ngrok Tunnel DNS Resolution"; dns_query; content:"ngrok.io"; nocase; pcre:"/^[a-f0-9]{4,20}\.ngrok\.io$/i"; flowbits:set,iranian.tunnel.ngrok,3600; threshold:type limit, track by_src, count 1, seconds 3600; classtype:trojan-activity; sid:2000018; rev:2; metadata:bark_bite iranian_apt tunneling suspicious;)
+
+alert tcp $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Ngrok Tunnel Established"; flow:to_server,established; flowbits:isset,iranian.tunnel.ngrok; content:"|16 03|"; depth:2; content:"ngrok.io"; fast_pattern:only; threshold:type limit, track by_src, count 1, seconds 3600; classtype:trojan-activity; sid:2000019; rev:2; metadata:bark_bite iranian_apt c2_tunnel critical;)
+
+# GitHub Dead Drop Resolver (GreenCharlie/IRGC innovation)
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT GitHub Dead Drop C2 Resolution"; flow:to_server,established; content:"GET"; http_method; content:"api.github.com"; http_host; content:"/repos/"; http_uri; pcre:"/\/repos\/[^\/]+\/[^\/]+\/(contents|releases)/"; content:"Accept|3a 20|application/vnd.github"; http_header; flowbits:set,iranian.github.c2; classtype:trojan-activity; sid:2000020; rev:1; metadata:bark_bite iranian_apt greencharlie dead_drop;)
+
+# GitHub C2 instruction retrieval
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT GitHub C2 Instructions Retrieved"; flow:to_client,established; flowbits:isset,iranian.github.c2; content:"200"; http_stat_code; content:"base64"; http_server_body; pcre:"/\"content\"\s*:\s*\"[A-Za-z0-9+\/]{50,}/"; classtype:trojan-activity; sid:2000021; rev:1; metadata:bark_bite iranian_apt c2_communication critical;)
+
+# Havoc C2 Framework (Iranian APT standard)
+# Improved detection of malleable profiles
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Havoc C2 Beacon"; flow:to_server,established; content:"GET"; http_method; urilen:2<>10; pcre:"/^\/[a-zA-Z0-9]{2,10}$/U"; content:!"Referer|3a|"; http_header; content:"Mozilla/5.0"; http_header; pcre:"/Cookie:[^\r\n]*[a-zA-Z0-9+\/]{100,}/"; flowbits:set,iranian.havoc; classtype:trojan-activity; sid:2000022; rev:2; metadata:bark_bite iranian_apt havoc_c2 high_confidence;)
+
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT Havoc C2 Task Response"; flow:to_client,established; flowbits:isset,iranian.havoc; content:"200"; http_stat_code; content:!"Content-Type|3a 20|text/html"; http_header; pcre:"/^[a-zA-Z0-9+\/\r\n]{200,}$/P"; classtype:trojan-activity; sid:2000023; rev:2; metadata:bark_bite iranian_apt havoc_c2 critical;)
+
+# Remote Access Tools (Pioneer Kitten ransomware handoff)
+alert tcp $HOME_NET any -> $EXTERNAL_NET 7070 (msg:"Bark&Bite - Iranian APT AnyDesk Remote Access"; flow:to_server,established; content:"|01 00 00 00 21 12 a4 42|"; depth:8; content:"anynet"; distance:0; within:50; threshold:type limit, track by_src, count 1, seconds 86400; classtype:policy-violation; sid:2000024; rev:2; metadata:bark_bite iranian_apt remote_access ransomware_precursor;)
+
+# MeshCentral (Iranian favorite for persistent access)
+alert tcp $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MeshCentral Agent Beacon"; flow:to_server,established; content:"|16 03|"; depth:2; content:"meshcentral"; nocase; content:"agent"; distance:0; within:50; nocase; threshold:type limit, track by_src, count 1, seconds 3600; classtype:trojan-activity; sid:2000025; rev:1; metadata:bark_bite iranian_apt meshcentral persistence;)
+
+#==============================================================================
+# POST-EXPLOITATION AND LATERAL MOVEMENT
+#==============================================================================
+
+# Living-off-the-land PowerShell (All Iranian groups)
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT PowerShell Download Cradle"; flow:to_server,established; content:"User-Agent|3a 20|WindowsPowerShell"; http_header; content:"GET"; http_method; pcre:"/\/(ps1|txt|xml|dat)$/U"; flowbits:set,iranian.powershell.download; classtype:trojan-activity; sid:2000026; rev:2; metadata:bark_bite iranian_apt living_off_land;)
+
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT PowerShell Payload Delivery"; flow:to_client,established; flowbits:isset,iranian.powershell.download; content:"200"; http_stat_code; pcre:"/(\$[a-zA-Z0-9_]+\s*=|function\s+[a-zA-Z0-9_]+|Invoke-|IEX|downloadstring)/i"; classtype:trojan-activity; sid:2000027; rev:2; metadata:bark_bite iranian_apt payload_delivery critical;)
+
+# Rapid lateral movement detection (2-3 hour window characteristic)
+alert tcp $HOME_NET any -> $HOME_NET 445 (msg:"Bark&Bite - Iranian APT Rapid SMB Lateral Movement"; flow:to_server,established; content:"|ff 53 4d 42|"; depth:4; content:"|75 00|"; distance:4; within:2; threshold:type both, track by_src, count 10, seconds 7200; classtype:lateral-movement; sid:2000028; rev:1; metadata:bark_bite iranian_apt lateral_movement behavioral;)
+
+alert tcp $HOME_NET any -> $HOME_NET 3389 (msg:"Bark&Bite - Iranian APT RDP Lateral Movement Surge"; flow:to_server,established; flags:S; threshold:type both, track by_src, count 5, seconds 7200; classtype:lateral-movement; sid:2000029; rev:1; metadata:bark_bite iranian_apt rdp_movement behavioral;)
+
+#==============================================================================
+# DATA EXFILTRATION PATTERNS
+#==============================================================================
+
+# Large data transfer to non-US infrastructure (Iranian preference)
+alert ip $HOME_NET any -> ![$HOME_NET,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16] any (msg:"Bark&Bite - Iranian APT Data Exfiltration to Non-US Host"; flow:to_server,established; stream_size:server,>,5000000; threshold:type limit, track by_src, count 1, seconds 3600; classtype:data-exfiltration; sid:2000030; rev:2; metadata:bark_bite iranian_apt exfiltration behavioral;)
+
+# DNS tunneling with Iranian encoding patterns
+alert dns $HOME_NET any -> any 53 (msg:"Bark&Bite - Iranian APT DNS Tunnel Exfiltration"; dns_query; pcre:"/^[a-f0-9]{32,}\./"; byte_test:1,>,50,0,relative; threshold:type both, track by_src, count 20, seconds 300; classtype:data-exfiltration; sid:2000031; rev:2; metadata:bark_bite iranian_apt dns_tunnel critical;)
+
+# Base64 DNS queries (APT35 TTP)
+alert dns $HOME_NET any -> any 53 (msg:"Bark&Bite - Iranian APT Base64 DNS Exfiltration"; dns_query; pcre:"/^[a-zA-Z0-9+\/]{40,}[=]{0,2}\./"; threshold:type both, track by_src, count 10, seconds 300; classtype:data-exfiltration; sid:2000032; rev:2; metadata:bark_bite iranian_apt apt35 dns_exfil;)
+
+#==============================================================================
+# WEB SHELL DETECTION (Enhanced)
+#==============================================================================
+
+# Iranian web shell command patterns
+alert http any any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT Web Shell Command Execution"; flow:to_server,established; content:"POST"; http_method; pcre:"/\.(asp|aspx|jsp|php)(\?[^\s]*)?$/U"; content:"cmd"; http_client_body; pcre:"/(cmd|command|exec|shell|system)\s*[=:]\s*[\"']?(whoami|net\s+user|ipconfig|id|uname)/i"; classtype:web-application-attack; sid:2000033; rev:2; metadata:bark_bite iranian_apt web_shell critical;)
+
+# TWOFACE web shell (APT35 signature)
+alert http any any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT TWOFACE Web Shell Access"; flow:to_server,established; content:"POST"; http_method; content:"Cookies"; http_client_body; content:"Password"; distance:0; within:50; pcre:"/ContentType[\"']?\s*[=:]\s*[\"']?Shell/i"; classtype:web-application-attack; sid:2000034; rev:1; metadata:bark_bite iranian_apt apt35 twoface critical;)
+
+# Web shell file upload functionality
+alert http any any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT Web Shell File Upload"; flow:to_server,established; content:"POST"; http_method; content:"multipart/form-data"; http_header; content:"filename"; http_client_body; pcre:"/filename[=\"']*[^\"']*\.(exe|dll|ps1|bat|sh|elf)[\"']*/i"; content:"upload"; distance:0; within:200; nocase; classtype:web-application-attack; sid:2000035; rev:2; metadata:bark_bite iranian_apt web_shell file_upload;)
+
+#==============================================================================
+# RECONNAISSANCE AND SCANNING
+#==============================================================================
+
+# Targeted scanning from compromised hosts (post-exploitation)
+alert tcp $HOME_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT Internal Network Reconnaissance"; flow:to_server; flags:S; threshold:type both, track by_src, count 100, seconds 60; classtype:network-scan; sid:2000036; rev:2; metadata:bark_bite iranian_apt internal_recon behavioral;)
+
+# Exchange server targeting (Iranian favorite)
+alert tcp $EXTERNAL_NET any -> $HOME_NET 443 (msg:"Bark&Bite - Iranian APT Exchange Server Reconnaissance"; flow:to_server,established; content:"|16 03|"; depth:2; content:"outlook."; content:"owa"; distance:0; within:50; threshold:type both, track by_src, count 5, seconds 300; classtype:attempted-recon; sid:2000037; rev:1; metadata:bark_bite iranian_apt exchange_recon;)
+
+#==============================================================================
+# WIPER AND DESTRUCTIVE ATTACKS (Agonizing Serpens)
+#==============================================================================
+
+# MultiLayer wiper preparation
+alert tcp $HOME_NET any -> $HOME_NET 445 (msg:"Bark&Bite - Iranian APT Wiper Deployment via SMB"; flow:to_server,established; content:"|ff 53 4d 42|"; content:"MultiLayer"; nocase; flowbits:set,iranian.wiper; classtype:destructive-attack; sid:2000038; rev:1; metadata:bark_bite iranian_apt agonizing_serpens wiper critical;)
+
+# Mass file deletion patterns
+alert tcp $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT Mass File Deletion Activity"; flow:established; content:"DELETE"; pcre:"/(\.jpg|\.pdf|\.docx?|\.xlsx?|\.pptx?|\.txt|\.db)/i"; threshold:type both, track by_src, count 100, seconds 60; classtype:destructive-attack; sid:2000039; rev:1; metadata:bark_bite iranian_apt wiper_activity critical;)
+
+#==============================================================================
+# IRGC WATER SECTOR TARGETING
+#==============================================================================
+
+# Unitronics PLC exploitation
+alert tcp $EXTERNAL_NET any -> $HOME_NET 20256 (msg:"Bark&Bite - Iranian APT IRGC Unitronics PLC Access"; flow:to_server,established; content:"|55 4e 49 54|"; depth:4; content:"|01|"; distance:0; within:10; pcre:"/PCOM|OPLC/"; reference:url,cisa.gov/news-events/cybersecurity-advisories/aa23-335a; classtype:targeted-activity; sid:2000040; rev:2; metadata:bark_bite iranian_apt irgc water_sector critical;)
+
+# HMI manipulation commands
+alert tcp $EXTERNAL_NET any -> $HOME_NET 502 (msg:"Bark&Bite - Iranian APT SCADA Modbus Write Commands"; flow:to_server,established; content:"|00 00|"; depth:2; content:"|00 06|"; distance:2; within:2; content:"|10|"; distance:2; within:1; threshold:type both, track by_src, count 10, seconds 300; classtype:targeted-activity; sid:2000041; rev:1; metadata:bark_bite iranian_apt ics_attack critical;)
+
+#==============================================================================
+# AI-ENHANCED ATTACKS (GreenCharlie/APT35)
+#==============================================================================
+
+# AI-generated phishing infrastructure
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT AI Phishing Infrastructure Contact"; flow:to_server,established; content:"Host|3a 20|"; http_header; pcre:"/Host:\s*[a-z0-9\-]+(elect|campaign|polit|vote|2024|harris|trump)[a-z0-9\-]*\.(tk|ml|ga|cf)/i"; classtype:social-engineering; sid:2000042; rev:1; metadata:bark_bite iranian_apt greencharlie ai_phishing;)
+
+#==============================================================================
+# CORRELATION RULES
+#==============================================================================
+
+# Multi-stage attack detection
+alert tcp any any -> any any (msg:"Bark&Bite - Iranian APT Multi-Stage Attack Detected"; flowbits:isset,iranian.checkpoint|iranian.panos|iranian.citrix|iranian.f5|iranian.ivanti.auth|iranian.exchange; flowbits:isset,iranian.havoc|iranian.tunnel.ngrok|iranian.powershell.download; threshold:type limit, track by_src, count 1, seconds 7200; classtype:successful-admin; sid:2000050; rev:1; priority:1; metadata:bark_bite iranian_apt correlation attack_chain critical;)
