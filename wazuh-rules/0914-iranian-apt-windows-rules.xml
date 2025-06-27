@@ -238,7 +238,34 @@
       <id>T1486</id>
       <id>T1055</id>
     </mitre>
-    <group>attack,active_compromise,pci_dss_11.4,gdpr_IV_35.7.d,</group>
+    <group>attack,active_compromise,pci_dss_11.4,gdpr_IV_35.7.d</group>
+  </rule>
+
+</group>
+
+<group name="iranian_apt,unique_signatures">
+
+  <!-- Pioneer Kitten “chisel.exe” reverse-proxy execution ------------->
+  <rule id="910001" level="12">
+    <!-- Match Sysmon Event ID 1 (Process Create) -->
+    <if_group>sysmon_event1</if_group>
+    <field name="win.eventdata.Image">(?i).*\\chisel\.exe$</field>
+    <description>Iranian APT – Chisel reverse-proxy execution (Pioneer Kitten)</description>
+    <mitre>
+      <id>T1090</id>
+      <tactic>Command and Control</tactic>
+    </mitre>
+  </rule>
+
+  <!-- Possible GhostScript CVE-2023-36664 exploitation via command line -->
+  <rule id="910002" level="10">
+    <if_group>sysmon_event1</if_group>
+    <field name="win.eventdata.CommandLine">(?i).*currentprompt.*gswin.*</field>
+    <description>Iranian APT – Potential GhostScript CVE-2023-36664 exploitation attempt</description>
+    <mitre>
+      <id>T1203</id>
+      <tactic>Execution</tactic>
+    </mitre>
   </rule>
 
 </group>
