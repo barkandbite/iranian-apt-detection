@@ -1,6 +1,6 @@
 # Bark&Bite Security - Iranian APT Detection Rules
-# Version: 2.0
-# Last Updated: 2025-06-26
+# Version: 2.1
+# Last Updated: 2025-06-27
 # Copyright: Bark&Bite Security - Premium Threat Detection
 #
 # This enhanced ruleset detects network traffic associated with Iranian threat actors
@@ -181,3 +181,26 @@ alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT AI P
 
 # Multi-stage attack detection
 alert tcp any any -> any any (msg:"Bark&Bite - Iranian APT Multi-Stage Attack Detected"; flowbits:isset,iranian.checkpoint|iranian.panos|iranian.citrix|iranian.f5|iranian.ivanti.auth|iranian.exchange; flowbits:isset,iranian.havoc|iranian.tunnel.ngrok|iranian.powershell.download; threshold:type limit, track by_src, count 1, seconds 7200; classtype:successful-admin; sid:2000050; rev:1; priority:1; metadata:bark_bite iranian_apt correlation attack_chain critical;)
+
+# --------------------------------------------------------------------
+# ADDED: Unique Iranian APT signatures – 2025-06-27
+# --------------------------------------------------------------------
+
+# CVE-2023-36664 – GhostScript RCE via weaponised PDF (watering-hole attacks by Peach Sandstorm)
+alert http $EXTERNAL_NET any -> $HOME_NET any \
+   (msg:"Iranian APT: CVE-2023-36664 GhostScript exploit payload delivery"; \
+    file_data; \
+    content:"%!PS-Adobe-3.0"; depth:15; \
+    content:"currentprompt"; within:200; \
+    reference:cve,2023-36664; classtype:attempted-user; sid:1000039; rev:1;)
+
+# Pioneer Kitten “chisel” reverse proxy beacons (default banner on TCP/8888)
+alert tcp $HOME_NET any -> $EXTERNAL_NET 8888 \
+   (msg:"Iranian APT: Chisel reverse proxy beacon"; \
+    flow:to_server,established; \
+    content:"CHISEL/1.0"; depth:9; \
+    classtype:trojan-activity; sid:1000042; rev:1;)
+
+# --------------------------------------------------------------------
+# END OF NEW SURICATA RULES
+# --------------------------------------------------------------------
