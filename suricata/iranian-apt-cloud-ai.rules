@@ -1,0 +1,114 @@
+# Suricata Rules for Iranian APT Cloud and AI-Enhanced Attack Detection
+# Version: 1.0
+# Last Updated: 2025-06-27
+#
+# These rules detect Iranian APT activities targeting cloud infrastructure
+# and using AI-enhanced techniques
+
+#==============================================================================
+# CLOUD INFRASTRUCTURE TARGETING
+#==============================================================================
+
+# AWS Instance Metadata Service (IMDS) exploitation attempts
+alert http $HOME_NET any -> 169.254.169.254 80 (msg:"Bark&Bite - Iranian APT AWS IMDS Access Attempt"; flow:to_server,established; content:"GET"; http_method; content:"/latest/meta-data/"; http_uri; flowbits:set,iranian.cloud.aws; classtype:attempted-recon; sid:2000090; rev:1; metadata:bark_bite iranian_apt cloud_targeting aws;)
+
+alert http 169.254.169.254 80 -> $HOME_NET any (msg:"Bark&Bite - Iranian APT AWS Credentials Stolen via IMDS"; flow:to_client,established; flowbits:isset,iranian.cloud.aws; content:"200"; http_stat_code; content:"iam/security-credentials/"; content:"AccessKeyId"; http_server_body; content:"SecretAccessKey"; distance:0; within:200; classtype:credential-theft; sid:2000091; rev:1; metadata:bark_bite iranian_apt aws_credentials critical;)
+
+# Azure Instance Metadata Service targeting
+alert http $HOME_NET any -> 169.254.169.254 80 (msg:"Bark&Bite - Iranian APT Azure IMDS Access"; flow:to_server,established; content:"GET"; http_method; content:"/metadata/instance"; http_uri; content:"api-version="; http_uri; content:"Metadata|3a 20|true"; http_header; flowbits:set,iranian.cloud.azure; classtype:attempted-recon; sid:2000092; rev:1; metadata:bark_bite iranian_apt cloud_targeting azure;)
+
+# GCP metadata server access
+alert http $HOME_NET any -> [metadata.google.internal,169.254.169.254] 80 (msg:"Bark&Bite - Iranian APT GCP Metadata Access"; flow:to_server,established; content:"GET"; http_method; content:"/computeMetadata/v1/"; http_uri; content:"Metadata-Flavor|3a 20|Google"; http_header; flowbits:set,iranian.cloud.gcp; classtype:attempted-recon; sid:2000093; rev:1; metadata:bark_bite iranian_apt cloud_targeting gcp;)
+
+# Cloud storage reconnaissance
+alert dns $HOME_NET any -> any 53 (msg:"Bark&Bite - Iranian APT Cloud Storage Enumeration"; dns_query; pcre:"/^[a-z0-9\-]{3,63}\.(s3\.amazonaws\.com|blob\.core\.windows\.net|storage\.googleapis\.com)$/i"; threshold:type both, track by_src, count 20, seconds 60; classtype:attempted-recon; sid:2000094; rev:1; metadata:bark_bite iranian_apt cloud_storage recon;)
+
+# Kubernetes API server targeting
+alert tcp $HOME_NET any -> $HOME_NET 6443 (msg:"Bark&Bite - Iranian APT Kubernetes API Access"; flow:to_server,established; content:"|16 03|"; depth:2; content:"kubernetes"; flowbits:set,iranian.k8s.access; classtype:attempted-admin; sid:2000095; rev:1; metadata:bark_bite iranian_apt kubernetes container;)
+
+alert http $HOME_NET any -> $HOME_NET [6443,8443,443] (msg:"Bark&Bite - Iranian APT Kubernetes Secret Extraction"; flow:to_server,established; flowbits:isset,iranian.k8s.access; content:"GET"; http_method; content:"/api/v1/namespaces/"; http_uri; content:"/secrets"; http_uri; classtype:credential-theft; sid:2000096; rev:1; metadata:bark_bite iranian_apt kubernetes secrets critical;)
+
+#==============================================================================
+# AI-ENHANCED PHISHING INFRASTRUCTURE (GreenCharlie/APT35)
+#==============================================================================
+
+# AI-generated domain patterns for 2024/2025 elections
+alert dns $HOME_NET any -> any 53 (msg:"Bark&Bite - Iranian APT AI-Generated Political Domain"; dns_query; pcre:"/^(secure-)?(vote|ballot|election|campaign|candidate|2024|2025|trump|harris|democrat|republican)[0-9\-]*(portal|update|news|alert|verify|security)?\.(tk|ml|ga|cf|gq|work|click|download|online)$/i"; flowbits:set,iranian.ai.phishing; classtype:social-engineering; sid:2000097; rev:1; metadata:bark_bite iranian_apt ai_phishing political;)
+
+# OpenAI API usage for content generation
+alert tcp $HOME_NET any -> $EXTERNAL_NET 443 (msg:"Bark&Bite - Iranian APT OpenAI API Access"; flow:to_server,established; tls_sni; content:"api.openai.com"; flowbits:set,iranian.ai.api; classtype:suspicious-activity; sid:2000098; rev:1; metadata:bark_bite iranian_apt ai_tools;)
+
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT AI Content Generation Request"; flow:to_server,established; flowbits:isset,iranian.ai.api; content:"POST"; http_method; content:"/v1/completions\|/v1/chat/completions"; http_uri; content:"model"; http_client_body; pcre:"/\"prompt\"[^}]*phishing|spear.*phishing|email.*template/i"; classtype:social-engineering; sid:2000099; rev:1; metadata:bark_bite iranian_apt ai_weaponization critical;)
+
+# Deepfake infrastructure detection
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Deepfake Generation Platform Access"; flow:to_server,established; content:"Host"; http_header; pcre:"/Host:\s*(synthesia|d-id|heygen|deepfakesweb|faceswap)/i"; flowbits:set,iranian.deepfake; classtype:suspicious-activity; sid:2000100; rev:1; metadata:bark_bite iranian_apt deepfake;)
+
+#==============================================================================
+# SUPPLY CHAIN TARGETING
+#==============================================================================
+
+# NPM/PyPI package manager exploitation
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Malicious Package Upload"; flow:to_server,established; content:"PUT\|POST"; http_method; content:"registry.npmjs.org\|pypi.org"; http_host; content:"Content-Type|3a 20|application/"; http_header; pcre:"/\"name\"[^}]*(tehran|persia|iran|update|patch|security|crypto)/i"; classtype:trojan-activity; sid:2000101; rev:1; metadata:bark_bite iranian_apt supply_chain;)
+
+# Docker Hub malicious image detection
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Docker Image with Backdoor"; flow:to_server,established; content:"docker.io\|hub.docker.com"; http_host; content:"POST"; http_method; content:"/v2/"; http_uri; content:"ENTRYPOINT"; http_client_body; pcre:"/ENTRYPOINT[^]]*(\"|')(sh|bash|cmd)[^]]*(\"|')[^]]*(curl|wget|nc|python)/i"; classtype:trojan-activity; sid:2000102; rev:1; metadata:bark_bite iranian_apt container supply_chain;)
+
+#==============================================================================
+# MOBILE DEVICE TARGETING
+#==============================================================================
+
+# Iranian APT mobile C2 patterns
+alert tcp $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Mobile Device C2"; flow:to_server,established; content:"User-Agent"; content:"Android\|iPhone\|iPad"; http_header; content:"/api/device/register\|/mobile/check-in\|/app/heartbeat"; http_uri; flowbits:set,iranian.mobile; classtype:trojan-activity; sid:2000103; rev:1; metadata:bark_bite iranian_apt mobile_targeting;)
+
+# WhatsApp/Telegram API abuse for C2
+alert tcp $HOME_NET any -> $EXTERNAL_NET 443 (msg:"Bark&Bite - Iranian APT Messaging App C2"; flow:to_server,established; tls_sni; content:"api.whatsapp.com\|api.telegram.org"; flowbits:isset,iranian.mobile; content:"sendMessage\|sendDocument"; http_uri; threshold:type both, track by_src, count 50, seconds 300; classtype:trojan-activity; sid:2000104; rev:1; metadata:bark_bite iranian_apt mobile_c2;)
+
+#==============================================================================
+# ZERO-DAY PATTERNS (Behavioral)
+#==============================================================================
+
+# Memory corruption exploit patterns
+alert tcp any any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT Potential Heap Spray"; flow:to_server,established; content:"|41 41 41 41|"; depth:4; content:"|41 41 41 41|"; distance:0; within:4; pcre:"/(\x41{100,}|\x90{100,})/"; flowbits:set,iranian.exploit; classtype:attempted-admin; sid:2000105; rev:1; metadata:bark_bite iranian_apt zero_day heap_spray;)
+
+# ROP chain detection
+alert tcp any any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT ROP Chain Pattern"; flow:to_server,established; flowbits:isset,iranian.exploit; pcre:"/(\x5[0-7]\x58\x5[0-7]\x58){3,}/"; classtype:attempted-admin; sid:2000106; rev:1; metadata:bark_bite iranian_apt exploit rop_chain;)
+
+#==============================================================================
+# BLOCKCHAIN AND CRYPTOCURRENCY INFRASTRUCTURE
+#==============================================================================
+
+# Iranian sanctions evasion via crypto
+alert tcp $HOME_NET any -> $EXTERNAL_NET [8332,8333,18332,18333] (msg:"Bark&Bite - Iranian APT Bitcoin Node Connection"; flow:to_server,established; content:"|f9 be b4 d9|"; depth:4; content:"version"; content:"verack"; distance:0; within:100; flowbits:set,iranian.crypto; classtype:policy-violation; sid:2000107; rev:1; metadata:bark_bite iranian_apt cryptocurrency sanctions_evasion;)
+
+# Crypto exchange API for laundering
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Crypto Exchange API"; flow:to_server,established; content:"api.binance.com\|api.kraken.com\|api.kucoin.com"; http_host; content:"X-MBX-APIKEY\|API-Key"; http_header; flowbits:isset,iranian.crypto; classtype:policy-violation; sid:2000108; rev:1; metadata:bark_bite iranian_apt money_laundering;)
+
+#==============================================================================
+# SCADA/ICS PROTOCOL ATTACKS (Water/Energy Sectors)
+#==============================================================================
+
+# Modbus function code exploitation
+alert tcp $EXTERNAL_NET any -> $HOME_NET 502 (msg:"Bark&Bite - Iranian APT Modbus Write Multiple Registers"; flow:to_server,established; content:"|00 00|"; depth:2; content:"|00 06|"; distance:2; within:2; content:"|10|"; distance:2; within:1; byte_test:2,>,100,10,relative; classtype:attempted-admin; sid:2000109; rev:1; metadata:bark_bite iranian_apt ics_attack critical;)
+
+# DNP3 protocol manipulation
+alert tcp any any -> $HOME_NET 20000 (msg:"Bark&Bite - Iranian APT DNP3 Control Command"; flow:to_server,established; content:"|05 64|"; depth:2; content:"|c0 05|"; distance:0; within:10; content:"|41|"; distance:0; within:20; classtype:attempted-admin; sid:2000110; rev:1; metadata:bark_bite iranian_apt scada_attack critical;)
+
+#==============================================================================
+# ADVANCED EVASION TECHNIQUES
+#==============================================================================
+
+# Domain fronting detection
+alert tls $HOME_NET any -> $EXTERNAL_NET 443 (msg:"Bark&Bite - Iranian APT Domain Fronting"; tls_sni; content:"cloudfront.net\|azurefd.net\|akamaized.net"; tls_cert_subject; content:"CN="; pcre:"/CN=(?!.*cloudfront|.*azure|.*akamai)/"; classtype:misc-activity; sid:2000111; rev:1; metadata:bark_bite iranian_apt domain_fronting evasion;)
+
+# Fast flux DNS behavior
+alert dns any 53 -> $HOME_NET any (msg:"Bark&Bite - Iranian APT Fast Flux DNS"; dns_query; dns.answers; pcre:"/(\x00\x01\x00\x01.{6}){4,}/"; threshold:type both, track by_dst, count 5, seconds 300; classtype:trojan-activity; sid:2000112; rev:1; metadata:bark_bite iranian_apt fast_flux;)
+
+#==============================================================================
+# CORRELATION AND CAMPAIGN DETECTION
+#==============================================================================
+
+# Multi-vector Iranian campaign
+alert tcp any any -> any any (msg:"Bark&Bite - Iranian APT Multi-Vector Campaign Detected"; flowbits:isset,iranian.cloud.aws|iranian.cloud.azure|iranian.cloud.gcp; flowbits:isset,iranian.ai.phishing|iranian.deepfake; flowbits:isset,iranian.dns.c2|iranian.passive.check; threshold:type limit, track by_src, count 1, seconds 7200; priority:1; classtype:targeted-activity; sid:2000113; rev:1; metadata:bark_bite iranian_apt campaign nation_state critical;)
+
+# Critical infrastructure targeting pattern
+alert tcp any any -> any any (msg:"Bark&Bite - Iranian APT Critical Infrastructure Campaign"; flowbits:isset,iranian.wiper|iranian.scada; flowbits:isset,iranian.passive.check|iranian.tunnel.ngrok; threshold:type limit, track by_src, count 1, seconds 3600; priority:1; classtype:targeted-activity; sid:2000114; rev:1; metadata:bark_bite iranian_apt critical_infrastructure imminent_threat;)
