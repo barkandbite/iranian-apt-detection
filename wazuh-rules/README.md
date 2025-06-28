@@ -19,7 +19,7 @@ The file uses simplified syntax that should work better with the CLI method:
 
 ```bash
 # SSH into Wazuh manager
-ssh root@192.168.2.196
+ssh root@[your_wazuh_host_ip]
 
 # Navigate to rules directory
 cd /var/ossec/etc/rules/
