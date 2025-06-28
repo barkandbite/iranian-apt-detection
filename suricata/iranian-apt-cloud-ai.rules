@@ -112,3 +112,46 @@ alert tcp any any -> any any (msg:"Bark&Bite - Iranian APT Multi-Vector Campaign
 
 # Critical infrastructure targeting pattern
 alert tcp any any -> any any (msg:"Bark&Bite - Iranian APT Critical Infrastructure Campaign"; flowbits:isset,iranian.wiper|iranian.scada; flowbits:isset,iranian.passive.check|iranian.tunnel.ngrok; threshold:type limit, track by_src, count 1, seconds 3600; priority:1; classtype:targeted-activity; sid:2000114; rev:1; metadata:bark_bite iranian_apt critical_infrastructure imminent_threat;)
+
+#==============================================================================
+# IRANIAN APT TOOL-SPECIFIC SIGNATURES
+#==============================================================================
+
+# APT34 (OilRig) - QUADAGENT DNS Tunneling Detection
+# QUADAGENT uses predictable DNS patterns for C2 fallback channel
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT APT34/OilRig QUADAGENT DNS Tunneling C2 Handshake"; dns_query; content:"mail."; startswith; pcre:"/^mail\.[0-9]{6}\./"; flowbits:set,iranian.quadagent; threshold:type limit, track by_src, count 1, seconds 3600; classtype:trojan-activity; sid:2000115; rev:1; metadata:bark_bite iranian_apt apt34 oilrig quadagent dns_tunnel;)
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT APT34/OilRig QUADAGENT DNS Command Request"; dns_query; content:"ns1."; startswith; pcre:"/^ns1\.[0-9]{6}\./"; flowbits:isset,iranian.quadagent; classtype:trojan-activity; sid:2000116; rev:1; metadata:bark_bite iranian_apt apt34 oilrig quadagent c2_communication;)
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT APT34/OilRig QUADAGENT DNS Completion Signal"; dns_query; content:"ns2."; startswith; pcre:"/^ns2\.[0-9]{6}\./"; flowbits:isset,iranian.quadagent; classtype:trojan-activity; sid:2000117; rev:1; metadata:bark_bite iranian_apt apt34 oilrig quadagent critical;)
+
+# APT35/Charming Kitten - POWERSTAR Backdoor C2
+# Unique Content-DPR header used for AES IV transmission
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT APT35/Charming Kitten POWERSTAR C2 Activity"; flow:to_server,established; http.host; content:".cleverapps.io"; endswith; http.header; content:"Content-DPR|3a| "; fast_pattern; flowbits:set,iranian.powerstar; classtype:trojan-activity; sid:2000118; rev:1; metadata:bark_bite iranian_apt apt35 charming_kitten powerstar critical;)
+
+# Shamoon 2 - ISM Reconnaissance Tool
+# Initial stage reconnaissance tool with distinctive User-Agent and URI patterns
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Shamoon 2 ISM Recon Tool C2"; flow:to_server,established; http.user_agent; content:"Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko"; http.uri; pcre:"/^\/Home\/(BM|CC|SCV|CR|SF|gf)/"; flowbits:set,iranian.shamoon.ism; classtype:trojan-activity; sid:2000119; rev:1; metadata:bark_bite iranian_apt shamoon2 reconnaissance wiper_precursor;)
+
+# MuddyWater - PowGoop Loader Initial Beacon
+# PowerShell-based loader using Microsoft-CryptoAPI user agent
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater PowGoop Initial Beacon"; flow:to_server,established; http.method; content:"GET"; http.uri; content:"/v1/update"; http.user_agent; content:"Microsoft-CryptoAPI/"; fast_pattern; flowbits:set,iranian.muddywater.powgoop; classtype:trojan-activity; sid:2000120; rev:1; metadata:bark_bite iranian_apt muddywater powgoop loader;)
+
+# Charming Kitten - Custom Phishing Kit WebSocket Keylogger
+# React-based phishing kits with real-time keystroke exfiltration
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Charming Kitten Phishing Kit WebSocket Keylogging"; flow:to_server,established; http.method; content:"GET"; http.uri; content:"/sessions"; http.header; content:"Upgrade|3a 20|websocket"; fast_pattern; content:"Connection|3a 20|Upgrade"; http.header; distance:0; flowbits:set,iranian.phishing.keylog; classtype:credential-theft; sid:2000121; rev:1; metadata:bark_bite iranian_apt charming_kitten phishing keylogger critical;)
+
+# APT34 (OilRig) - Helminth Backdoor Cookie-Based C2
+# Exfiltrates data via unusually long Base64 encoded HTTP cookies
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT APT34/OilRig Helminth C2 via HTTP Cookie"; flow:to_server,established; http.cookie; pcre:"/[A-Za-z0-9+\/]{100,}/"; byte_test:1,>,120,0,relative; flowbits:set,iranian.helminth; classtype:trojan-activity; sid:2000122; rev:1; metadata:bark_bite iranian_apt apt34 oilrig helminth data_exfiltration;)
+
+# APT35/TA455 - SnailResin/SlugResin Backdoor C2
+# Uses UUID-based URIs for victim registration
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT APT35/TA455 SnailResin C2 Registration"; flow:to_server,established; http.method; content:"POST"; http.uri; pcre:"/\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\/register$/"; http.user_agent; content:"Mozilla/5.0"; flowbits:set,iranian.snailresin; classtype:trojan-activity; sid:2000123; rev:1; metadata:bark_bite iranian_apt apt35 ta455 snailresin c2_registration;)
+
+#==============================================================================
+# CORRELATION RULE FOR TOOL-SPECIFIC DETECTIONS
+#==============================================================================
+
+# Multiple Iranian APT tools detected
+alert tcp any any -> any any (msg:"Bark&Bite - Iranian APT Multiple Tool Signatures Detected"; flowbits:isset,iranian.quadagent|iranian.powerstar|iranian.shamoon.ism|iranian.muddywater.powgoop|iranian.phishing.keylog|iranian.helminth|iranian.snailresin; threshold:type limit, track by_src, count 1, seconds 3600; priority:1; classtype:targeted-activity; sid:2000124; rev:1; metadata:bark_bite iranian_apt correlation tool_detection campaign critical;)
