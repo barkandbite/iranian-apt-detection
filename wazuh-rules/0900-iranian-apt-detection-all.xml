@@ -1,0 +1,422 @@
+<!--
+  Wazuh Rules for Iranian APT Detection - Combined Ruleset
+  Version: 2.0
+  Last Updated: 2025-06-27
+  
+  This combined ruleset includes CVE detection, behavioral patterns, network indicators,
+  and unique signatures for Iranian threat actors including Pioneer Kitten, Lemon Sandstorm,
+  Peach Sandstorm, and IRGC-affiliated groups.
+  
+  Rule ID Ranges:
+  - 100900-100919: CVE exploitation detection
+  - 100920-100939: Behavioral detection
+  - 100940-100959: Network detection
+  - 101000-101023: Unique behaviors
+-->
+
+<group name="iranian_apt,">
+
+  <!-- ========== CVE EXPLOITATION DETECTION (100900-100919) ========== -->
+  
+  <!-- CVE-2024-24919: Check Point Security Gateway -->
+  <rule id="100900" level="15">
+    <if_group>web</if_group>
+    <url>/clients/MyCRL</url>
+    <description>Iranian APT: CVE-2024-24919 Check Point exploitation attempt</description>
+    <mitre>
+      <id>T1190</id>
+    </mitre>
+  </rule>
+
+  <!-- CVE-2024-3400: Palo Alto PAN-OS -->
+  <rule id="100902" level="15">
+    <if_group>web</if_group>
+    <url>/ssl-vpn/hipreport.esp</url>
+    <description>Iranian APT: CVE-2024-3400 PAN-OS exploitation attempt</description>
+    <mitre>
+      <id>T1190</id>
+    </mitre>
+  </rule>
+
+  <!-- CVE-2023-3519: Citrix NetScaler -->
+  <rule id="100904" level="15">
+    <if_group>web</if_group>
+    <url>/pcidss/report</url>
+    <description>Iranian APT: Citrix NetScaler exploitation attempt</description>
+    <mitre>
+      <id>T1190</id>
+    </mitre>
+  </rule>
+
+  <!-- CVE-2022-1388: F5 BIG-IP -->
+  <rule id="100906" level="15">
+    <if_group>web</if_group>
+    <match>X-F5-Auth-Token</match>
+    <description>Iranian APT: F5 BIG-IP CVE-2022-1388 exploitation attempt</description>
+    <mitre>
+      <id>T1190</id>
+    </mitre>
+  </rule>
+
+  <rule id="100907" level="15">
+    <if_group>web</if_group>
+    <url>/mgmt/tm/util/bash</url>
+    <description>Iranian APT: F5 BIG-IP command execution attempt</description>
+    <mitre>
+      <id>T1059</id>
+    </mitre>
+  </rule>
+
+  <!-- CVE-2024-21887: Ivanti Connect Secure -->
+  <rule id="100908" level="15">
+    <if_group>web</if_group>
+    <url>/api/v1/license/key-status/</url>
+    <description>Iranian APT: Ivanti CVE-2024-21887 command injection attempt</description>
+    <mitre>
+      <id>T1190</id>
+    </mitre>
+  </rule>
+
+  <!-- CVE-2020-1472: Zerologon -->
+  <rule id="100910" level="15">
+    <if_group>windows,authentication_failed</if_group>
+    <field name="win.eventdata.workstation">\\0\\0\\0\\0\\0\\0\\0\\0</field>
+    <description>Iranian APT: Zerologon (CVE-2020-1472) exploitation attempt</description>
+    <mitre>
+      <id>T1068</id>
+    </mitre>
+  </rule>
+
+  <!-- CVE-2021-26855: Exchange ProxyLogon -->
+  <rule id="100915" level="15">
+    <if_group>web</if_group>
+    <url>/owa/auth/x.js</url>
+    <description>Iranian APT: Exchange ProxyLogon exploitation attempt</description>
+    <mitre>
+      <id>T1190</id>
+    </mitre>
+  </rule>
+
+  <rule id="100916" level="15">
+    <if_group>web</if_group>
+    <match>X-AnonResource-Backend</match>
+    <description>Iranian APT: Exchange Server suspicious headers detected</description>
+    <mitre>
+      <id>T1190</id>
+    </mitre>
+  </rule>
+
+  <!-- CVE-2023-23397: Outlook NTLM Relay -->
+  <rule id="100918" level="15">
+    <if_group>windows</if_group>
+    <match>Outlook.exe</match>
+    <match>\\\\</match>
+    <match>reminder</match>
+    <description>Iranian APT: Outlook CVE-2023-23397 NTLM relay attempt</description>
+    <mitre>
+      <id>T1187</id>
+    </mitre>
+  </rule>
+
+  <!-- ========== BEHAVIORAL DETECTION (100920-100939) ========== -->
+
+  <!-- Remote Access Tools -->
+  <rule id="100920" level="14">
+    <if_group>sysmon_event_1</if_group>
+    <match>anydesk.exe</match>
+    <description>Iranian APT: AnyDesk remote access tool execution</description>
+    <mitre>
+      <id>T1219</id>
+    </mitre>
+  </rule>
+
+  <rule id="100921" level="14">
+    <if_group>sysmon_event_1</if_group>
+    <match>ngrok.exe</match>
+    <description>Iranian APT: Ngrok tunneling tool execution</description>
+    <mitre>
+      <id>T1572</id>
+    </mitre>
+  </rule>
+
+  <!-- Web Shell Detection -->
+  <rule id="100922" level="15">
+    <if_group>web</if_group>
+    <match>cmd=</match>
+    <description>Iranian APT: Web shell command execution attempt</description>
+    <mitre>
+      <id>T1505.003</id>
+    </mitre>
+  </rule>
+
+  <!-- Known Backdoors -->
+  <rule id="100924" level="15">
+    <if_group>sysmon_event_1</if_group>
+    <match>havoc</match>
+    <description>Iranian APT: Havoc backdoor execution detected</description>
+    <mitre>
+      <id>T1055</id>
+    </mitre>
+  </rule>
+
+  <!-- Persistence -->
+  <rule id="100925" level="14">
+    <if_sid>5706</if_sid>
+    <match>schtasks</match>
+    <match>powershell</match>
+    <description>Iranian APT: Scheduled task persistence detected</description>
+    <mitre>
+      <id>T1053.005</id>
+    </mitre>
+  </rule>
+
+  <!-- Credential Theft -->
+  <rule id="100927" level="15">
+    <if_group>sysmon_event_1</if_group>
+    <match>mimikatz</match>
+    <description>Iranian APT: Mimikatz credential dumping tool detected</description>
+    <mitre>
+      <id>T1003</id>
+    </mitre>
+  </rule>
+
+  <!-- PowerShell Abuse -->
+  <rule id="100932" level="14">
+    <if_group>windows</if_group>
+    <match>powershell.exe</match>
+    <match>-enc</match>
+    <description>Iranian APT: Encoded PowerShell execution detected</description>
+    <mitre>
+      <id>T1059.001</id>
+    </mitre>
+  </rule>
+
+  <!-- Exchange Web Shell -->
+  <rule id="100936" level="15">
+    <if_group>sysmon_event_11</if_group>
+    <match>\\inetpub\\wwwroot\\aspnet_client</match>
+    <match>.aspx</match>
+    <description>Iranian APT: Suspicious file in Exchange directory</description>
+    <mitre>
+      <id>T1505.003</id>
+    </mitre>
+  </rule>
+
+  <!-- ========== NETWORK DETECTION (100940-100959) ========== -->
+
+  <!-- Unitronics PLC -->
+  <rule id="100940" level="14">
+    <if_group>firewall</if_group>
+    <srcport>20256</srcport>
+    <description>Iranian APT: Unitronics PLC port communication</description>
+    <mitre>
+      <id>T1571</id>
+    </mitre>
+  </rule>
+
+  <!-- Suspicious User Agents -->
+  <rule id="100941" level="14">
+    <if_group>web</if_group>
+    <match>User-Agent: Python</match>
+    <description>Iranian APT: Python script user-agent detected</description>
+    <mitre>
+      <id>T1071.001</id>
+    </mitre>
+  </rule>
+
+  <!-- Cobalt Strike -->
+  <rule id="100944" level="15">
+    <if_group>ids</if_group>
+    <match>Cobalt Strike</match>
+    <description>Iranian APT: Cobalt Strike beacon detected</description>
+    <mitre>
+      <id>T1001</id>
+    </mitre>
+  </rule>
+
+  <!-- Port Scanning -->
+  <rule id="100946" level="13" frequency="50" timeframe="60">
+    <if_group>firewall</if_group>
+    <match>drop</match>
+    <same_src_ip />
+    <description>Iranian APT: Port scanning detected</description>
+    <mitre>
+      <id>T1046</id>
+    </mitre>
+  </rule>
+
+  <!-- Known C2 Domains -->
+  <rule id="100949" level="15">
+    <if_group>sysmon_event_22,web</if_group>
+    <match>gupdate.net</match>
+    <description>Iranian APT: Known C2 domain detected</description>
+    <mitre>
+      <id>T1071.001</id>
+    </mitre>
+  </rule>
+
+  <!-- Ngrok Tunneling -->
+  <rule id="100952" level="15">
+    <if_group>firewall,sysmon_event_3</if_group>
+    <match>ngrok.io</match>
+    <description>Iranian APT: Ngrok tunnel service detected</description>
+    <mitre>
+      <id>T1090.001</id>
+    </mitre>
+  </rule>
+
+  <!-- ========== UNIQUE BEHAVIORS (101000-101023) ========== -->
+
+  <!-- DNS Hijacking -->
+  <rule id="101000" level="14">
+    <if_group>sysmon_event_22</if_group>
+    <field name="win.eventdata.queryName">acme-v02.api.letsencrypt.org</field>
+    <description>Iranian APT: Let's Encrypt query - DNS hijacking preparation</description>
+    <mitre>
+      <id>T1584.002</id>
+    </mitre>
+  </rule>
+
+  <!-- Tehran Business Hours -->
+  <rule id="101002" level="13">
+    <if_group>authentication_success</if_group>
+    <time>02:00 - 10:00</time>
+    <description>Iranian APT: Authentication during Tehran business hours</description>
+    <mitre>
+      <id>T1078</id>
+    </mitre>
+  </rule>
+
+  <!-- Farsi Language -->
+  <rule id="101004" level="14">
+    <if_group>web</if_group>
+    <match>Accept-Language: fa-IR</match>
+    <description>Iranian APT: Farsi language preference detected</description>
+    <mitre>
+      <id>T1071.001</id>
+    </mitre>
+  </rule>
+
+  <!-- Cryptocurrency Mining -->
+  <rule id="101006" level="14">
+    <if_group>sysmon_event_3</if_group>
+    <field name="win.eventdata.destinationPort">3333</field>
+    <match>xmrig</match>
+    <description>Iranian APT: Cryptocurrency mining detected</description>
+    <mitre>
+      <id>T1496</id>
+    </mitre>
+  </rule>
+
+  <rule id="101007" level="15">
+    <if_group>sysmon_event_1</if_group>
+    <match>--donate-level 0</match>
+    <description>Iranian APT: XMRig miner with no donation</description>
+    <mitre>
+      <id>T1496</id>
+    </mitre>
+  </rule>
+
+  <!-- DNS Tunneling -->
+  <rule id="101008" level="14">
+    <if_group>sysmon_event_22</if_group>
+    <field name="win.eventdata.queryType">16</field>
+    <match>cmd</match>
+    <description>Iranian APT: DNS TXT record C2 pattern</description>
+    <mitre>
+      <id>T1071.004</id>
+    </mitre>
+  </rule>
+
+  <!-- Email Theft -->
+  <rule id="101010" level="15">
+    <if_group>web</if_group>
+    <url>mail.google.com</url>
+    <match>ui=html</match>
+    <description>Iranian APT: HYPERSCRAPE email theft tool</description>
+    <mitre>
+      <id>T1114.002</id>
+    </mitre>
+  </rule>
+
+  <!-- PowerLess Backdoor -->
+  <rule id="101012" level="15">
+    <if_group>sysmon_event_7</if_group>
+    <match>system.management.automation.dll</match>
+    <description>Iranian APT: PowerLess backdoor detected</description>
+    <mitre>
+      <id>T1059.001</id>
+    </mitre>
+  </rule>
+
+  <!-- Telegram Targeting -->
+  <rule id="101014" level="14">
+    <if_group>sysmon_event_11</if_group>
+    <match>telegram</match>
+    <match>.json</match>
+    <description>Iranian APT: Telegram data theft detected</description>
+    <mitre>
+      <id>T1552.001</id>
+    </mitre>
+  </rule>
+
+  <!-- Shadow Copy Operations -->
+  <rule id="101017" level="14">
+    <if_group>sysmon_event_1</if_group>
+    <match>vssadmin</match>
+    <match>shadows</match>
+    <description>Iranian APT: Shadow copy enumeration detected</description>
+    <mitre>
+      <id>T1490</id>
+    </mitre>
+  </rule>
+
+  <!-- Log4Shell -->
+  <rule id="101020" level="15">
+    <if_group>web</if_group>
+    <match>${jndi:ldap://</match>
+    <description>Iranian APT: Log4Shell exploitation attempt</description>
+    <mitre>
+      <id>T1190</id>
+    </mitre>
+  </rule>
+
+  <!-- ========== CORRELATION RULES ========== -->
+
+  <!-- Multiple CVE Attempts -->
+  <rule id="100914" level="15" frequency="5" timeframe="60">
+    <if_matched_sid>100900,100902,100904,100906,100908</if_matched_sid>
+    <description>Iranian APT: Multiple CVE exploitation attempts</description>
+    <mitre>
+      <id>T1190</id>
+    </mitre>
+  </rule>
+
+  <!-- Active Compromise -->
+  <rule id="100935" level="16" frequency="3" timeframe="300">
+    <if_matched_sid>100920,100921,100924,100927</if_matched_sid>
+    <description>Iranian APT: Multiple attack stages - active compromise</description>
+    <mitre>
+      <id>T1486</id>
+    </mitre>
+  </rule>
+
+  <!-- Multiple C2 Indicators -->
+  <rule id="100954" level="16" frequency="5" timeframe="600">
+    <if_matched_sid>100941,100944,100949,100952</if_matched_sid>
+    <description>Iranian APT: Multiple C2 indicators - active compromise</description>
+    <mitre>
+      <id>T1102</id>
+    </mitre>
+  </rule>
+
+  <!-- Campaign Detection -->
+  <rule id="101022" level="16" frequency="3" timeframe="3600">
+    <if_matched_sid>101000,101006,101008</if_matched_sid>
+    <description>Iranian APT: Multiple unique techniques - active campaign</description>
+    <mitre>
+      <id>T1204</id>
+    </mitre>
+  </rule>
+
+</group>
