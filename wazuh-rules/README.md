@@ -6,30 +6,38 @@ This file includes:
 - **Unique Behaviors** (101000-101023): DNS hijacking, Tehran business hours, Farsi language, crypto mining
 - **Correlation Rules**: Multi-stage attack detection
 
+**New Advanced Rules (100960-100999):**
+
+- **MuddyWater** PowGoop DLL side-loading
+- **APT34/OilRig** QUADAGENT persistence
+- **APT35/Charming Kitten** PowerLess backdoor (enhanced)
+- **APT35/TA455** SnailResin malware
+- **APT33** TurnedUp YARA detection
+
+**Deployment Instructions:**
 The file uses simplified syntax that should work better with the CLI method:
 
-```bash
-# SSH into your Wazuh manager
+# SSH into Wazuh manager
 ssh root@192.168.2.196
 
 # Navigate to rules directory
 cd /var/ossec/etc/rules/
 
-# Create the file
-nano 0900-iranian-apt-detection-all.xml
+# Create the master rule file
+nano 0900-iranian-apt-detection-master.xml
 
-# Paste the content from the artifact above
+# Paste the content from above
 
 # Set permissions
-chown ossec:ossec 0900-iranian-apt-detection-all.xml
-chmod 660 0900-iranian-apt-detection-all.xml
+chown ossec:ossec 0900-iranian-apt-detection-master.xml
+chmod 660 0900-iranian-apt-detection-master.xml
 
-# Test the configuration
+# Validate configuration
 /var/ossec/bin/ossec-logtest -t
 
-# If no errors, restart Wazuh
+# Restart Wazuh
 systemctl restart wazuh-manager
 
-# Check logs for any issues
+# Monitor logs
 tail -f /var/ossec/logs/ossec.log
 ```
