@@ -1,17 +1,30 @@
 <!--
-  Wazuh Rules for Iranian APT Detection - Combined Ruleset
-  Version: 2.0
+  Wazuh Rules for Iranian APT Detection - Master Ruleset
+  Version: 3.0
   Last Updated: 2025-06-27
   
-  This combined ruleset includes CVE detection, behavioral patterns, network indicators,
-  and unique signatures for Iranian threat actors including Pioneer Kitten, Lemon Sandstorm,
-  Peach Sandstorm, and IRGC-affiliated groups.
+  This master ruleset combines all Iranian APT detection rules including:
+  - CVE exploitation detection
+  - Behavioral patterns and tool detection
+  - Network-based indicators
+  - Unique Iranian APT signatures
+  - Advanced APT group-specific detections
+  
+  Iranian APT Groups Covered:
+  - Pioneer Kitten (Fox Kitten, UNC757, Parisite)
+  - Lemon Sandstorm (formerly Rubidium)
+  - Peach Sandstorm (APT33, Elfin, Refined Kitten)
+  - MuddyWater (Mercury, Static Kitten, TEMP.Zagros)
+  - APT34 (OilRig, Crambus, Helix Kitten)
+  - APT35 (Charming Kitten, Phosphorus, TA455)
+  - IRGC-affiliated groups
   
   Rule ID Ranges:
   - 100900-100919: CVE exploitation detection
   - 100920-100939: Behavioral detection
   - 100940-100959: Network detection
-  - 101000-101023: Unique behaviors
+  - 100960-100999: Advanced APT group-specific rules
+  - 101000-101023: Unique behaviors and signatures
 -->
 
 <group name="iranian_apt,">
@@ -265,6 +278,97 @@
     </mitre>
   </rule>
 
+  <!-- ========== ADVANCED APT GROUP-SPECIFIC RULES (100960-100999) ========== -->
+
+  <!-- MuddyWater PowGoop DLL Side-Loading -->
+  <rule id="100960" level="12">
+    <if_group>sysmon_event_1</if_group>
+    <field name="win.eventdata.image">rundll32.exe</field>
+    <field name="win.eventdata.parentImage">GoogleUpdate.exe</field>
+    <description>Iranian APT: MuddyWater PowGoop DLL Side-Loading - GoogleUpdate.exe spawned rundll32.exe</description>
+    <mitre>
+      <id>T1574.002</id>
+      <id>T1036</id>
+    </mitre>
+  </rule>
+
+  <!-- APT34/OilRig QUADAGENT Persistence -->
+  <rule id="100961" level="10">
+    <if_group>sysmon_event_1</if_group>
+    <field name="win.eventdata.image">schtasks.exe</field>
+    <match>/create /tn "Office365DCOMCheck"</match>
+    <description>Iranian APT: APT34/OilRig QUADAGENT Persistence via Office365DCOMCheck task</description>
+    <mitre>
+      <id>T1053.005</id>
+    </mitre>
+  </rule>
+
+  <rule id="100962" level="10">
+    <if_group>sysmon_event_1</if_group>
+    <field name="win.eventdata.image">schtasks.exe</field>
+    <match>/create /tn "SystemDiskClean"</match>
+    <description>Iranian APT: APT34/OilRig QUADAGENT Persistence via SystemDiskClean task</description>
+    <mitre>
+      <id>T1053.005</id>
+    </mitre>
+  </rule>
+
+  <!-- Charming Kitten PowerLess Backdoor -->
+  <rule id="100963" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID">4104</field>
+    <match>trying to get the C&C command</match>
+    <description>Iranian APT: Charming Kitten PowerLess Backdoor C2 communication detected</description>
+    <mitre>
+      <id>T1059.001</id>
+      <id>T1027</id>
+    </mitre>
+  </rule>
+
+  <rule id="100964" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID">4104</field>
+    <match>PowerLess Backdoor Started</match>
+    <description>Iranian APT: Charming Kitten PowerLess Backdoor initialization detected</description>
+    <mitre>
+      <id>T1059.001</id>
+      <id>T1027</id>
+    </mitre>
+  </rule>
+
+  <rule id="100965" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID">4104</field>
+    <match>Stealed data</match>
+    <description>Iranian APT: Charming Kitten PowerLess Backdoor data theft detected</description>
+    <mitre>
+      <id>T1059.001</id>
+      <id>T1005</id>
+    </mitre>
+  </rule>
+
+  <!-- APT35/TA455 SnailResin DLL -->
+  <rule id="100966" level="10">
+    <if_group>sysmon_event_11</if_group>
+    <field name="win.eventdata.targetFilename">secur32.dll</field>
+    <field name="win.eventdata.image">SignedConnection.exe</field>
+    <description>Iranian APT: APT35/TA455 SnailResin DLL dropped for side-loading</description>
+    <mitre>
+      <id>T1574.002</id>
+    </mitre>
+  </rule>
+
+  <!-- APT33 YARA Detection -->
+  <rule id="100967" level="15">
+    <if_group>yara</if_group>
+    <field name="yara.rule">APT33_TurnedUp_PDB_Artifact</field>
+    <description>Iranian APT: APT33 TurnedUp malware artifact detected via YARA</description>
+    <options>alert_by_email</options>
+    <mitre>
+      <id>S0199</id>
+    </mitre>
+  </rule>
+
   <!-- ========== UNIQUE BEHAVIORS (101000-101023) ========== -->
 
   <!-- DNS Hijacking -->
@@ -339,7 +443,7 @@
     </mitre>
   </rule>
 
-  <!-- PowerLess Backdoor -->
+  <!-- PowerLess Backdoor (Generic) -->
   <rule id="101012" level="15">
     <if_group>sysmon_event_7</if_group>
     <match>system.management.automation.dll</match>
@@ -407,6 +511,37 @@
     <description>Iranian APT: Multiple C2 indicators - active compromise</description>
     <mitre>
       <id>T1102</id>
+    </mitre>
+  </rule>
+
+  <!-- APT34 Correlation -->
+  <rule id="100968" level="12" timeframe="300">
+    <if_matched_sid>100961,100962</if_matched_sid>
+    <same_field>win.eventdata.user</same_field>
+    <description>Iranian APT: APT34/OilRig QUADAGENT persistence pattern detected</description>
+    <options>alert_by_email</options>
+    <mitre>
+      <id>T1053.005</id>
+      <id>T1112</id>
+    </mitre>
+  </rule>
+
+  <!-- MuddyWater Campaign -->
+  <rule id="100969" level="15" frequency="2" timeframe="600">
+    <if_matched_sid>100960</if_matched_sid>
+    <description>Iranian APT: MuddyWater campaign activity detected</description>
+    <mitre>
+      <id>T1574.002</id>
+    </mitre>
+  </rule>
+
+  <!-- Charming Kitten Campaign -->
+  <rule id="100970" level="15" frequency="2" timeframe="300">
+    <if_matched_sid>100963,100964,100965</if_matched_sid>
+    <description>Iranian APT: Charming Kitten PowerLess backdoor campaign active</description>
+    <options>alert_by_email</options>
+    <mitre>
+      <id>T1059.001</id>
     </mitre>
   </rule>
 
