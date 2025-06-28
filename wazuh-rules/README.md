@@ -16,7 +16,8 @@ This file includes:
 
 **Deployment Instructions:**
 The file uses simplified syntax that should work better with the CLI method:
-'''bash
+
+```bash
 # SSH into Wazuh manager
 ssh root@192.168.2.196
 
