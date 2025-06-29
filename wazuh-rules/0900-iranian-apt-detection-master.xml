@@ -554,4 +554,169 @@
     </mitre>
   </rule>
 
+<!-- ============================================================================
+       JUNE 2025 NETWORK UPDATES - APPEND TO 0912-iranian-apt-network-rules.xml  
+       Research Date: 2025-06-29
+       Network patterns: MQTT C2, Azure abuse, passive backdoors, crypto targeting
+       ============================================================================ -->
+
+  <!-- MQTT C2 Communication (IOCONTROL) -->
+  <rule id="101144" level="15">
+    <if_group>firewall</if_group>
+    <dstport>8883|1883</dstport>
+    <protocol>tcp</protocol>
+    <action>allow</action>
+    <description>Iranian APT: MQTT protocol communication to external hosts - possible IOCONTROL C2</description>
+    <mitre>
+      <id>T0884</id>
+      <id>T1071.002</id>
+    </mitre>
+    <group>attack,mqtt,iocontrol,critical_infrastructure,pci_dss_11.4,</group>
+  </rule>
+
+  <!-- Azure Subdomain C2 Pattern -->
+  <rule id="101145" level="14">
+    <if_group>sysmon_event_22</if_group>
+    <field name="win.eventdata.queryName" type="pcre2">^[a-z0-9\-]{8,20}\.azurewebsites\.net$</field>
+    <description>Iranian APT: Azure subdomain C2 infrastructure detected - $(win.eventdata.queryName)</description>
+    <mitre>
+      <id>T1071.001</id>
+      <id>T1102.002</id>
+    </mitre>
+    <group>attack,azure_c2,unc1549,</group>
+  </rule>
+
+  <!-- WebSocket Phishing Backend Communication -->
+  <rule id="101146" level="15">
+    <if_group>sysmon_event_3</if_group>
+    <field name="win.eventdata.destinationPort">8569|8570|8571</field>
+    <field name="win.eventdata.destinationHostname" type="pcre2">(?i)(idea-home|auth-portal|secure-verify)\.online</field>
+    <description>Iranian APT: WebSocket phishing backend connection - $(win.eventdata.destinationHostname)</description>
+    <mitre>
+      <id>T1566.002</id>
+      <id>T1071.001</id>
+    </mitre>
+    <group>attack,websocket_phishing,apt35,react_kit,</group>
+  </rule>
+
+  <!-- Cryptocurrency Exchange API Pattern -->
+  <rule id="101147" level="15">
+    <if_group>firewall</if_group>
+    <url type="pcre2">(?i)(nobitex|binance|coinbase).*api.*(withdraw|transfer)</url>
+    <status>200</status>
+    <description>Iranian APT: Cryptocurrency exchange API access for potential theft</description>
+    <mitre>
+      <id>T1496</id>
+      <id>T1657</id>
+    </mitre>
+    <group>attack,cryptocurrency,api_theft,</group>
+  </rule>
+
+  <!-- Passive Backdoor Inbound Connections -->
+  <rule id="101148" level="15">
+    <if_group>firewall</if_group>
+    <direction>inbound</direction>
+    <dstport>443|8443|8080</dstport>
+    <action>allow</action>
+    <time>22:00-06:00</time>
+    <srcip negate="yes">^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)</srcip>
+    <description>Iranian APT: Off-hours inbound connection to web service - possible passive backdoor</description>
+    <mitre>
+      <id>T1205</id>
+      <id>T1571</id>
+    </mitre>
+    <group>attack,passive_backdoor,off_hours,unc1860,</group>
+  </rule>
+
+  <!-- Industrial Protocol Abuse -->
+  <rule id="101149" level="15">
+    <if_group>firewall</if_group>
+    <dstport>502|20000|44818</dstport>
+    <protocol>tcp</protocol>
+    <srcip negate="yes">^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)</srcip>
+    <description>Iranian APT: External access to industrial protocols (Modbus/DNP3/EtherNet/IP)</description>
+    <mitre>
+      <id>T0886</id>
+      <id>T0885</id>
+    </mitre>
+    <group>attack,industrial_protocols,scada,critical_infrastructure,</group>
+  </rule>
+
+  <!-- Azure Resource Manager Mass Queries -->
+  <rule id="101150" level="14" frequency="20" timeframe="300">
+    <if_group>sysmon_event_3</if_group>
+    <field name="win.eventdata.destinationHostname">management.azure.com</field>
+    <same_source_ip />
+    <description>Iranian APT: Azure Resource Manager mass enumeration detected</description>
+    <mitre>
+      <id>T1526</id>
+      <id>T1018</id>
+    </mitre>
+    <group>attack,azure_enumeration,cloud_recon,</group>
+  </rule>
+
+  <!-- AI API Abuse for Content Generation -->
+  <rule id="101151" level="14">
+    <if_group>sysmon_event_3</if_group>
+    <field name="win.eventdata.destinationHostname" type="pcre2">(?i)(api\.openai\.com|api\.anthropic\.com)</field>
+    <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)(chrome|firefox|edge|browser)</field>
+    <description>Iranian APT: AI API access from non-browser process - possible content generation</description>
+    <mitre>
+      <id>T1588.005</id>
+      <id>T1566</id>
+    </mitre>
+    <group>attack,ai_api_abuse,content_generation,</group>
+  </rule>
+
+  <!-- Mass Cryptocurrency Exchange Connections -->
+  <rule id="101152" level="15" frequency="10" timeframe="600">
+    <if_group>sysmon_event_3</if_group>
+    <field name="win.eventdata.destinationHostname" type="pcre2">(?i)(binance|coinbase|kraken|kucoin|nobitex)</field>
+    <same_source_ip />
+    <description>Iranian APT: Mass cryptocurrency exchange access - possible theft operation</description>
+    <mitre>
+      <id>T1496</id>
+      <id>T1657</id>
+    </mitre>
+    <group>attack,cryptocurrency,mass_access,predatory_sparrow,</group>
+  </rule>
+
+  <!-- TEMPLEDROP Driver Network Activity -->
+  <rule id="101153" level="15">
+    <if_group>sysmon_event_3</if_group>
+    <field name="win.eventdata.image">system</field>
+    <field name="win.eventdata.destinationPort">443|8443</field>
+    <field name="win.eventdata.destinationIp" negate="yes">^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)</field>
+    <description>Iranian APT: System process making external HTTPS connection - possible TEMPLEDROP activity</description>
+    <mitre>
+      <id>T1014</id>
+      <id>T1071.001</id>
+    </mitre>
+    <group>attack,templedrop,system_network,</group>
+  </rule>
+
+  <!-- Industrial Device Reconnaissance -->
+  <rule id="101154" level="14" frequency="50" timeframe="300">
+    <if_group>firewall</if_group>
+    <dstport>80|443|8080|8443</dstport>
+    <url type="pcre2">(?i)(login|admin|config|setup|device)</url>
+    <same_source_ip />
+    <description>Iranian APT: Industrial device web interface scanning detected</description>
+    <mitre>
+      <id>T1046</id>
+      <id>T1595.002</id>
+    </mitre>
+    <group>attack,industrial_recon,device_scanning,</group>
+  </rule>
+
+  <!-- June 2025 Network Campaign Correlation -->
+  <rule id="101155" level="17" frequency="3" timeframe="7200">
+    <if_matched_sid>101144,101146,101147,101148,101149</if_matched_sid>
+    <description>Iranian APT: June 2025 multi-vector network campaign - active nation-state operation</description>
+    <mitre>
+      <id>T1204</id>
+    </mitre>
+    <group>attack,june_2025_network_campaign,nation_state,pci_dss_11.4,gdpr_IV_35.7.d,</group>
+  </rule>
+
 </group>
