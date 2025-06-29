@@ -19,9 +19,21 @@ Enterprise-grade detection rules for Iranian Advanced Persistent Threat (APT) gr
 ## Quick Start
 
 ### 1. Deploy Wazuh Rules
+
+#### Option A: Deploy Individual Rule Files (Recommended)
 ```bash
-sudo cp wazuh-rules/0900-iranian-apt-master.xml /var/ossec/etc/rules/
-sudo /var/ossec/bin/wazuh-control restart
+sudo cp wazuh-rules/09*.xml /var/ossec/etc/rules/
+sudo chown ossec:ossec /var/ossec/etc/rules/09*.xml
+sudo chmod 660 /var/ossec/etc/rules/09*.xml
+sudo systemctl restart wazuh-manager
+```
+
+#### Option B: Deploy Consolidated Master File
+```bash
+sudo cp archive/0900-iranian-apt-detection-master.xml /var/ossec/etc/rules/
+sudo chown ossec:ossec /var/ossec/etc/rules/0900-iranian-apt-detection-master.xml
+sudo chmod 660 /var/ossec/etc/rules/0900-iranian-apt-detection-master.xml
+sudo systemctl restart wazuh-manager
 ```
 
 ### 2. Deploy Suricata Rules
@@ -66,9 +78,9 @@ sudo chmod +x /var/ossec/active-response/bin/iranian-apt-active-response.sh
 - **Impact**: 9 techniques
 
 ### Rule Statistics
-- **Wazuh Rules**: 200+ detection rules
-- **Suricata Signatures**: 130+ network signatures
-- **CVEs Covered**: 25+ including zero-days
+- **Wazuh Rules**: 166 detection rules across 8 files
+- **Suricata Signatures**: 130 network signatures
+- **CVEs Covered**: 15+ including zero-days
 - **Unique Behavioral Patterns**: 40+
 
 ## Key Features
@@ -99,7 +111,14 @@ sudo chmod +x /var/ossec/active-response/bin/iranian-apt-active-response.sh
 ```
 iranian-apt-detection/
 ├── wazuh-rules/               # SIEM detection rules
-│   ├── 0900-iranian-apt-master.xml
+│   ├── 0910-iranian-apt-cve-detection-rules.xml
+│   ├── 0911-iranian-apt-behavior-rules.xml
+│   ├── 0912-iranian-apt-network-rules.xml
+│   ├── 0913-iranian-apt-fim-rules.xml
+│   ├── 0914-iranian-apt-windows-rules.xml
+│   ├── 0915-iranian-apt-unique-behaviors.xml
+│   ├── 0916-iranian-apt-cloud-container.xml
+│   ├── 0917-iranian-apt-june2025-updates.xml
 │   └── README.md
 ├── suricata/                  # Network IDS signatures
 │   ├── iranian_apt_v2.rules
@@ -107,17 +126,26 @@ iranian-apt-detection/
 ├── configurations/            # Agent and system configs
 │   ├── sysmon-config-iranian-apt.xml
 │   ├── ossec-agent-iranian-apt.conf
-│   └── iranian-apt-active-response.xml
+│   ├── iranian-apt-active-response.xml
+│   └── README.md
 ├── documentation/             # Threat intelligence and guides
 │   ├── SOC-Quick-Reference-Iranian-APT.md
 │   ├── MITRE-ATT&CK-Mapping.md
-│   └── Sector-Vulnerability-Analysis.md
+│   ├── Sector-Vulnerability-Analysis.md
+│   └── README.md
 ├── tools/                     # Deployment and testing scripts
 │   ├── deploy-iranian-apt-rules.sh
 │   ├── iranian-apt-active-response.sh
-│   └── test.sh
-└── archive/                   # Historical versions
-
+│   ├── deploy-active-response.sh
+│   ├── test.sh
+│   └── README.md
+├── archive/                   # Historical versions
+│   └── README.md
+├── CHANGELOG.md
+├── CONTRIBUTING.md
+├── LICENSE
+├── README.md
+└── UPDATE_TEMPLATE.md
 ```
 
 ## Installation Guide
