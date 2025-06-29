@@ -1,0 +1,112 @@
+<!--
+  Wazuh Active Response Configuration for Iranian APT Detection
+  Version: 2.0
+  Last Updated: 2025-06-29
+  
+  Add this configuration to the Wazuh manager's ossec.conf file
+-->
+
+<!-- Command Definition -->
+<command>
+  <name>iranian-apt-response</name>
+  <executable>iranian-apt-active-response.sh</executable>
+  <expect>srcip</expect>
+  <timeout_allowed>yes</timeout_allowed>
+</command>
+
+<!-- Active Response Definitions -->
+
+<!-- Critical CVE Exploitation Response -->
+<active-response>
+  <command>iranian-apt-response</command>
+  <location>local</location>
+  <rules_id>100900-100929</rules_id>
+  <timeout>86400</timeout>
+</active-response>
+
+<!-- Web Shell Immediate Response -->
+<active-response>
+  <command>iranian-apt-response</command>
+  <location>local</location>
+  <rules_id>100931,100990</rules_id>
+  <level>15</level>
+</active-response>
+
+<!-- Credential Theft Response -->
+<active-response>
+  <command>iranian-apt-response</command>
+  <location>local</location>
+  <rules_group>credential_theft</rules_group>
+  <level>15</level>
+</active-response>
+
+<!-- Critical Infrastructure Protection -->
+<active-response>
+  <command>iranian-apt-response</command>
+  <location>all</location>
+  <rules_group>critical_infrastructure</rules_group>
+</active-response>
+
+<!-- Ransomware/Wiper Emergency Response -->
+<active-response>
+  <command>iranian-apt-response</command>
+  <location>local</location>
+  <rules_group>ransomware</rules_group>
+</active-response>
+
+<!-- Nation-State Campaign Response -->
+<active-response>
+  <command>iranian-apt-response</command>
+  <location>all</location>
+  <rules_id>101090-101099</rules_id>
+</active-response>
+
+<!-- Iranian APT Group Response -->
+<active-response>
+  <command>iranian-apt-response</command>
+  <location>local</location>
+  <rules_group>iranian_apt</rules_group>
+  <level>14,15,16</level>
+  <timeout>3600</timeout>
+</active-response>
+
+<!-- Alert Configuration for Iranian APT -->
+<alerts>
+  <log_alert_level>3</log_alert_level>
+  <email_alert_level>12</email_alert_level>
+  
+  <!-- Special email alerts for Iranian APT -->
+  <email_alerts>
+    <email_to>security-team@company.com</email_to>
+    <group>iranian_apt</group>
+    <level>14</level>
+    <format>full</format>
+  </email_alerts>
+  
+  <!-- Critical alerts to incident response -->
+  <email_alerts>
+    <email_to>incident-response@company.com</email_to>
+    <group>iranian_apt</group>
+    <level>15</level>
+    <format>sms</format>
+    <do_not_delay>yes</do_not_delay>
+  </email_alerts>
+</alerts>
+
+<!-- Integration with external systems -->
+<integration>
+  <name>iranian-apt-slack</name>
+  <hook_url>https://hooks.slack.com/services/YOUR/WEBHOOK/HERE</hook_url>
+  <level>14</level>
+  <group>iranian_apt</group>
+  <alert_format>json</alert_format>
+</integration>
+
+<integration>
+  <name>iranian-apt-soar</name>
+  <api_key>YOUR_SOAR_API_KEY</api_key>
+  <hook_url>https://soar.company.com/api/v1/incidents</hook_url>
+  <level>15</level>
+  <group>iranian_apt</group>
+  <alert_format>json</alert_format>
+</integration>
