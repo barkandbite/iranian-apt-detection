@@ -1,0 +1,80 @@
+# --------------------------------------------------------------------
+# JUNE 2025 IRANIAN APT THREAT UPDATES - APPEND TO iranian_apt_v2.rules
+# Research Date: 2025-06-27
+# New Threats: AI-powered phishing, IOCONTROL, TEMPLEDROP, CVE-2025 series
+# --------------------------------------------------------------------
+
+#==============================================================================
+# AI-POWERED SOCIAL ENGINEERING (APT35/Educated Manticore)
+#==============================================================================
+
+# React-based phishing kit with real-time MFA relay
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT React Phishing Kit WebSocket Backend"; flow:to_server,established; content:"GET"; http_method; content:"/socket.io/"; http_uri; content:"Upgrade|3a 20|websocket"; http_header; content:"idea-home.online\|auth-portal.online\|secure-verify.online"; http_host; flowbits:set,iranian.react.phishing; classtype:social-engineering; sid:2000115; rev:1; metadata:bark_bite iranian_apt apt35 ai_phishing critical;)
+
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT AI Phishing Credential Relay"; flow:to_server,established; flowbits:isset,iranian.react.phishing; content:"POST"; http_method; content:"/api/v1/auth/"; http_uri; content:"mfa_token"; http_client_body; content:"gmail\|outlook\|yahoo"; http_client_body; distance:0; within:200; classtype:credential-theft; sid:2000116; rev:1; metadata:bark_bite iranian_apt mfa_bypass critical;)
+
+# AI-generated perfect grammar phishing detection via behavioral analysis
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT AI-Generated Phishing Content"; flow:to_server,established; content:"Content-Type|3a 20|text/html"; http_header; pcre:"/react-dom|ReactDOM|__webpack_require__/i"; content:"form"; http_server_body; content:"action"; distance:0; within:50; pcre:"/form[^>]*action[^>]*(gmail|outlook|office365|microsoft)/i"; classtype:social-engineering; sid:2000117; rev:1; metadata:bark_bite iranian_apt ai_generated;)
+
+#==============================================================================
+# IOCONTROL MALWARE - CRITICAL INFRASTRUCTURE TARGETING
+#==============================================================================
+
+# MQTT over TLS on port 8883 for IOCONTROL C2
+alert tcp $HOME_NET any -> $EXTERNAL_NET 8883 (msg:"Bark&Bite - Iranian APT IOCONTROL MQTT C2"; flow:to_server,established; content:"|16 03|"; depth:2; content:"|10|"; offset:5; depth:1; content:"IOCTL\|FUEL\|PUMP\|VALVE"; distance:0; within:100; flowbits:set,iranian.iocontrol; classtype:trojan-activity; sid:2000118; rev:1; metadata:bark_bite iranian_apt iocontrol critical_infrastructure critical;)
+
+# Device renaming and ladder logic modification patterns
+alert tcp $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Industrial Device Manipulation"; flow:to_server,established; flowbits:isset,iranian.iocontrol; content:"PUT\|POST"; http_method; content:"device_name\|ladder_logic\|program_upload"; http_client_body; pcre:"/CyberAv3ngers|IRGC|Down.*USA/i"; classtype:targeted-activity; sid:2000119; rev:1; metadata:bark_bite iranian_apt cyberav3ngers industrial_sabotage critical;)
+
+# Water treatment facility targeting signatures
+alert tcp $EXTERNAL_NET any -> $HOME_NET 502 (msg:"Bark&Bite - Iranian APT Water System Modbus Attack"; flow:to_server,established; content:"|00 00|"; depth:2; content:"|00 06|"; distance:2; within:2; content:"|06|"; distance:2; within:1; byte_test:2,>,100,8,relative; threshold:type both, track by_src, count 5, seconds 300; classtype:attempted-admin; sid:2000120; rev:1; metadata:bark_bite iranian_apt water_systems critical;)
+
+#==============================================================================
+# CRYPTOCURRENCY EXCHANGE TARGETING
+#==============================================================================
+
+# Nobitex-style exchange targeting patterns
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Crypto Exchange API Abuse"; flow:to_server,established; content:"POST"; http_method; content:"/api/v1/\|/api/v2/"; http_uri; content:"withdraw\|transfer\|trade"; http_uri; content:"amount"; http_client_body; byte_test:4,>,1000000,0,relative; flowbits:set,iranian.crypto.theft; classtype:policy-violation; sid:2000121; rev:1; metadata:bark_bite iranian_apt cryptocurrency theft;)
+
+# Fund burning/destruction patterns (Predatory Sparrow technique)
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Crypto Fund Destruction"; flow:to_server,established; flowbits:isset,iranian.crypto.theft; content:"burn_address\|null_wallet\|0x000000"; http_client_body; content:"90000000\|$90"; distance:0; within:50; classtype:destructive-attack; sid:2000122; rev:1; metadata:bark_bite iranian_apt predatory_sparrow fund_destruction critical;)
+
+#==============================================================================
+# AZURE CLOUD C2 INFRASTRUCTURE  
+#==============================================================================
+
+# Azure subdomain abuse for C2 (UNC1549 technique)
+alert dns $HOME_NET any -> any 53 (msg:"Bark&Bite - Iranian APT Azure C2 Subdomain Resolution"; dns_query; pcre:"/^[a-z0-9\-]{8,20}\.azurewebsites\.net$/i"; threshold:type both, track by_src, count 10, seconds 300; flowbits:set,iranian.azure.c2; classtype:trojan-activity; sid:2000123; rev:1; metadata:bark_bite iranian_apt unc1549 azure_abuse;)
+
+# Fraudulent Azure subscription indicators  
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Azure Resource Manager Abuse"; flow:to_server,established; content:"management.azure.com"; http_host; content:"subscriptions/"; http_uri; content:"Microsoft.Compute/virtualMachines"; http_uri; flowbits:isset,iranian.azure.c2; classtype:policy-violation; sid:2000124; rev:1; metadata:bark_bite iranian_apt pioneer_kitten azure_fraud;)
+
+#==============================================================================
+# PASSIVE BACKDOOR DETECTION (UNC1860)
+#==============================================================================
+
+# Inbound-only connection patterns (no outbound C2)
+alert tcp $EXTERNAL_NET any -> $HOME_NET 443 (msg:"Bark&Bite - Iranian APT Passive Backdoor Check-in"; flow:to_server,established; content:"|16 03|"; depth:2; content:"Authorization|3a 20|Bearer"; http_header; pcre:"/Bearer\s+[A-Za-z0-9+\/]{40,}/"; time:22:00-06:00; threshold:type limit, track by_dst, count 1, seconds 3600; classtype:trojan-activity; sid:2000125; rev:1; metadata:bark_bite iranian_apt unc1860 passive_backdoor;)
+
+# TEMPLEDOOR passive implant signatures
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT TEMPLEDOOR Passive Implant"; flow:to_server,established; content:"POST"; http_method; content:"/api/health\|/status\|/ping"; http_uri; content:"X-Session-Token"; http_header; pcre:"/X-Session-Token:\s*[a-f0-9]{32}/"; classtype:trojan-activity; sid:2000126; rev:1; metadata:bark_bite iranian_apt templedoor;)
+
+#==============================================================================
+# NEW CVE EXPLOITATION DETECTION  
+#==============================================================================
+
+# CVE-2025-24201: Apple WebKit zero-day
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT CVE-2025-24201 WebKit Exploit"; flow:to_server,established; content:"Content-Type|3a 20|text/html"; http_header; content:"webkit"; http_server_body; nocase; pcre:"/CVE-2025-24201|webkit.*overflow|canvas.*exploit/i"; classtype:attempted-admin; sid:2000127; rev:1; metadata:bark_bite iranian_apt cve_2025_24201;)
+
+# CVE-2024-30088: Windows Kernel privilege escalation  
+alert tcp $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT CVE-2024-30088 STEALHOOK Deployment"; flow:to_server,established; content:"User-Agent"; http_header; content:"STEALHOOK\|CVE-2024-30088"; http_header; classtype:attempted-admin; sid:2000128; rev:1; metadata:bark_bite iranian_apt cve_2024_30088 stealhook;)
+
+#==============================================================================
+# CORRELATION RULES
+#==============================================================================
+
+# Multi-vector June 2025 campaign detection
+alert tcp any any -> any any (msg:"Bark&Bite - Iranian APT June 2025 Multi-Vector Campaign"; flowbits:isset,iranian.react.phishing|iranian.iocontrol|iranian.crypto.theft; flowbits:isset,iranian.azure.c2|iranian.passive.backdoor; threshold:type limit, track by_src, count 1, seconds 7200; priority:1; classtype:targeted-activity; sid:2000129; rev:1; metadata:bark_bite iranian_apt june_2025_campaign nation_state critical;)
+
+# Critical infrastructure + crypto targeting pattern
+alert tcp any any -> any any (msg:"Bark&Bite - Iranian APT Infrastructure & Financial Dual Target"; flowbits:isset,iranian.iocontrol; flowbits:isset,iranian.crypto.theft; threshold:type limit, track by_src, count 1, seconds 3600; priority:1; classtype:targeted-activity; sid:2000130; rev:1; metadata:bark_bite iranian_apt dual_targeting critical_infrastructure cryptocurrency critical;)
