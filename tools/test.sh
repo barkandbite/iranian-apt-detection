@@ -52,7 +52,7 @@ test_suricata_rules() {
     
     # Test rule syntax
     echo "[*] Validating Suricata rules syntax..."
-    suricata -T -S suricata/iranian-apt.rules -l /tmp 2>&1 | grep -E "(error|invalid)" && echo "[-] Suricata rule errors found" || echo "[+] Suricata rules valid"
+    suricata -T -S suricata/iranian_apt_v2.rules -l /tmp 2>&1 | grep -E "(error|invalid)" && echo "[-] Suricata rule errors found" || echo "[+] Suricata rules valid"
 }
 
 # Function to generate test events
