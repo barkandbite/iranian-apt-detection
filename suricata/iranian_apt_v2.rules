@@ -198,3 +198,476 @@ alert tcp $HOME_NET any -> $EXTERNAL_NET 8888 (msg:"Iranian APT: Chisel reverse 
 # --------------------------------------------------------------------
 # END OF NEW SURICATA RULES
 # --------------------------------------------------------------------
+# Bark & Bite - Iranian APT Detection Rules: March 2026 Update
+# Version: 3.0
+# Last Updated: 2026-03-09
+# Credit: Bark & Bite Security
+#
+# This update covers new Iranian APT activity from July 2025 through March 2026.
+# Designed to append to the existing iranian_apt_v2.rules (SID 2000001-2000130).
+# New SID range: 2000131-2000230
+#
+# Threat context: Following the June 2025 twelve-day Iran-Israel war and
+# Operation Epic Fury (Feb 28, 2026), Iranian cyber operations are at their
+# highest-ever tempo. MuddyWater, CyberAv3ngers, UNC1549, Infy, and
+# RedKitten are all actively targeting U.S. and Western critical infrastructure.
+#
+# References:
+#   - CISA Joint Fact Sheet: Iranian Cyber Actors May Target Vulnerable US
+#     Networks (Jun 30, 2025; updated Jan 14, 2026)
+#   - FBI Urgent Reminder: Iranian Cyber Actors (Mar 3, 2026)
+#   - CISA AA23-335A: IRGC-Affiliated CyberAv3ngers (updated Dec 18, 2024)
+#   - CISA AA24-241A: Iran-based Ransomware Access Brokers
+#   - CISA AA24-290A: Iranian Brute Force and Credential Access
+#   - Dragos 2026 OT Cybersecurity Year in Review
+#   - Group-IB: Operation Olalampo (Feb 2026)
+#   - Mandiant: UNC1549 TWOSTROKE/DEEPROOT (Nov 2025)
+#   - Ctrl-Alt-Intel: MuddyWater Exposed (Mar 2026)
+
+#==============================================================================
+# SECTION 1: NEW CVE EXPLOITATION - INITIAL ACCESS
+# MITRE ATT&CK: T1190 (Exploit Public-Facing Application)
+#==============================================================================
+
+# CVE-2026-1281: Ivanti EPMM Unauthenticated RCE via bash arithmetic expansion
+# Exploited by MuddyWater; CISA KEV Jan 29, 2026; scanned with Nuclei templates
+# CVSS 9.8 - Targets /mifs/rs/api/v2/ endpoint with crafted arithmetic payloads
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT MuddyWater CVE-2026-1281 Ivanti EPMM RCE 2026"; flow:to_server,established; content:"POST"; http_method; content:"/mifs/rs/api/v2/"; http_uri; fast_pattern; content:"$((" ; http_client_body; flowbits:set,iranian.ivanti.epmm; reference:cve,2026-1281; classtype:attempted-admin; sid:2000131; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# CVE-2025-59718: FortiOS/FortiProxy SAML Authentication Bypass
+# Exploited by multiple Iranian groups; CISA KEV Dec 16, 2025
+# Auth bypass via FortiCloud SSO SAML assertion manipulation
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT CVE-2025-59718 FortiOS SAML Auth Bypass 2026"; flow:to_server,established; content:"POST"; http_method; content:"/api/v2/authentication"; http_uri; content:"SAMLResponse"; http_client_body; flowbits:set,iranian.fortios.saml; reference:cve,2025-59718; classtype:attempted-admin; sid:2000132; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# CVE-2024-55591: FortiOS Auth Bypass - MuddyWater Modified watchTowr PoC
+# MuddyWater replaced test commands with hardcoded FortiOS CLI payloads
+# Creates admin account "FortiSetup" with super_admin profile
+# Known C2 IP: 194.11.246.101
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT MuddyWater CVE-2024-55591 FortiOS Auth Bypass 2025"; flow:to_server,established; content:"POST"; http_method; content:"/api/v2/cmdb/system/admin"; http_uri; content:"super_admin"; http_client_body; flowbits:set,iranian.fortios.admin; reference:cve,2024-55591; classtype:attempted-admin; sid:2000133; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# CVE-2024-55591: FortiOS - Detect the specific "FortiSetup" admin account creation
+# This is highly specific to MuddyWater's modified PoC payload
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT MuddyWater FortiSetup Admin Creation 2026"; flow:to_server,established; content:"POST"; http_method; content:"/api/v2/"; http_uri; content:"FortiSetup"; http_client_body; reference:cve,2024-55591; classtype:successful-admin; sid:2000134; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# CVE-2025-23006: SonicWall SMA 1000 Pre-auth Deserialization RCE
+# Chained with CVE-2025-40602; exploited by multiple Iranian groups
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT CVE-2025-23006 SonicWall SMA Deserialization 2025"; flow:to_server,established; content:"POST"; http_method; content:"/cgi-bin/"; http_uri; content:"java.lang.Runtime"; http_client_body; flowbits:set,iranian.sonicwall; reference:cve,2025-23006; classtype:attempted-admin; sid:2000135; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# CVE-2021-36260: Hikvision Command Injection - Still actively exploited
+# Used by CyberAv3ngers for battlefield damage assessment via IP cameras
+# T1190, T1133 (External Remote Services)
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT CyberAv3ngers Hikvision Command Injection 2026"; flow:to_server,established; content:"PUT"; http_method; content:"/SDK/webLanguage"; http_uri; fast_pattern; content:"<?xml"; http_client_body; content:"<language>"; distance:0; within:200; reference:cve,2021-36260; classtype:attempted-admin; sid:2000136; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# CVE-2021-33044: Dahua Authentication Bypass
+# Paired with Hikvision exploits for IP camera compromise campaigns
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT CyberAv3ngers Dahua Auth Bypass 2026"; flow:to_server,established; content:"POST"; http_method; content:"/RPC2_Login"; http_uri; content:"loginType"; http_client_body; content:"Direct"; distance:0; within:50; reference:cve,2021-33044; classtype:attempted-admin; sid:2000137; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# CVE-2025-64446: FortiWeb Manager Path Traversal to Admin Access
+# Zero-day sold in Nov 2025; actively exploited since Oct 2025; CVSS 9.1
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT CVE-2025-64446 FortiWeb Path Traversal 2025"; flow:to_server,established; content:"GET"; http_method; content:"/api/v2.0/"; http_uri; content:".."; http_uri; distance:0; reference:cve,2025-64446; classtype:attempted-admin; sid:2000138; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# MuddyWater Known C2 IP for Fortinet exploitation campaign
+# Source: Ctrl-Alt-Intel MuddyWater Exposed report, March 2026
+alert ip 194.11.246.101 any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT MuddyWater Known FortiOS C2 IP 2026"; classtype:command-and-control; sid:2000139; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+alert ip $HOME_NET any -> 194.11.246.101 any (msg:"Bark&Bite - Iranian APT MuddyWater Known FortiOS C2 Outbound 2026"; classtype:command-and-control; sid:2000140; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+#==============================================================================
+# SECTION 2: MUDDYWATER NEW MALWARE C2 CHANNELS
+# MITRE ATT&CK: T1095, T1071.001, T1567.002, T1102, T1059.007
+# Groups: MuddyWater/Seedworm (MOIS-affiliated)
+# Context: Confirmed on networks of U.S. bank, U.S. airport, Canadian
+#          non-profit as of March 2026
+#==============================================================================
+
+# --- UDPGangster Backdoor (December 2025) ---
+# Custom UDP C2 on port 1269 with ROR-encoded data
+# Command bytes: 0x04=heartbeat, 0x0A=cmd.exe, 0x14=file exfil,
+#                0x1E=payload deploy, 0x63=C2 update
+# PDB paths reference usernames "gangster" and "SURGE"
+# MITRE: T1095 (Non-Application Layer Protocol)
+
+# UDPGangster - C2 beacon to known port
+alert udp $HOME_NET any -> $EXTERNAL_NET 1269 (msg:"Bark&Bite - Iranian APT MuddyWater UDPGangster C2 Port 2025"; dsize:>20; threshold:type both, track by_src, count 3, seconds 300; classtype:command-and-control; sid:2000141; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# UDPGangster - Known C2 IP 157.20.182.75
+alert udp $HOME_NET any -> 157.20.182.75 any (msg:"Bark&Bite - Iranian APT MuddyWater UDPGangster Known C2 IP 2025"; classtype:command-and-control; sid:2000142; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# UDPGangster - Heartbeat command byte (0x04 as first data byte, small packet)
+alert udp $HOME_NET any -> $EXTERNAL_NET 1269 (msg:"Bark&Bite - Iranian APT MuddyWater UDPGangster Heartbeat 2025"; dsize:<100; content:"|04|"; offset:0; depth:1; threshold:type both, track by_src, count 5, seconds 600; classtype:trojan-activity; sid:2000143; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# --- Dindoor Backdoor (March 2026) ---
+# Built on Deno JavaScript runtime ("bring your own runtime" evasion)
+# Signed with cert issued to "Amy Cherne"
+# Exfiltrates via Rclone to Wasabi cloud storage
+# MITRE: T1059.007, T1567.002
+
+# Dindoor - Rclone user-agent exfiltrating to Wasabi
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater Dindoor Rclone Wasabi Exfil 2026"; flow:to_server,established; content:"rclone"; http_user_agent; pkt_data; content:".wasabisys.com"; http_host; classtype:trojan-activity; sid:2000144; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# Dindoor - Any outbound to Wasabi cloud (uncommon in enterprise; high signal)
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater Wasabi Cloud Exfil Suspect 2026"; flow:to_server,established; content:"PUT"; http_method; content:".wasabisys.com"; http_host; threshold:type both, track by_src, count 5, seconds 600; classtype:trojan-activity; sid:2000145; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# --- Fakeset Backdoor (March 2026) ---
+# Python-based; staged from Backblaze B2 storage buckets
+# Known buckets: gitempire.s3.us-east-005.backblazeb2.com
+#                elvenforest.s3.us-east-005.backblazeb2.com
+# Signed by "Amy Cherne" and "Donald Gay"
+# MITRE: T1059.006, T1105
+
+# Fakeset - Known Backblaze B2 staging domain (gitempire)
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater Fakeset Backblaze gitempire 2026"; flow:to_server,established; content:"gitempire.s3.us-east-005.backblazeb2.com"; http_host; classtype:trojan-activity; sid:2000146; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# Fakeset - Known Backblaze B2 staging domain (elvenforest)
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater Fakeset Backblaze elvenforest 2026"; flow:to_server,established; content:"elvenforest.s3.us-east-005.backblazeb2.com"; http_host; classtype:trojan-activity; sid:2000147; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# Fakeset - Generic Backblaze B2 executable download (broader detection)
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater Backblaze B2 Payload Download 2026"; flow:to_server,established; content:"GET"; http_method; content:".s3.us-east-005.backblazeb2.com"; http_host; content:".exe"; http_uri; classtype:trojan-activity; sid:2000148; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# --- CHAR Backdoor / Operation Olalampo (Jan-Feb 2026) ---
+# Rust-based; fully controlled via Telegram Bot API
+# Bot name "Olalampo", username "stager_51_bot"
+# Shows AI-assisted development (emoji debug strings)
+# Associated: GhostFetch (downloader), GhostBackDoor, HTTP_VIP
+# HTTP_VIP connects to codefusiontech[.]org
+# MITRE: T1102 (Web Service), T1573
+
+# CHAR - Known Telegram bot C2 (stager_51_bot)
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater CHAR Telegram Bot C2 2026"; flow:to_server,established; content:"api.telegram.org"; http_host; content:"/bot"; http_uri; content:"stager_51_bot"; nocase; classtype:command-and-control; sid:2000149; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# CHAR/HTTP_VIP - Known C2 domain codefusiontech.org
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT MuddyWater HTTP_VIP C2 Domain 2026"; dns.query; content:"codefusiontech.org"; nocase; classtype:command-and-control; sid:2000150; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# --- Generic Telegram Bot API C2 Detection ---
+# Multiple Iranian families use Telegram: CHAR, Tonnerre v50, SloppyMIO, Handala
+# Detects programmatic Telegram bot API calls (not regular browser usage)
+# MITRE: T1102.002 (Bidirectional Communication)
+
+# Telegram Bot API - getUpdates polling (C2 command retrieval pattern)
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Telegram Bot API getUpdates Polling 2026"; flow:to_server,established; content:"api.telegram.org"; http_host; content:"/bot"; http_uri; content:"/getUpdates"; http_uri; threshold:type both, track by_src, count 10, seconds 3600; classtype:command-and-control; sid:2000151; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# Telegram Bot API - sendDocument (data exfiltration via file upload)
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Telegram Bot API File Exfil 2026"; flow:to_server,established; content:"POST"; http_method; content:"api.telegram.org"; http_host; content:"/sendDocument"; http_uri; classtype:trojan-activity; sid:2000152; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# --- PersianC2 / ArenaC2 / Key C2 (Exposed Feb 2026) ---
+# PersianC2: JSON API polling with Persian/Farsi strings
+# ArenaC2: HTTP POST via FastAPI/uvicorn with AES-256-CBC, "ArenaReport" decoy
+# Key C2: Custom UDP protocol
+# MITRE: T1071.001, T1573.001
+
+# ArenaC2 - FastAPI/uvicorn server header (uncommon in enterprise)
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT MuddyWater ArenaC2 Uvicorn Server 2026"; flow:to_client,established; content:"server"; http_header; content:"uvicorn"; http_header; classtype:command-and-control; sid:2000153; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# --- Phoenix v4 (Aug-Oct 2025) ---
+# C2 domain: screenai[.]online
+# Exposed open directory via SimpleHTTP/0.6 Python/3.10.12 on 443/8080
+# MITRE: T1566.001, T1219
+
+# Phoenix v4 - Known C2 domain
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT MuddyWater Phoenix C2 Domain 2025"; dns.query; content:"screenai.online"; nocase; classtype:command-and-control; sid:2000154; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# Phoenix v4 - SimpleHTTP Python server fingerprint (C2 indicator)
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT MuddyWater SimpleHTTP Python C2 2025"; flow:to_client,established; content:"Server"; http_header; content:"SimpleHTTP/0.6 Python/3.10"; http_header; classtype:command-and-control; sid:2000155; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# --- MuddyWater Sliver C2 Framework ---
+# Known infrastructure: 157.20.182.49 on port 31337
+# MITRE: T1071.001 (Application Layer Protocol)
+
+alert tcp $HOME_NET any -> 157.20.182.49 31337 (msg:"Bark&Bite - Iranian APT MuddyWater Sliver C2 Known Infra 2026"; flow:to_server,established; classtype:command-and-control; sid:2000156; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+#==============================================================================
+# SECTION 3: CYBERAV3NGERS ICS/OT TARGETING
+# MITRE ATT&CK: T1071.005, T1572, T0831 (Manipulation of Control)
+# Group: IRGC-CEC / BAUXITE (Dragos designation)
+# Context: Stage 2 ICS Kill Chain capability confirmed; 400+ devices
+#          globally; IOCONTROL deployed across PLCs, HMIs, routers, cameras
+#==============================================================================
+
+# --- IOCONTROL Malware ---
+# Custom OT/IoT cyberweapon; targets D-Link, Hikvision, Baicells, Red Lion,
+# Orpak, Phoenix Contact, Teltonika, Unitronics
+# C2: MQTT over TLS (port 8883), also cleartext (1883)
+# Evasion: DNS-over-HTTPS via Cloudflare
+# Config: AES-256-CBC encrypted
+# Binary: /usr/bin/iocontrol
+# Commands: "hello" (sysinfo), "check exec", "execute command", "self-delete",
+#           "port scan"
+# Initially 0/66 VirusTotal detections
+# MITRE: T1071.005 (MQTT), T1573.002 (Asymmetric Cryptography)
+
+# IOCONTROL - MQTT over TLS on port 8883 from OT/IoT segments
+# This is the primary C2 channel; MQTT CONNECT packet starts with 0x10
+alert tcp $HOME_NET any -> $EXTERNAL_NET 8883 (msg:"Bark&Bite - Iranian APT CyberAv3ngers IOCONTROL MQTT-TLS C2 2026"; flow:to_server,established; content:"|16 03|"; depth:2; threshold:type both, track by_src, count 3, seconds 600; classtype:command-and-control; sid:2000157; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# IOCONTROL - MQTT cleartext on port 1883 (CONNECT packet detection)
+# MQTT fixed header: first byte 0x10 = CONNECT, followed by remaining length
+alert tcp $HOME_NET any -> $EXTERNAL_NET 1883 (msg:"Bark&Bite - Iranian APT CyberAv3ngers IOCONTROL MQTT Cleartext C2 2026"; flow:to_server,established; content:"|10|"; offset:0; depth:1; content:"MQTT"; distance:0; within:12; classtype:command-and-control; sid:2000158; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# IOCONTROL - DNS-over-HTTPS via Cloudflare from non-browser process
+# OT devices should NOT be making DoH requests to Cloudflare
+# MITRE: T1071.004 (DNS), T1568.002 (Dynamic Resolution)
+alert tls $HOME_NET any -> $EXTERNAL_NET 443 (msg:"Bark&Bite - Iranian APT CyberAv3ngers IOCONTROL DoH Cloudflare 2026"; flow:to_server,established; tls.sni; content:"cloudflare-dns.com"; classtype:command-and-control; sid:2000159; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# IOCONTROL - DNS-over-HTTPS query pattern (application/dns-message)
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT IOCONTROL DoH Query Pattern 2026"; flow:to_server,established; content:"GET"; http_method; content:"/dns-query"; http_uri; content:"dns="; http_uri; classtype:command-and-control; sid:2000160; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# --- PLC_Controller.exe (July 2025) ---
+# Compiled Python tool sending S7comm/COTP requests to Siemens S7-300/S7-400
+# Forces PLCs into STOP mode - direct ICS disruption capability
+# S7comm over COTP on TCP port 102
+# MITRE: T0831 (Manipulation of Control), T0855 (Unauthorized Command)
+
+# PLC_Controller - S7comm CPU STOP function request
+# COTP header (0x03 0x00), then S7comm job with function code 0x29 (PLC Stop)
+alert tcp $HOME_NET any -> $HOME_NET 102 (msg:"Bark&Bite - Iranian APT CyberAv3ngers S7comm CPU STOP Request 2025"; flow:to_server,established; content:"|03 00|"; depth:2; content:"|32 01 00 00|"; distance:0; within:20; content:"|29|"; distance:0; within:15; classtype:attempted-admin; sid:2000161; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# CyberAv3ngers - Unitronics PLC exploitation on port 20256
+# Default PCOM protocol port; CyberAv3ngers targeted Unitronics Vision PLCs
+# at water treatment facilities
+# MITRE: T0855 (Unauthorized Command Message)
+alert tcp $EXTERNAL_NET any -> $HOME_NET 20256 (msg:"Bark&Bite - Iranian APT CyberAv3ngers Unitronics PCOM Access 2026"; flow:to_server,established; threshold:type both, track by_src, count 3, seconds 60; classtype:attempted-admin; sid:2000162; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# CyberAv3ngers - Mass Hikvision/Dahua camera scanning
+# Detects RTSP brute-force attempts characteristic of camera exploitation
+# campaigns used for battlefield damage assessment
+# MITRE: T1595 (Active Scanning)
+alert tcp $EXTERNAL_NET any -> $HOME_NET 554 (msg:"Bark&Bite - Iranian APT CyberAv3ngers RTSP Camera Bruteforce 2026"; flow:to_server,established; content:"DESCRIBE rtsp://"; depth:20; threshold:type both, track by_src, count 20, seconds 60; classtype:attempted-recon; sid:2000163; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# CyberAv3ngers - Hikvision ISAPI backdoor access post-exploitation
+# After CVE-2021-36260 exploitation, actors access ISAPI for ongoing control
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT CyberAv3ngers Hikvision ISAPI Backdoor 2026"; flow:to_server,established; content:"PUT"; http_method; content:"/ISAPI/System/configurationFile"; http_uri; classtype:successful-admin; sid:2000164; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+#==============================================================================
+# SECTION 4: INFY/PRINCE OF PERSIA APT C2
+# MITRE ATT&CK: T1568.002 (DGA), T1102.002 (Web Service C2)
+# Context: Resurface in Sep 2025 after years of silence with Foudre v34
+#          and Tonnerre v50 - both with domain generation algorithms
+#==============================================================================
+
+# --- Foudre v34 (September 2025) ---
+# Two-step DGA: generates 10-12 char domains on .site and .ix.tc TLDs
+# RSA sig verification at /key/<domain><yy><day_of_year>.sig
+# C2 beacon path: /1/?c=<GUID>
+# MITRE: T1568.002, T1071.001
+
+# Foudre v34 - C2 beacon with GUID parameter
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Infy Foudre v34 GUID Beacon 2025"; flow:to_server,established; content:"GET"; http_method; content:"/1/?c="; http_uri; fast_pattern; pcre:"/\/1\/\?c=[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/U"; classtype:command-and-control; sid:2000165; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# Foudre v34 - RSA signature verification request
+# Pattern: /key/<alphanumeric><2-digit-year><3-digit-day>.sig
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Infy Foudre v34 RSA Sig Verify 2025"; flow:to_server,established; content:"GET"; http_method; content:"/key/"; http_uri; content:".sig"; http_uri; distance:0; classtype:command-and-control; sid:2000166; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# Foudre v34 - DGA domain on .ix.tc TLD (uncommon TLD, high signal)
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT Infy Foudre DGA .ix.tc Domain 2025"; dns.query; content:".ix.tc"; endswith; classtype:domain-c2; sid:2000167; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# --- Tonnerre v50 (September 2025) ---
+# DGA: 13-character domains on .privatedns.org
+# C2 also via Telegram bot @ttestro1bot
+# Known C2 IPs: 45.80.148.195, 45.80.148.124
+# MITRE: T1568.002, T1102.002
+
+# Tonnerre v50 - DGA domains on .privatedns.org
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT Infy Tonnerre DGA .privatedns.org 2025"; dns.query; content:".privatedns.org"; endswith; classtype:domain-c2; sid:2000168; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# Tonnerre v50 - Known C2 IP (45.80.148.195)
+alert ip $HOME_NET any -> 45.80.148.195 any (msg:"Bark&Bite - Iranian APT Infy Tonnerre Known C2 IP-1 2025"; classtype:command-and-control; sid:2000169; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# Tonnerre v50 - Known C2 IP (45.80.148.124)
+alert ip $HOME_NET any -> 45.80.148.124 any (msg:"Bark&Bite - Iranian APT Infy Tonnerre Known C2 IP-2 2025"; classtype:command-and-control; sid:2000170; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# Tonnerre v50 - Telegram bot C2 (@ttestro1bot)
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Infy Tonnerre Telegram Bot C2 2025"; flow:to_server,established; content:"api.telegram.org"; http_host; content:"ttestro1bot"; http_uri; nocase; classtype:command-and-control; sid:2000171; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+#==============================================================================
+# SECTION 5: UNC1549 / NIMBUS MANTICORE AEROSPACE TARGETING
+# MITRE ATT&CK: T1574.001, T1572, T1003.006
+# Context: Mandiant-tracked surge hitting aerospace and defense via
+#          third-party access; TWOSTROKE, DEEPROOT, and multiple toolsets
+#==============================================================================
+
+# --- TWOSTROKE / DEEPROOT (November 2025) ---
+# TWOSTROKE: C++ backdoor with compromised code-signing certs
+# DEEPROOT: Cross-platform Go backdoor (Linux/Windows)
+# Both use Azure tenant accounts for C2 and SSH reverse tunnels
+# Additional tools: CRASHPAD, DCSYNCER.SLICK, SIGHTGRAB, TRUSTTRAP,
+#                   GHOSTLINE, POLLBLEND
+
+# UNC1549 - SSH reverse tunnel on non-standard ports (C2 pattern)
+# Iranian actors use SSH tunnels for persistence; detect SSH on unusual ports
+alert tcp $HOME_NET any -> $EXTERNAL_NET !22 (msg:"Bark&Bite - Iranian APT UNC1549 SSH Reverse Tunnel Non-Standard Port 2025"; flow:to_server,established; content:"SSH-2.0-"; depth:8; threshold:type both, track by_src, count 1, seconds 3600; classtype:command-and-control; sid:2000172; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# UNC1549 - DCSync attack over DRSUAPI (DCSYNCER.SLICK tool)
+# Detect non-DC hosts requesting DRS replication
+# MITRE: T1003.006 (DCSync)
+alert tcp $HOME_NET any -> $HOME_NET 135 (msg:"Bark&Bite - Iranian APT UNC1549 DCSYNCER SLICK DCSync Attempt 2025"; flow:to_server,established; content:"|05 00 0b|"; depth:3; content:"e3514235-4b06-11d1-ab04-00c04fc2dcd2"; nocase; distance:0; within:200; classtype:credential-theft; sid:2000173; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+#==============================================================================
+# SECTION 6: REDKITTEN / CHARMING KITTEN / APT42 / CRAFTY CAMEL
+# MITRE ATT&CK: T1102.001, T1027.003, T1566.001
+# Context: Targeting human rights NGOs, activists, journalists, and GCC
+#          aviation/critical infrastructure
+#==============================================================================
+
+# --- RedKitten SloppyMIO (January 2026) ---
+# Three-stage C2: GitHub dead-drop -> steganographic config on Google Drive
+#                 -> Telegram Bot API for commands
+# Beacons every 2 hours via scheduled task
+# AI-generated VBA macro code
+# MITRE: T1102.001 (Dead Drop Resolver), T1027.003 (Steganography)
+
+# SloppyMIO - GitHub raw content dead-drop resolver
+# Detects systematic fetching of GitHub raw content that may contain
+# encoded C2 addresses (non-browser user-agent to raw.githubusercontent.com)
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT RedKitten SloppyMIO GitHub Dead-Drop 2026"; flow:to_server,established; content:"raw.githubusercontent.com"; http_host; content:!"Mozilla"; http_user_agent; threshold:type both, track by_src, count 3, seconds 7200; classtype:command-and-control; sid:2000174; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# --- BellaCiao / BellaCpp DNS Beaconing (Charming Kitten) ---
+# DNS-based C2 with structured subdomain pattern:
+# <5+ alpha chars><alphanum>.XX.systemupdate.info
+# MITRE: T1071.004 (DNS)
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT Charming Kitten BellaCiao DNS Beacon 2026"; dns.query; content:".systemupdate.info"; nocase; endswith; classtype:domain-c2; sid:2000175; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# --- Crafty Camel (2025) ---
+# Targets GCC aviation/infrastructure via compromised third-party emails
+# Uses OneDrive/Dropbox for payload relay with polyglot files
+# MITRE: T1566.001 (Spearphishing Attachment), T1027.009 (Embedded Payloads)
+
+# Crafty Camel - Polyglot file download (HTA disguised as PDF)
+# Detect .pdf.hta double extension downloads
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Crafty Camel Polyglot HTA Download 2025"; flow:to_server,established; content:"GET"; http_method; content:".pdf.hta"; http_uri; classtype:trojan-activity; sid:2000176; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+#==============================================================================
+# SECTION 7: RANSOMWARE OPERATIONS
+# MITRE ATT&CK: T1486, T1490, T1027.002
+# Groups: Fox Kitten/Pioneer Kitten (Pay2Key.I2P), Cotton Sandstorm
+# Context: Pay2Key.I2P first full RaaS on I2P network; 80% profit share
+#          for attacks on "enemies of Iran"; $4M+ from 51+ attacks
+#==============================================================================
+
+# --- Pay2Key.I2P Ransomware (Feb 2025 resurgence) ---
+# First full RaaS on I2P anonymous network (not Tor)
+# Attack chain: 7-Zip SFX -> dual CMD/PS loaders -> XOR payloads ->
+#               Themida-protected Mimic ransomware (ELENOR-Corp variant)
+# MITRE: T1486, T1027.002 (Software Packing)
+
+# Pay2Key - PowerShell creating Defender file-type exclusion for .exe
+# Characteristic pre-encryption preparation step
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Pay2Key Defender Exclusion Setup 2025"; flow:to_server,established; content:"powershell"; nocase; http_client_body; content:"Add-MpPreference"; distance:0; within:200; content:"-ExclusionExtension"; distance:0; within:200; content:".exe"; distance:0; within:50; classtype:trojan-activity; sid:2000177; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# Pay2Key - I2P network traffic detection
+# I2P uses UDP on high ports (typically 9000+) for transport
+# Detects I2P router bootstrap connections
+alert udp $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Pay2Key I2P Network Bootstrap 2025"; content:"I2P"; depth:10; threshold:type both, track by_src, count 5, seconds 300; classtype:policy-violation; sid:2000178; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# Pay2Key - 7-Zip SFX self-extracting archive with embedded executables
+# Detect SFX archives being downloaded that match the attack chain
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Pay2Key 7zip SFX Payload Delivery 2025"; flow:to_client,established; content:"200"; http_stat_code; file_data; content:"7z"; depth:4; content:"!@Install@"; distance:0; within:100; classtype:trojan-activity; sid:2000179; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+#==============================================================================
+# SECTION 8: CLOUD SERVICE ABUSE AND EVASION
+# MITRE ATT&CK: T1567.002, T1102, T1090.004
+# Context: Iranian actors weaponize Wasabi, Backblaze, Telegram, Ethereum
+#          blockchain, Cloudflare tunneling to evade traditional detection
+#==============================================================================
+
+# --- Rclone-based Data Exfiltration ---
+# MuddyWater uses Rclone for cloud exfil; detect Rclone user-agent
+# MITRE: T1567.002 (Exfiltration to Cloud Storage)
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater Rclone Exfil User-Agent 2026"; flow:to_server,established; content:"rclone/"; http_user_agent; classtype:trojan-activity; sid:2000180; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# --- Ethereum Blockchain C2 Resolution (EtherHiding) ---
+# MuddyWater embeds C2 addresses in smart contracts
+# Detect Ethereum JSON-RPC calls from enterprise endpoints
+# MITRE: T1568.002 (Domain Generation Algorithms)
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater EtherHiding Blockchain C2 2026"; flow:to_server,established; content:"POST"; http_method; content:"eth_call"; http_client_body; threshold:type both, track by_src, count 3, seconds 600; classtype:command-and-control; sid:2000181; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# --- Unauthorized RMM Tool Detection ---
+# MuddyWater deploys AnyDesk (via HTTP_VIP), MeshCentral, SimpleHelp
+# on compromised networks including OT-adjacent workstations
+# MITRE: T1219 (Remote Access Software)
+
+# AnyDesk - Relay traffic to AnyDesk infrastructure
+alert tls $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater AnyDesk RMM Abuse 2026"; flow:to_server,established; tls.sni; content:".net.anydesk.com"; endswith; threshold:type both, track by_src, count 1, seconds 3600; classtype:policy-violation; sid:2000182; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# MeshCentral - Agent check-in pattern
+alert tls $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater MeshCentral RMM Abuse 2026"; flow:to_server,established; tls.sni; content:"meshcentral"; nocase; threshold:type both, track by_src, count 1, seconds 3600; classtype:policy-violation; sid:2000183; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+#==============================================================================
+# SECTION 9: BEHAVIORAL AND INFRASTRUCTURE PATTERNS
+# MITRE ATT&CK: T1588.003, T1583.001, T1078
+# Context: Cross-group behavioral indicators that help identify Iranian
+#          operations regardless of specific malware family
+#==============================================================================
+
+# --- MuddyWater Fortinet Webshell Activity ---
+# After initial access via FortiOS CVEs, MuddyWater drops webshells
+# and modifies VPN configurations
+# MITRE: T1505.003 (Web Shell)
+
+# Fortinet webshell - POST to /remote/logincheck with webshell indicators
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT MuddyWater Fortinet Webshell Upload 2026"; flow:to_server,established; content:"POST"; http_method; content:"/remote/"; http_uri; content:"exec("; http_client_body; classtype:successful-admin; sid:2000184; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# --- MuddyWater FortiOS VPN Group Manipulation ---
+# Modifying VPN user groups to maintain access after patching
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT MuddyWater FortiOS VPN Group Modify 2026"; flow:to_server,established; content:"PUT"; http_method; content:"/api/v2/cmdb/vpn.ssl/settings"; http_uri; classtype:attempted-admin; sid:2000185; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# --- Mass Credential Brute Force ---
+# Per CISA AA24-290A: Iranian actors use MFA push bombing, password spraying
+# Detect rapid authentication failures indicative of Iranian brute force
+# MITRE: T1110.003 (Password Spraying), T1621 (MFA Request Generation)
+
+# High-rate LDAP bind failures (password spray indicator)
+alert tcp $EXTERNAL_NET any -> $HOME_NET 389 (msg:"Bark&Bite - Iranian APT Credential Spray LDAP Bind Flood 2026"; flow:to_server,established; content:"|30|"; depth:1; content:"|60|"; distance:0; within:10; threshold:type both, track by_src, count 30, seconds 60; classtype:credential-theft; sid:2000186; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# --- Default Credential Exploitation on IoT/OT ---
+# CyberAv3ngers targets devices with factory-default credentials
+# CISA AA23-335A: Unitronics PLCs left with default password "1111"
+# MITRE: T1078.001 (Default Accounts)
+
+# Unitronics default credential attempt
+alert tcp $EXTERNAL_NET any -> $HOME_NET 20256 (msg:"Bark&Bite - Iranian APT CyberAv3ngers Unitronics Default Cred 2026"; flow:to_server,established; content:"1111"; classtype:attempted-admin; sid:2000187; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+#==============================================================================
+# SECTION 10: MUDDYVIPER / FOODER AND ADDITIONAL TOOLS
+# MITRE ATT&CK: T1059, T1105, T1071
+# Context: Mid-2025 campaigns targeting Israel with potential Western expansion
+#==============================================================================
+
+# --- MuddyViper/Fooder (mid-2025) ---
+# MuddyViper: C/C++ backdoor with CNG API encryption
+# Fooder: Loader disguised as Snake video game
+# Uses SSH reverse tunnels for C2 persistence
+# MITRE: T1059.003, T1572
+
+# MuddyViper - SSH reverse tunnel establishment (outbound SSH to high ports)
+alert tcp $HOME_NET any -> $EXTERNAL_NET 2222:65535 (msg:"Bark&Bite - Iranian APT MuddyWater SSH Tunnel High Port 2025"; flow:to_server,established; content:"SSH-2.0-"; depth:8; threshold:type both, track by_src, count 1, seconds 3600; classtype:command-and-control; sid:2000188; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# --- WezRat (Cotton Sandstorm) ---
+# Modular infostealer; commands, screenshots, keylogging, clipboard/cookie theft
+# Communicates over HTTPS with structured JSON command/response
+# MITRE: T1056.001 (Keylogging), T1113 (Screen Capture)
+
+# WezRat - Characteristic Chrome cookie database exfiltration over HTTP
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Cotton Sandstorm WezRat Cookie Exfil 2026"; flow:to_server,established; content:"POST"; http_method; content:"Cookies"; http_client_body; content:"chrome"; distance:0; within:100; nocase; classtype:trojan-activity; sid:2000189; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+#==============================================================================
+# SECTION 11: CORRELATION AND MULTI-STAGE DETECTION
+# These rules fire when multiple indicators from earlier sections align,
+# providing high-confidence composite alerts
+#==============================================================================
+
+# Multi-stage: FortiOS exploitation followed by Wasabi/Backblaze exfil
+# Correlates initial access CVE with data exfiltration stage
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater FortiOS-to-Cloud Attack Chain 2026"; flow:to_server,established; flowbits:isset,iranian.fortios.saml; content:".wasabisys.com"; http_host; classtype:successful-admin; sid:2000190; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater FortiOS-to-Backblaze Attack Chain 2026"; flow:to_server,established; flowbits:isset,iranian.fortios.saml; content:".backblazeb2.com"; http_host; classtype:successful-admin; sid:2000191; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# Multi-stage: Ivanti EPMM exploit followed by Telegram C2
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater Ivanti-to-Telegram Attack Chain 2026"; flow:to_server,established; flowbits:isset,iranian.ivanti.epmm; content:"api.telegram.org"; http_host; classtype:successful-admin; sid:2000192; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# Multi-stage: ICS exploitation followed by IOCONTROL MQTT C2 setup
+alert tcp $HOME_NET any -> $EXTERNAL_NET 8883 (msg:"Bark&Bite - Iranian APT CyberAv3ngers ICS Exploit-to-MQTT Chain 2026"; flow:to_server,established; flowbits:isset,iranian.fortios.admin; content:"|16 03|"; depth:2; classtype:successful-admin; sid:2000193; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_09;)
+
+# --------------------------------------------------------------------
+# END OF MARCH 2026 UPDATE
+# Total new rules: 63 (SID 2000131-2000193)
+# --------------------------------------------------------------------

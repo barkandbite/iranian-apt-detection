@@ -1,0 +1,141 @@
+<!--
+  Wazuh Rules for Iranian APT Detection - March 2026 Updates
+  Version: 1.0
+  Last Updated: 2026-03-09
+  
+  This ruleset contains the March 2026 threat updates including:
+  - CVE-2026-1281 (Ivanti EPMM)
+  - CVE-2025-59718 & CVE-2024-55591 (FortiOS)
+  - MuddyWater Malware: UDPGangster, Dindoor, Fakeset, CHAR
+  - CyberAv3ngers OT Malware: IOCONTROL
+  
+  Rule ID Range: 101200-101299
+-->
+
+<group name="iranian_apt,march2026_updates,">
+
+  <!-- ========== CVE EXPLOITATION (101200-101210) ========== -->
+
+  <!-- CVE-2026-1281: Ivanti EPMM RCE via bash arithmetic expansion -->
+  <rule id="101200" level="15">
+    <if_sid>31101</if_sid>
+    <field name="url" type="pcre2">/mifs/rs/api/v2/</field>
+    <field name="request" type="pcre2">\$\(\(</field>
+    <description>Iranian APT: MuddyWater CVE-2026-1281 Ivanti EPMM RCE attempt detected</description>
+    <mitre>
+      <id>T1190</id>
+    </mitre>
+    <group>attack,exploit,muddywater,pci_dss_10.2.4,pci_dss_11.4,</group>
+  </rule>
+
+  <!-- CVE-2025-59718: FortiOS SAML Auth Bypass -->
+  <rule id="101201" level="15">
+    <if_sid>31101</if_sid>
+    <field name="url" type="pcre2">/api/v2/authentication</field>
+    <field name="request" type="pcre2">SAMLResponse</field>
+    <description>Iranian APT: CVE-2025-59718 FortiOS SAML Authentication Bypass attempt</description>
+    <mitre>
+      <id>T1190</id>
+      <id>T1550.004</id>
+    </mitre>
+    <group>attack,exploit,auth_bypass,pci_dss_10.2.4,pci_dss_10.2.5,</group>
+  </rule>
+
+  <!-- CVE-2024-55591: FortiOS Auth Bypass (FortiSetup admin account) -->
+  <rule id="101202" level="15">
+    <if_sid>4701,4702</if_sid>
+    <field name="win.system.eventID">^4720$|^4732$</field>
+    <field name="win.eventdata.targetUserName" type="pcre2">(?i)FortiSetup</field>
+    <description>Iranian APT: Suspicious administrator account "FortiSetup" created - possible MuddyWater CVE-2024-55591</description>
+    <mitre>
+      <id>T1136.001</id>
+      <id>T1078.002</id>
+    </mitre>
+    <group>attack,persistence,muddywater,pci_dss_10.2.5,pci_dss_8.1.2,</group>
+  </rule>
+
+  <!-- ========== MUDDYWATER MALWARE (101211-101230) ========== -->
+
+  <!-- UDPGangster: UDP 1269 C2 activity -->
+  <rule id="101211" level="12">
+    <if_group>sysmon_event_3</if_group>
+    <field name="win.eventdata.destinationPort">^1269$</field>
+    <field name="win.eventdata.protocol">udp</field>
+    <description>Iranian APT: MuddyWater UDPGangster C2 network activity detected (UDP:1269)</description>
+    <mitre>
+      <id>T1095</id>
+      <id>T1071.001</id>
+    </mitre>
+    <group>attack,c2,muddywater,pci_dss_11.4,</group>
+  </rule>
+
+  <!-- UDPGangster: SystemProc.exe process creation -->
+  <rule id="101212" level="13">
+    <if_group>sysmon_event_1</if_group>
+    <field name="win.eventdata.image" type="pcre2">(?i)RoamingLow\SystemProc\.exe</field>
+    <description>Iranian APT: MuddyWater UDPGangster malware execution detected - SystemProc.exe</description>
+    <mitre>
+      <id>T1059.003</id>
+    </mitre>
+    <group>attack,execution,muddywater,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- Dindoor: Deno runtime and Wasabi exfiltration -->
+  <rule id="101213" level="14">
+    <if_group>sysmon_event_3</if_group>
+    <field name="win.eventdata.destinationHostname" type="pcre2">\.wasabisys\.com$</field>
+    <description>Iranian APT: MuddyWater Dindoor malware - Wasabi cloud exfiltration detected</description>
+    <mitre>
+      <id>T1567.002</id>
+    </mitre>
+    <group>attack,exfiltration,muddywater,pci_dss_11.4,</group>
+  </rule>
+
+  <!-- Fakeset: Backblaze B2 exfiltration -->
+  <rule id="101214" level="14">
+    <if_group>sysmon_event_3</if_group>
+    <field name="win.eventdata.destinationHostname" type="pcre2">\.backblazeb2\.com$</field>
+    <description>Iranian APT: MuddyWater Fakeset malware - Backblaze B2 network activity detected</description>
+    <mitre>
+      <id>T1567.002</id>
+    </mitre>
+    <group>attack,exfiltration,muddywater,pci_dss_11.4,</group>
+  </rule>
+
+  <!-- CHAR/Olalampo: Telegram Bot API C2 -->
+  <rule id="101215" level="12">
+    <if_group>sysmon_event_3</if_group>
+    <field name="win.eventdata.destinationHostname" type="pcre2">api\.telegram\.org$</field>
+    <description>Iranian APT: MuddyWater CHAR/Olalampo - Telegram Bot API C2 detected</description>
+    <mitre>
+      <id>T1102.002</id>
+    </mitre>
+    <group>attack,c2,muddywater,pci_dss_11.4,</group>
+  </rule>
+
+  <!-- ========== CYBERAV3NGERS OT MALWARE (101231-101240) ========== -->
+
+  <!-- IOCONTROL: OT Cyberweapon Binary -->
+  <rule id="101231" level="15">
+    <if_group>sysmon_event_1</if_group>
+    <field name="win.eventdata.image" type="pcre2">/usr/bin/iocontrol|iocontrol\.exe</field>
+    <description>Iranian APT: CyberAv3ngers IOCONTROL OT malware execution detected</description>
+    <mitre>
+      <id>T0859</id>
+      <id>T0883</id>
+    </mitre>
+    <group>attack,execution,cyberav3ngers,ics,ot,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- IOCONTROL: MQTT C2 traffic -->
+  <rule id="101232" level="14">
+    <if_group>sysmon_event_3</if_group>
+    <field name="win.eventdata.destinationPort">^8883$|^1883$</field>
+    <description>Iranian APT: CyberAv3ngers IOCONTROL MQTT C2 network activity detected</description>
+    <mitre>
+      <id>T1071.001</id>
+    </mitre>
+    <group>attack,c2,cyberav3ngers,ics,ot,pci_dss_11.4,</group>
+  </rule>
+
+</group>

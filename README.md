@@ -1,6 +1,6 @@
 # Iranian APT Detection Rules
 
-[![Version](https://img.shields.io/badge/version-0.5.1-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![MITRE ATT&CK](https://img.shields.io/badge/MITRE%20ATT%26CK-v13-orange.svg)](documentation/MITRE-ATT&CK-Mapping.md)
 
@@ -8,13 +8,13 @@
 
 Enterprise-grade detection rules for Iranian Advanced Persistent Threat (APT) groups targeting critical infrastructure, defense, and technology sectors. This repository provides comprehensive Wazuh SIEM rules and Suricata IDS signatures to detect and respond to Iranian cyber operations.
 
-## 🚨 Recent Threats (June 2025)
+## 🚨 Recent Threats (March 2026 Update)
 
-- **NEW**: AI-powered phishing campaigns using React frameworks
-- **NEW**: IOCONTROL malware targeting industrial control systems
-- **NEW**: TEMPLEDROP/TEMPLELOCK kernel-level evasion techniques
-- **NEW**: Passive backdoors with no outbound C2
-- **NEW**: Azure cloud infrastructure abuse
+- **CRITICAL**: Operation Epic Fury (Feb 28, 2026) response signatures
+- **NEW**: MuddyWater's **UDPGangster**, **Dindoor**, and **Fakeset** malware families
+- **NEW**: CyberAv3ngers **IOCONTROL** OT/ICS malware targeting 400+ device types
+- **NEW**: Exploitation of **CVE-2026-1281** (Ivanti EPMM) and **CVE-2025-59718** (FortiOS)
+- **NEW**: C2 via Telegram Bot API, Wasabi/Backblaze cloud storage, and MQTT-TLS
 
 ## Quick Start
 
@@ -54,45 +54,50 @@ sudo chmod +x /var/ossec/active-response/bin/iranian-apt-active-response.sh
 
 | Group | Also Known As | Primary Targets | Key Techniques |
 |-------|---------------|-----------------|----------------|
-| **Pioneer Kitten** | Fox Kitten, UNC757, Parisite | VPN/Firewall vendors | CVE exploitation, Ransomware |
+| **MuddyWater** | Mercury, Static Kitten | Government, Telecom, Finance | **UDPGangster**, **Dindoor**, **Fakeset**, PowerShell |
+| **CyberAv3ngers** | IRGC-CEC | Water, Energy, OT/ICS | **IOCONTROL**, PLC disruption, MQTT C2 |
+| **Pioneer Kitten** | Fox Kitten, UNC757, Parisite | VPN/Firewall vendors | CVE exploitation, Ransomware, I2P RaaS |
+| **UNC1549** | Nimbus Manticore | Defense, Aerospace | **TWOSTROKE**, **DEEPROOT**, Azure C2 |
+| **Infy** | Prince of Persia | Activists, Government | **Foudre**, **Tonnerre**, DGA, Telegram C2 |
 | **Lemon Sandstorm** | RUBIDIUM | Cloud services | Exchange exploitation |
-| **MuddyWater** | Mercury, Static Kitten | Government, Telecom | PowerShell, Living-off-the-land |
-| **APT34** | OilRig, Helix Kitten | Energy, Finance | DNS tunneling, Custom tools |
-| **APT35** | Charming Kitten, Phosphorus | Academia, Activists | Social engineering, Phishing |
-| **IRGC CyberAv3ngers** | - | Water facilities | ICS/SCADA attacks |
 
 ## Detection Coverage
 
 ### By Kill Chain Phase
-- **Initial Access**: 19 techniques
-- **Execution**: 11 techniques  
-- **Persistence**: 14 techniques
-- **Privilege Escalation**: 7 techniques
-- **Defense Evasion**: 18 techniques
-- **Credential Access**: 12 techniques
-- **Discovery**: 8 techniques
-- **Lateral Movement**: 9 techniques
-- **Collection**: 6 techniques
-- **Command & Control**: 21 techniques
-- **Exfiltration**: 7 techniques
-- **Impact**: 9 techniques
+- **Initial Access**: 25 techniques (+6)
+- **Execution**: 18 techniques (+7)
+- **Persistence**: 19 techniques (+5)
+- **Privilege Escalation**: 10 techniques (+3)
+- **Defense Evasion**: 24 techniques (+6)
+- **Credential Access**: 15 techniques (+3)
+- **Discovery**: 11 techniques (+3)
+- **Lateral Movement**: 12 techniques (+3)
+- **Collection**: 9 techniques (+3)
+- **Command & Control**: 32 techniques (+11)
+- **Exfiltration**: 12 techniques (+5)
+- **Impact**: 14 techniques (+5)
 
 ### Rule Statistics
-- **Wazuh Rules**: 166 detection rules across 8 files
-- **Suricata Signatures**: 130 network signatures
-- **CVEs Covered**: 15+ including zero-days
-- **Unique Behavioral Patterns**: 40+
+- **Wazuh Rules**: 177 detection rules across 9 files
+- **Suricata Signatures**: 193 network signatures
+- **CVEs Covered**: 25+ including 2025/2026 zero-days
+- **Unique Behavioral Patterns**: 60+
 
 ## Key Features
 
 ### 🎯 Targeted CVE Detection
+- **CVE-2026-1281** (Ivanti EPMM RCE) **NEW**
+- **CVE-2025-59718** (FortiOS SAML Bypass) **NEW**
+- **CVE-2025-55182** (React Server Components RCE) **NEW**
+- **CVE-2024-55591** (FortiOS Auth Bypass) **NEW**
 - CVE-2024-24919 (Check Point Security Gateway)
 - CVE-2024-3400 (Palo Alto PAN-OS)
-- CVE-2023-23397 (Outlook NTLM Relay)
-- CVE-2021-26855 (Exchange ProxyLogon)
-- CVE-2025-24201 (WebKit Zero-Day) **NEW**
 
 ### 🔍 Unique Iranian Signatures
+- **Cloud Storage Exfiltration** (Wasabi, Backblaze)
+- **Telegram Bot API** Command & Control
+- **MQTT-TLS** Industrial Control System communication
+- **Deno Runtime** evasion artifacts (Dindoor)
 - Tehran business hours activity (UTC+3:30)
 - Farsi language artifacts
 - DNS hijacking with Let's Encrypt
@@ -238,4 +243,4 @@ These rules are provided as-is for defensive purposes. Users are responsible for
 
 ---
 
-**Last Updated**: June 29, 2025 | **Version**: 2.0.0 | **Maintainer**: Bark&Bite Security
+**Last Updated**: March 9, 2026 | **Version**: 3.0.0 | **Maintainer**: Bark&Bite Security Intelligence

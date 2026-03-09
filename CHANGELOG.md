@@ -5,6 +5,33 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.0] - 2026-03-09
+
+### Added
+- **Major Update**: Integration of detections from Operation Epic Fury (Feb 2026).
+- New Wazuh Rules file: `0918-iranian-apt-march2026-updates.xml` (SID 101200-101240).
+- 63 new Suricata signatures (SID 2000131-2000193) covering 2025-2026 activity.
+- Comprehensive threat intelligence report: `documentation/THREAT_INTEL_MARCH_2026.md`.
+- Deployment guide: `documentation/MARCH-2026-DEPLOYMENT.md`.
+- New detections for MuddyWater malware families:
+  - **UDPGangster**: UDP:1269 C2 and `SystemProc.exe` persistence.
+  - **Dindoor**: Deno-based backdoor with Wasabi cloud exfiltration.
+  - **Fakeset**: Python backdoor with Backblaze B2 storage integration.
+  - **CHAR/Olalampo**: Telegram Bot API-controlled Rust backdoor.
+- New detections for CyberAv3ngers OT/ICS malware:
+  - **IOCONTROL**: Custom cyberweapon targeting PLCs/HMIs via MQTT-TLS.
+- Expanded CVE coverage:
+  - CVE-2026-1281 (Ivanti EPMM RCE)
+  - CVE-2025-59718 (FortiOS SAML Auth Bypass)
+  - CVE-2024-55591 (FortiOS Auth Bypass / "FortiSetup" admin creation)
+  - CVE-2025-55182 (React Server Components "React2Shell")
+  - CVE-2025-23006 (SonicWall SMA 1000)
+
+### Changed
+- Updated main README with vibrant new layout and current statistics.
+- Refreshed group attribution table with latest 2026 intelligence.
+- Improved detection coverage statistics across all kill chain phases.
+
 ## [2.0.0] - 2025-06-29
 
 ### Fixed
