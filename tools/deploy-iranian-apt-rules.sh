@@ -1,13 +1,15 @@
 #!/bin/bash
-# Deploy Iranian APT Detection Rules - New Unique Signatures
-# Version: 1.0
+# Deploy Iranian APT Detection Rules - March 2026 Update
+# Version: 0.6.0
 # Bark&Bite Security
 #
 # This script deploys the unique Iranian APT detection signatures including:
-# - DNS hijacking patterns
-# - Time-based behavioral analytics
-# - Persian language artifacts
-# - Cloud and AI-enhanced attack detection
+# - Operation Epic Fury (Feb 2026) detections
+# - MuddyWater Malware: UDPGangster, Dindoor, Fakeset, CHAR
+# - CyberAv3ngers OT/ICS: IOCONTROL
+# - CVE-2026-1281, CVE-2025-59718, CVE-2024-55591
+# - Cloud Exfiltration: Wasabi, Backblaze B2
+# - Telegram Bot API C2
 
 set -e
 
@@ -51,9 +53,8 @@ deploy_wazuh_rules() {
     fi
     
     # Copy new rule files
-    echo "Copying new Iranian APT unique behavior rules..."
-    cp wazuh-rules/0915-iranian-apt-unique-behaviors.xml "$WAZUH_RULES_DIR/" || echo -e "${RED}Failed to copy 0915${NC}"
-    cp wazuh-rules/0916-iranian-apt-cloud-container.xml "$WAZUH_RULES_DIR/" || echo -e "${RED}Failed to copy 0916${NC}"
+    echo "Copying Iranian APT detection rules..."
+    cp wazuh-rules/091*.xml "$WAZUH_RULES_DIR/" || echo -e "${RED}Failed to copy rules${NC}"
     
     # Set proper permissions
     chown ossec:ossec "$WAZUH_RULES_DIR"/091*.xml
@@ -89,14 +90,13 @@ deploy_suricata_rules() {
     cp "$SURICATA_RULES_DIR"/iranian-apt*.rules "$SURICATA_RULES_DIR"/iranian-apt*.rules.bak 2>/dev/null || true
     
     # Copy new rule files
-    echo "Copying new Iranian APT detection rules..."
-    cp suricata/iranian-apt-dns-hijacking.rules "$SURICATA_RULES_DIR/" || echo -e "${RED}Failed to copy DNS hijacking rules${NC}"
-    cp suricata/iranian-apt-cloud-ai.rules "$SURICATA_RULES_DIR/" || echo -e "${RED}Failed to copy Cloud/AI rules${NC}"
+    echo "Copying Iranian APT detection rules..."
+    cp suricata/iranian_apt_v2.rules "$SURICATA_RULES_DIR/" || echo -e "${RED}Failed to copy rules${NC}"
     
     # Update suricata.yaml to include new rules
-    if ! grep -q "iranian-apt-dns-hijacking.rules" /etc/suricata/suricata.yaml; then
-        echo "Adding new rules to suricata.yaml..."
-        sed -i '/rule-files:/a\  - iranian-apt-dns-hijacking.rules\n  - iranian-apt-cloud-ai.rules' /etc/suricata/suricata.yaml
+    if ! grep -q "iranian_apt_v2.rules" /etc/suricata/suricata.yaml; then
+        echo "Adding iranian_apt_v2.rules to suricata.yaml..."
+        sed -i '/rule-files:/a\  - iranian_apt_v2.rules' /etc/suricata/suricata.yaml
     fi
     
     # Test Suricata configuration
@@ -174,6 +174,10 @@ create_dashboards() {
     {
       "title": "Cloud Attacks",
       "query": "rule.id:[101100 TO 101121] OR rule.groups:cloud"
+    },
+    {
+      "title": "March 2026 Updates",
+      "query": "rule.id:[101200 TO 101299] OR rule.groups:march2026_updates"
     }
   ]
 }

@@ -5,10 +5,10 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [3.0.0] - 2026-03-09
+## [0.6.0] - 2026-03-09
 
 ### Added
-- **Major Update**: Integration of detections from Operation Epic Fury (Feb 2026).
+- **Major Update (Pre-release)**: Integration of detections from Operation Epic Fury (Feb 2026).
 - New Wazuh Rules file: `0918-iranian-apt-march2026-updates.xml` (SID 101200-101240).
 - 63 new Suricata signatures (SID 2000131-2000193) covering 2025-2026 activity.
 - Comprehensive threat intelligence report: `documentation/THREAT_INTEL_MARCH_2026.md`.

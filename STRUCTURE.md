@@ -12,6 +12,7 @@ iranian-apt-detection/
 │   ├── 0915-iranian-apt-unique-behaviors.xml        # Unique Iranian signatures
 │   ├── 0916-iranian-apt-cloud-container.xml         # Cloud and container security
 │   ├── 0917-iranian-apt-june2025-updates.xml        # June 2025 threat updates
+│   ├── 0918-iranian-apt-march2026-updates.xml       # March 2026 threat updates (v0.6.0)
 │   └── README.md                                     # Wazuh rules documentation
 │
 ├── configurations/
@@ -21,11 +22,13 @@ iranian-apt-detection/
 │   └── README.md                                     # Configuration guide
 │
 ├── suricata/
-│   ├── iranian_apt_v2.rules                         # Current Suricata IDS signatures
+│   ├── iranian_apt_v2.rules                         # Current Suricata IDS signatures (v3.0)
 │   └── README.md                                     # Suricata deployment guide
 │
 ├── documentation/
 │   ├── README.md                                     # Documentation overview
+│   ├── MARCH-2026-DEPLOYMENT.md                     # March 2026 deployment guide
+│   ├── THREAT_INTEL_MARCH_2026.md                   # March 2026 threat intelligence
 │   ├── SOC-Quick-Reference-Iranian-APT.md           # SOC quick reference
 │   ├── MITRE-ATT&CK-Mapping.md                      # MITRE framework mapping
 │   └── Sector-Vulnerability-Analysis.md             # Sector-specific analysis
@@ -62,7 +65,7 @@ iranian-apt-detection/
 
 ## Rule ID Allocation
 
-### Wazuh Rules (100900-101199)
+### Wazuh Rules (100900-101299)
 - **100900-100924**: CVE exploitation detection (0910)
 - **100925-100959**: Behavioral detection (0911)
 - **100940-100959**: Network detection (0912) - overlaps with behavioral
@@ -71,14 +74,16 @@ iranian-apt-detection/
 - **101000-101023**: Unique Iranian behaviors (0915)
 - **101100-101121**: Cloud and container security (0916)
 - **101122-101199**: June 2025 updates (0917)
+- **101200-101299**: March 2026 updates (0918)
 
-### Suricata SID Ranges (2000001-2000130)
+### Suricata SID Ranges (2000001-2000230)
 - **2000001-2000014**: CVE exploitation signatures
 - **2000015-2000025**: C2 infrastructure detection
 - **2000026-2000089**: Various detection categories
 - **2000090-2000114**: Cloud and AI attacks
 - **2000115-2000124**: Tool-specific signatures
 - **2000125-2000130**: June 2025 updates
+- **2000131-2000230**: March 2026 updates
 
 ## File Naming Conventions
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 # Test script for Iranian APT detection rules
-# Version: 1.0
+# Version: 0.6.0
 # This script validates Wazuh rules and Suricata signatures
 
 set -e
@@ -116,6 +116,8 @@ test_cve_patterns() {
         "POST /owa/auth/Current/themes HTTP/1.1"
         "GET /ssl-vpn/hipreport.esp?SESSID=../../ HTTP/1.1"
         "POST /mgmt/tm/util/bash HTTP/1.1"
+        "POST /mifs/rs/api/v2/ $((7*7)) HTTP/1.1"
+        "POST /api/v2/authentication SAMLResponse HTTP/1.1"
     )
     
     for log in "${test_logs[@]}"; do

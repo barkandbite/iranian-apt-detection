@@ -14,6 +14,8 @@ This directory contains modular Wazuh SIEM rules for detecting Iranian APT activ
 | 0914-iranian-apt-windows-rules.xml | 100980-100999 | Windows-specific detection | 20 rules |
 | 0915-iranian-apt-unique-behaviors.xml | 101000-101023 | Unique Iranian signatures | 24 rules |
 | 0916-iranian-apt-cloud-container.xml | 101100-101121 | Cloud and container security | 22 rules |
+| 0917-iranian-apt-june2025-updates.xml | 101122-101199 | June 2025 threat updates | 78 rules |
+| 0918-iranian-apt-march2026-updates.xml | 101200-101299 | March 2026 threat updates | 41 rules |
 
 ## Deployment Options
 
@@ -108,6 +110,14 @@ grep -h "rule id=" /var/ossec/etc/rules/09*.xml | sort | uniq -d
 - Kubernetes exploitation
 - Container escapes
 - AI API abuse
+
+### March 2026 Updates (0918)
+- Ivanti EPMM (CVE-2026-1281)
+- FortiOS SAML (CVE-2025-59718)
+- MuddyWater Malware: UDPGangster, Dindoor, Fakeset, CHAR
+- CyberAv3ngers OT/ICS: IOCONTROL
+- Cloud Exfiltration: Wasabi, Backblaze B2
+- Telegram Bot API C2
 
 ## Integration with Active Response
 

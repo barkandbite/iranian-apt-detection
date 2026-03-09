@@ -6,10 +6,10 @@ This directory contains Suricata IDS signatures for detecting Iranian APT networ
 ## Current Ruleset
 
 ### Main File: iranian_apt_v2.rules
-- **Version**: 2.1
-- **Last Updated**: 2025-06-27
-- **SID Range**: 2000001-2000130
-- **Total Rules**: 130 signatures
+- **Version**: 3.0
+- **Last Updated**: 2026-03-09
+- **SID Range**: 2000001-2000230
+- **Total Rules**: 193 signatures
 
 ### Rule Categories
 
@@ -27,6 +27,7 @@ This directory contains Suricata IDS signatures for detecting Iranian APT networ
 | Cloud Targeting | 2000090-2000114 | 25 | Cloud and container attacks |
 | Tool-Specific | 2000115-2000124 | 10 | Iranian APT tools |
 | June 2025 Updates | 2000125-2000130 | 6 | Latest threat signatures |
+| March 2026 Updates | 2000131-2000230 | 63 | MuddyWater Malware, CyberAv3ngers OT |
 
 ## Deployment
 
