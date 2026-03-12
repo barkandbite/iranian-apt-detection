@@ -91,12 +91,12 @@ deploy_suricata_rules() {
     
     # Copy new rule files
     echo "Copying Iranian APT detection rules..."
-    cp suricata/iranian_apt_v2.rules "$SURICATA_RULES_DIR/" || echo -e "${RED}Failed to copy rules${NC}"
-    
+    cp suricata/iranian_apt_v3.1.rules "$SURICATA_RULES_DIR/" || echo -e "${RED}Failed to copy rules${NC}"
+
     # Update suricata.yaml to include new rules
-    if ! grep -q "iranian_apt_v2.rules" /etc/suricata/suricata.yaml; then
-        echo "Adding iranian_apt_v2.rules to suricata.yaml..."
-        sed -i '/rule-files:/a\  - iranian_apt_v2.rules' /etc/suricata/suricata.yaml
+    if ! grep -q "iranian_apt_v3.1.rules" /etc/suricata/suricata.yaml; then
+        echo "Adding iranian_apt_v3.1.rules to suricata.yaml..."
+        sed -i '/rule-files:/a\  - iranian_apt_v3.1.rules' /etc/suricata/suricata.yaml
     fi
     
     # Test Suricata configuration

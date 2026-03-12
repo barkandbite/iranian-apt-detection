@@ -1,11 +1,13 @@
 # Bark & Bite - Iranian APT Detection Rules
-# Version: 2.1
-# Last Updated: 2025-07-06
-# Credit: Bark & Bite
+# Version: 3.1
+# Last Updated: 2026-03-12
+# Credit: Bark & Bite Security
 #
 # This enhanced ruleset detects network traffic associated with Iranian threat actors
-# including Pioneer Kitten, Lemon Sandstorm, BladedFeline, UNC1860, and emerging groups
-# Optimized for extremely high accuracy with minimal false positives
+# including MuddyWater, CyberAv3ngers, Pioneer Kitten, Lemon Sandstorm, BladedFeline,
+# UNC1860, UNC1549, Handala/Void Manticore, APT42/RedKitten, Infy, and emerging groups.
+# Optimized for extremely high accuracy with minimal false positives.
+# Total signatures: 199 rules (SID 1000039-2000322)
 
 #==============================================================================
 # CVE EXPLOITATION DETECTION - INITIAL ACCESS
@@ -204,7 +206,7 @@ alert tcp $HOME_NET any -> $EXTERNAL_NET 8888 (msg:"Iranian APT: Chisel reverse 
 # Credit: Bark & Bite Security
 #
 # This update covers new Iranian APT activity from July 2025 through March 2026.
-# Designed to append to the existing iranian_apt_v2.rules (SID 2000001-2000130).
+# Designed to append to the existing base rules (SID 2000001-2000130).
 # New SID range: 2000131-2000230
 #
 # Threat context: Following the June 2025 twelve-day Iran-Israel war and
