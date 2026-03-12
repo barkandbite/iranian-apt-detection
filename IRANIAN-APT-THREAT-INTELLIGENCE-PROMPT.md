@@ -633,7 +633,135 @@ Per Trellix "The Iranian Cyber Capability 2026":
 
 ---
 
-## PART 11: ADDITIONAL SOURCED REFERENCES
+## PART 11: GRANULAR IOCs FROM UNIT 42 / PALO ALTO RESEARCH
+
+### IOCONTROL Malware - Deep Technical IOCs (Claroty Team82)
+
+| Indicator | Value |
+|-----------|-------|
+| Binary path | `/usr/bin/iocontrol` |
+| Version | 1.0.5, ARM-32 bit Big Endian |
+| Persistence | `/etc/rc3.d/S93InitSystemd.sh` (watchdog restarts every 5 sec) |
+| PID file | `/var/run/iocontrol.pid` |
+| Temp dir | `/tmp/iocontrol/` |
+| Packing | Modified UPX (magic "UPX!" changed to "ABC!" to break unpackers) |
+| AES key | `22e70a3056aa209e90dc5a354edda2c1c3b88f1e4720dc6a090c4617a919447e` |
+| AES IV | `1c3b88f1e4720dc6a090c4617a919447` |
+| MQTT broker IP | `159.100.6.69` (Frankfurt) |
+| MQTT management | RabbitMQ on port 15672 |
+| C2 domain | `uuokhhfsdlk.tylarion867mino.com` |
+| Legacy C2 | `ocferda.com` (registered Nov 23, 2023) |
+| MQTT topics | `{GUID}/hello`, `{GUID}/push`, `{GUID}/output` |
+| MQTT creds | Derived from victim GUID (e.g., GUID `855958ce-6483-4953-8c18-3f9625d88c27` -> user `5958ce`, pass `3-4953-8c18-3f9625`) |
+| Command opcodes | 0=device info, 1=check exec, 2=OS commands, 3=self-delete, 8=port scan |
+| Sample hash | `1b39f9b2b96a6586c4a11ab2fdbff8fdf16ba5a0ac7603149023d73f33b84498` |
+
+### Operation Olalampo - Full IOC List
+
+**Domains:**
+- `codefusiontech[.]org`
+- `miniquest[.]org`
+- `promoverse[.]org`
+- `jerusalemsolutions[.]com`
+
+**IPs:**
+- `162.0.230.185`
+- `209.74.87.100`
+- `143.198.5.41`
+- `209.74.87.67`
+
+**File Hashes (SHA-1):**
+- `f4e0f4449dc50e33e912403082e093dd8e4bc55d` (AnyDesk)
+- `3441306816018d08dd03a97ac306fac0200e9152` (chrome_inject.exe)
+- `9ca11fcbd75420bd7a578e8bf6ef855e7bd0fb8e` (ex-server)
+- `06f3b55f0d66913cd53d2f0e76a5e2d67ff8ed04` (client.exe)
+- `2f5166086da5a57d7e59a767a54ed6fe9a6db444` (lpu.exe)
+
+**SOCKS5 DLL:** `FMAPP.dll` (SHA-1: `62ED16701A14CE26314F2436D9532FE606C15407`)
+**Persistence:** Windows service "MicrosoftVersionUpdater"
+**Doc metadata usernames:** "DontAsk", "Jacob"
+
+### Stagecomp/Darkcomp Hashes
+
+**Stagecomp:**
+- `24857fe82f454719cd18bcbe19b0cfa5387bee1022008b7f5f3a8be9f05e4d14`
+- `A92d28f1d32e3a9ab7c3691f8bfca8f7586bb0666adbba47eab3e1a8faf7ecc0`
+
+**Darkcomp:**
+- `3df9dcc45d2a3b1f639e40d47eceeafb229f6d9e7f0adcd8f1731af1563ffb90`
+- `1319d474d19eb386841732c728acf0c5fe64aa135101c6ceee1bd0369ecf97b6`
+
+### Sosano Backdoor (Go-based, UNK_CraftyCamel/IRGC-linked)
+
+- 12MB Go binary (bloated with unused libraries)
+- Delivered via polyglot files (PDF+HTA, PDF+ZIP)
+- XOR keys: `1234567890abcdef`, `abcdef1234567890`, `0fedcba987654321`
+- Commands: `sosano` (directory ops), `yangom` (dir listing), `monday` (download next stage)
+- C2: `bokhoreshonline[.]com` -> `104.238.57[.]61` (CrownCloud hosting)
+
+### APT42 SpearSpecter Campaign IOCs
+
+**C2 domains:**
+- `datadrift.somee.com`
+- `prism-west-candy.glitch.me`
+- `line.completely.workers.dev`
+- `meetingapp.site`
+
+**TameCat persistence:**
+- Path: `%APPDATA%\Local\Microsoft\InputPersonalization\TrainedDataStore.ps1`
+- Registry: `HKCU:\Software\Microsoft\Windows\CurrentVersion\Run`
+
+### APT42 Credential Harvesting Infrastructure
+
+- 130+ phishing domains registered via NameCheap (2025)
+- Custom phishing kits built in React with live keyloggers
+- Mimics Gmail, Outlook, Yahoo login pages
+- GCollection and DWP kits capable of real-time MFA token capture
+- Only FIDO2/passkeys are immune; defeats TOTP/SMS-based MFA
+
+### MuddyWater Malware Evolution Timeline
+
+BugSleep -> StealthCache -> Phoenix -> Fooder -> MuddyViper -> RustyWater -> CHAR -> UDPGangster -> Dindoor -> Fakeset
+
+**C2 framework evolution:** POWERSTATS -> MuddyC3 -> PhonyC2 -> MuddyC2Go -> DarkBeatC2 -> PersianC2 -> ArenaC2 -> Key C2
+
+### Pioneer Kitten / Fox Kitten Additional Details
+
+- Sells domain admin credentials on cybercrime marketplaces using handles "Br0k3r" and "xplfinder"
+- Does NOT disclose Iranian origin to ransomware partners
+- FBI assesses activity is personal profit, not state-directed
+- Operates under cover company **Danesh Novin Sahand**
+- During 2023-2025 FortiGuard IR campaign: deployed Havoc, HanifNet, HXLibrary, NeoExpressRAT, MeshCentral, SystemBC
+- Activity patterns match Iranian workweek (Sunday-Wednesday) and +03:30 timezone
+
+### Deno BYOR Technical Details
+
+- `deno.exe` delivered via PowerShell if not present
+- Executes hidden Base64-encoded commands using `-A` (Allow All) flag
+- Payloads fetched in **8KB chunks**, reassembled as Base64 Data URI, executed directly in memory (zero disk artifacts)
+- Deno supports HTTP/S imports natively - thin loader pulls real functionality from C2 at runtime
+- Cross-platform (Windows/macOS/Linux)
+- Deno is rarely in endpoint watchlists, evading signature-based and process-lineage detection
+
+### Dust Specter / GhostForm RAT Technical Details
+
+- .NET RAT using invisible Windows forms with timers for delayed execution
+- In-memory PowerShell execution
+- Some binaries embed hardcoded Google Forms URLs (Arabic-language Iraqi MoFA impersonation)
+- AI-assisted development markers (emojis, 0xABCDEF seed placeholder)
+- **TwinTalk C2 protocol:** Randomized 10-hex URI paths with 6-char checksum verification, JWT (weak HS256) in Authorization headers, hardcoded Chrome User-Agent verification, geofencing
+
+### Cobalt Strike Infrastructure Scale (January 2026)
+
+- Hunt.io observed **1,921 unique IPs** hosting Cobalt Strike infrastructure (vs. ~739/month average in 2025)
+- Beacon configurations: XOR encoding (0x69 for v3, 0x2e for v4), TLV format
+- Iranian actors use Malleable C2 profiles to mimic legitimate traffic
+- **CrossC2** framework (2025) extends beacon deployment to Linux/macOS
+- AI-driven malleable C2 profile generation is emerging trend
+
+---
+
+## PART 12: ADDITIONAL SOURCED REFERENCES
 
 ### Israeli Sources
 - [Check Point Research: "Handala Hack" - Unveiling Group's Modus Operandi](https://research.checkpoint.com/2026/handala-hack-unveiling-groups-modus-operandi/)
@@ -663,6 +791,25 @@ Per Trellix "The Iranian Cyber Capability 2026":
 - [Picus Security: Iranian Threat Actors — What Defenders Need to Know](https://www.picussecurity.com/resource/iranian-threat-actors-what-defenders-need-to-know)
 - [Trellix: The Iranian Cyber Capability 2026](https://www.trellix.com/blogs/research/the-iranian-cyber-capability-2026/)
 - [Rescana: 149 Hacktivist DDoS Attacks](https://www.rescana.com/post/global-surge-149-hacktivist-ddos-attacks-target-scada-and-critical-infrastructure-across-16-countri)
+
+### Technical Analysis / IOC Sources
+- [Claroty Team82: IOCONTROL Analysis](https://claroty.com/team82/research/inside-a-new-ot-iot-cyber-weapon-iocontrol)
+- [Group-IB: Operation Olalampo](https://www.group-ib.com/blog/muddywater-operation-olalampo/)
+- [SecPro: Operation Olalampo IOCs](https://secpro.substack.com/p/operation-olalampo-indicators-of)
+- [Symantec/Security.com: Seedworm US Targets](https://www.security.com/threat-intelligence/iran-cyber-threat-activity-us)
+- [Proofpoint: Sosano/CraftyCamel](https://www.proofpoint.com/us/blog/threat-insight/call-it-what-you-want-threat-actor-delivers-highly-targeted-multistage-polyglot)
+- [Zscaler ThreatLabz: Dust Specter](https://www.zscaler.com/blogs/security-research/dust-specter-apt-targets-government-officials-iraq)
+- [Google Cloud: Untangling APT42](https://cloud.google.com/blog/topics/threat-intelligence/untangling-iran-apt42-operations)
+- [CISA Advisory AA24-241A: Pioneer Kitten](https://www.cisa.gov/news-events/cybersecurity-advisories/aa24-241a)
+- [FortiGuard: Fox Kitten](https://fortiguard.fortinet.com/threat-actor/5570/fox-kitten)
+- [HarfangLab: MuddyWater RMM Campaign](https://harfanglab.io/insidethelab/muddywater-rmm-campaign/)
+- [Ctrl-Alt-Intel: MuddyWater Exposed](https://ctrlaltintel.com/threat%20research/MuddyWater/)
+- [CyberWarrior76: MuddyWater BYOR Analysis](https://cyberwarrior76.substack.com/p/irans-muddywater-just-dropped-two)
+- [Rescana: Dindoor Analysis](https://www.rescana.com/post/muddywater-s-dindoor-backdoor-iranian-apt-targets-u-s-organizations-via-deno-runtime-and-cloud-sto)
+- [Hunt.io: Cobalt Strike Hunting Guide](https://hunt.io/blog/guide-hunting-cobalt-strike-part-4-c2-feeds-api)
+- [Halcyon: Iranian Cybercriminal Tactics 2026](https://www.halcyon.ai/ransomware-alerts/iranian-use-of-cybercriminal-tactics-in-destructive-cyber-attacks-2026-updates)
+- [Help Net Security: Cisco SD-WAN Exploitation](https://www.helpnetsecurity.com/2026/03/05/cisco-cve-2026-20128-cve-2026-20122-exploited/)
+- [Australian ACSC: SD-WAN Alert](https://www.cyber.gov.au/about-us/view-all-content/alerts-and-advisories/exploitation-of-cisco-sd-wan-appliances)
 
 ---
 
