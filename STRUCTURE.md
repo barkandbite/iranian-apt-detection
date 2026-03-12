@@ -22,7 +22,7 @@ iranian-apt-detection/
 │   └── README.md                                     # Configuration guide
 │
 ├── suricata/
-│   ├── iranian_apt_v2.rules                         # Current Suricata IDS signatures (v3.0)
+│   ├── iranian_apt_v3.1.rules                       # Current Suricata IDS signatures (v3.1)
 │   └── README.md                                     # Suricata deployment guide
 │
 ├── documentation/
@@ -60,7 +60,7 @@ iranian-apt-detection/
 1. **Wazuh Rules**: Deploy all files from `wazuh-rules/09*.xml` or use master from archive
 2. **Sysmon**: Deploy `configurations/sysmon-config-iranian-apt.xml` to Windows endpoints
 3. **Agent Config**: Add content from `configurations/ossec-agent-iranian-apt.conf` to agents
-4. **Suricata**: Copy `suricata/iranian_apt_v2.rules` to your rules directory
+4. **Suricata**: Copy `suricata/iranian_apt_v3.1.rules` to your rules directory
 5. **Active Response**: Run `tools/deploy-active-response.sh` for automated response
 
 ## Rule ID Allocation

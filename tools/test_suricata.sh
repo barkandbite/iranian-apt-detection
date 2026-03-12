@@ -5,7 +5,7 @@
 
 set -e
 
-RULES_FILE="suricata/iranian_apt_v2.rules"
+RULES_FILE="suricata/iranian_apt_v3.1.rules"
 
 echo "Suricata Rules Validation"
 echo "========================="

@@ -35,12 +35,12 @@ sudo systemctl restart wazuh-manager
 
 ## 3. Install Suricata Rules
 ```bash
-sudo cp suricata/iranian_apt_v2.rules /etc/suricata/rules/
+sudo cp suricata/iranian_apt_v3.1.rules /etc/suricata/rules/
 ```
 Add the file to `suricata.yaml` under `rule-files`:
 ```yaml
 rule-files:
-  - iranian_apt_v2.rules
+  - iranian_apt_v3.1.rules
 ```
 Validate the configuration and reload Suricata:
 ```bash

@@ -5,11 +5,11 @@ This directory contains Suricata IDS signatures for detecting Iranian APT networ
 
 ## Current Ruleset
 
-### Main File: iranian_apt_v2.rules
-- **Version**: 3.0
-- **Last Updated**: 2026-03-09
-- **SID Range**: 2000001-2000230
-- **Total Rules**: 193 signatures
+### Main File: iranian_apt_v3.1.rules
+- **Version**: 3.1
+- **Last Updated**: 2026-03-12
+- **SID Range**: 1000039-2000322
+- **Total Rules**: 199 signatures
 
 ### Rule Categories
 
@@ -27,20 +27,57 @@ This directory contains Suricata IDS signatures for detecting Iranian APT networ
 | Cloud Targeting | 2000090-2000114 | 25 | Cloud and container attacks |
 | Tool-Specific | 2000115-2000124 | 10 | Iranian APT tools |
 | June 2025 Updates | 2000125-2000130 | 6 | Latest threat signatures |
-| March 2026 Updates | 2000131-2000230 | 63 | MuddyWater Malware, CyberAv3ngers OT |
+| March 2026 v3.0 | 2000131-2000193 | 63 | MuddyWater malware, CyberAv3ngers OT |
+| **March 2026 v3.1** | **2000231-2000322** | **92** | **Emergency update (see below)** |
+
+### v3.1 Emergency Update Coverage (March 12, 2026)
+
+| Section | SID Range | Count | Description |
+|---------|-----------|-------|-------------|
+| Cisco SD-WAN | 2000231-2000234 | 4 | CVE-2026-20122/20128 exploitation |
+| MDM Wiper (Stryker) | 2000235-2000238 | 4 | Intune/Workspace ONE bulk wipe |
+| Sicarii Ransomware | 2000239-2000242 | 4 | .sicarii extension, file.io exfil |
+| Operation Olalampo | 2000243-2000247 | 5 | GhostFetch, HTTP_VIP patterns |
+| MuddyWater C2 Domains | 2000248-2000252 | 5 | New C2 infrastructure |
+| RedAlert APK | 2000253-2000256 | 4 | Phishing campaign IOCs |
+| RMM Tool Abuse | 2000257-2000263 | 7 | SimpleHelp, Syncro, NetBird, etc. |
+| Backdoor Patterns | 2000264-2000266 | 3 | BugSleep, TameCat, PowerLess |
+| Privilege Escalation | 2000267 | 1 | CVE-2024-30088 |
+| Deno Runtime | 2000268-2000269 | 2 | BYOR evasion detection |
+| Cobalt Strike | 2000270-2000272 | 3 | HTTP/DNS beacon, named pipes |
+| Wiper Detection | 2000273-2000274 | 2 | Mass distribution, disk overwrite |
+| DDoS/Hacktivist | 2000275-2000277 | 3 | UDP/HTTP/SYN flood |
+| SOCKS5 Proxy | 2000278-2000279 | 2 | MuddyWater tunneling |
+| Credential Theft | 2000280-2000282 | 3 | Kerberoasting, LSASS, browser |
+| DCHSpy Mobile | 2000283 | 1 | SFTP exfiltration |
+| Infrastructure | 2000284-2000287 | 4 | .online TLD, polyglot, double ext |
+| Cloud Abuse | 2000288-2000292 | 5 | OneDrive, Drive, Discord, Firebase |
+| Correlation Chains | 2000293-2000297 | 5 | Multi-stage attack detection |
+| Encryption Evasion | 2000298-2000300 | 3 | Self-signed cert, SSH/443, DoH |
+| Enhanced OT/ICS | 2000301-2000305 | 5 | Modbus, DNP3, BACnet, EtherNet/IP |
+| NTP Manipulation | 2000306 | 1 | Time source attacks |
+| Stagecomp/Darkcomp | 2000307-2000308 | 2 | MuddyWater tools |
+| Sosano/GhostForm | 2000309-2000310 | 2 | Go/WebSocket backdoors |
+| React2Shell | 2000311 | 1 | CVE-2025-55182 |
+| FortiOS fgfmd | 2000312 | 1 | CVE-2024-23113 |
+| AMSI/ETW Bypass | 2000313-2000314 | 2 | Evasion detection |
+| Mobile Targeting | 2000315 | 1 | Shortened URL APK delivery |
+| Known C2 IPs | 2000316-2000317 | 2 | MuddyWater infrastructure |
+| DGA Detection | 2000318-2000319 | 2 | OilRig high-entropy DNS |
+| Wiper Pre-cursors | 2000320-2000322 | 3 | Backup deletion, boot tamper |
 
 ## Deployment
 
 ### 1. Copy Rules File
 ```bash
-sudo cp iranian_apt_v2.rules /etc/suricata/rules/
+sudo cp iranian_apt_v3.1.rules /etc/suricata/rules/
 ```
 
 ### 2. Update suricata.yaml
 Add to the `rule-files` section:
 ```yaml
 rule-files:
-  - iranian_apt_v2.rules
+  - iranian_apt_v3.1.rules
 ```
 
 ### 3. Test Configuration

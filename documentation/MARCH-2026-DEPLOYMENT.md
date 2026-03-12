@@ -8,16 +8,12 @@
 ## Quick Deploy
 
 ```bash
-# Append to existing ruleset (do NOT replace iranian_apt_v2.rules)
-sudo cat bb-iran-march2026-update.rules >> /etc/suricata/rules/iranian_apt_v2.rules
+# Deploy the consolidated v3.1 ruleset
+sudo cp iranian_apt_v3.1.rules /etc/suricata/rules/
 
-# OR deploy as separate file
-sudo cp bb-iran-march2026-update.rules /etc/suricata/rules/
-
-# If deploying as separate file, add to suricata.yaml:
+# Update suricata.yaml:
 #   rule-files:
-#     - iranian_apt_v2.rules
-#     - bb-iran-march2026-update.rules
+#     - iranian_apt_v3.1.rules
 
 # Validate syntax
 sudo suricata -T -c /etc/suricata/suricata.yaml
