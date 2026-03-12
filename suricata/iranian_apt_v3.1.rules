@@ -91,7 +91,7 @@ alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT GitH
 
 # Havoc C2 Framework (Iranian APT standard) - COMPLETELY REWRITTEN
 # Simple pattern following working syntax from existing rules
-alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Havoc C2 Beacon"; flow:to_server,established; content:"GET"; http_method; urilen:2<>10; content:"Mozilla/5.0"; http.user_agent; content:"Cookie"; http_header; flowbits:set,iranian.havoc; classtype:trojan-activity; sid:2000022; rev:9; metadata:bark_bite iranian_apt havoc_c2 high_confidence;)
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Havoc C2 Beacon"; flow:to_server,established; content:"GET"; http_method; urilen:2<>10; content:"Mozilla/5.0"; http_user_agent; content:"Cookie"; http_header; flowbits:set,iranian.havoc; classtype:trojan-activity; sid:2000022; rev:10; metadata:bark_bite iranian_apt havoc_c2 high_confidence;)
 
 # Remote Access Tools (Pioneer Kitten ransomware handoff)
 alert tcp $HOME_NET any -> $EXTERNAL_NET 7070 (msg:"Bark&Bite - Iranian APT AnyDesk Remote Access"; flow:to_server,established; content:"|01 00 00 00 21 12 a4 42|"; depth:8; content:"anynet"; distance:0; within:50; threshold:type limit, track by_src, count 1, seconds 86400; classtype:policy-violation; sid:2000024; rev:2; metadata:bark_bite iranian_apt remote_access ransomware_precursor;)
@@ -105,7 +105,7 @@ alert tls $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MeshC
 
 # Living-off-the-land PowerShell (All Iranian groups) - FIXED STICKY BUFFERS
 # Add pkt_data between different buffer types per CLAUDE.md
-alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT PowerShell Download Cradle"; flow:to_server,established; content:"GET"; http_method; content:"WindowsPowerShell"; http.user_agent; pkt_data; content:"/"; http_uri; content:".ps1"; http_uri; flowbits:set,iranian.powershell.download; classtype:trojan-activity; sid:2000026; rev:8; metadata:bark_bite iranian_apt living_off_land;)
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT PowerShell Download Cradle"; flow:to_server,established; content:"GET"; http_method; content:"WindowsPowerShell"; http_user_agent; content:".ps1"; http_uri; flowbits:set,iranian.powershell.download; classtype:trojan-activity; sid:2000026; rev:9; metadata:bark_bite iranian_apt living_off_land;)
 
 alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT PowerShell Payload Delivery"; flow:to_client,established; flowbits:isset,iranian.powershell.download; content:"200"; http_stat_code; file_data; pcre:"/(\\$[a-zA-Z0-9_]+\\s*=|function\\s+[a-zA-Z0-9_]+|Invoke-|IEX|downloadstring)/i"; classtype:trojan-activity; sid:2000027; rev:2; metadata:bark_bite iranian_apt payload_delivery critical;)
 

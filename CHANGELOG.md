@@ -5,6 +5,16 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.1] - 2026-03-12
+
+### Fixed
+- **SID 2000022** (Havoc C2 Beacon): Fixed mixed buffer syntax — changed sticky buffer `http.user_agent` to legacy modifier `http_user_agent` for compatibility with the `http_header` modifier in the same rule. Suricata 7.x rejects mixing sticky buffers and legacy modifiers without a `pkt_data` reset. (rev 9 -> 10)
+- **SID 2000026** (PowerShell Download Cradle): Fixed "no matches for previous buffer" error caused by `pkt_data` reset between `http.user_agent` sticky buffer and `http_uri` legacy modifier. Simplified to use consistent legacy modifier syntax throughout. (rev 8 -> 9)
+
+### Notes
+- Both bugs caused Suricata to refuse to load the entire rules file (`Loading signatures failed`), making all 199 rules non-functional until fixed.
+- Validated all 199 rules pass `suricata -T` with Suricata 7.0.3.
+
 ## [0.6.0] - 2026-03-09
 
 ### Added
