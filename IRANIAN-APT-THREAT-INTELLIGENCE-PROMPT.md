@@ -813,6 +813,87 @@ BugSleep -> StealthCache -> Phoenix -> Fooder -> MuddyViper -> RustyWater -> CHA
 
 ---
 
+## PART 13: US GOVERNMENT DIRECTIVES AND ADDITIONAL INTELLIGENCE
+
+### Active Government Directives (March 2026)
+
+| Directive | Date | Requirement |
+|-----------|------|-------------|
+| CISA Emergency Advisory AA26-059A | Feb 28, 2026 | "Elevated and imminent" Iranian cyber threat to all US critical infrastructure |
+| CISA Emergency Directive ED 26-03 | Mar 2026 | FCEB agencies must inventory, patch, and assess Cisco SD-WAN systems |
+| CISA Binding Operational Directive 26-02 | Feb 5, 2026 | Removal of end-of-support edge devices |
+| NSA/CISA/FBI/DC3 Joint Fact Sheet | Updated Jan 14, 2026 | Iranian actors targeting DIB companies with Israeli relationships |
+| NSA Five Eyes Joint Advisory | Feb 25, 2026 | SD-WAN exploitation guidance |
+
+### Additional CVE: CVE-2026-24858 (FortiOS SSO)
+
+- CVSS 9.4: Critical FortiOS SSO authentication bypass
+- Added to CISA KEV Jan 27, 2026
+- Exploitation involved unauthorized admin account creation and VPN reconfiguration
+- 10,000+ FortiOS instances remain unpatched for CVE-2020-12812 (legacy flaw under renewed attack)
+
+### Dragos OT Group Designations (2026)
+
+| Dragos Name | Maps To | Focus |
+|-------------|---------|-------|
+| BAUXITE | CyberAv3ngers | Water/wastewater, ICS Stage 2 Kill Chain |
+| PARISITE | Pioneer Kitten | IT-to-OT access broker, VPN exploitation |
+| PYROXENE | New group (2025) | Multi-year supply chain via fake LinkedIn recruiters targeting OT personnel; receives access from PARISITE |
+| SYLVANITE | New group (2025) | Rapid exploitation broker enabling Voltzite access to US electric grid; exploited Ivanti VPN within 48 hours of disclosure |
+
+### CrowdStrike Iranian "Kitten" Taxonomy (Active 2026)
+
+| CrowdStrike Name | Affiliation | Focus |
+|------------------|-------------|-------|
+| Charming Kitten | IRGC (APT42) | Credential theft, journalists/NGOs |
+| Refined Kitten | IRGC | Saudi Arabia targeting |
+| Imperial Kitten | IRGC | Strategic targeting |
+| Hydro Kitten | IRGC-CEC | Critical infrastructure research |
+| Banished Kitten | MOIS (Void Manticore) | Destructive operations |
+| Remix Kitten | MOIS | Intelligence collection |
+| Haywire Kitten | Emennet Pasargad | Influence operations |
+| Spectral Kitten | Unknown | Active campaigns |
+| Vengeful Kitten | Unknown | Active campaigns |
+
+### Supply Chain and MSP Targeting Details
+
+- **MuddyWater** compromised Israeli IT provider "Rashim" for downstream access to customers
+- **Pioneer Kitten**: Targets VPN appliances and MSPs as initial access broker for ransomware gangs (ALPHV/BlackCat, NoEscape, RansomHouse)
+- **PYROXENE**: Multi-year supply chain campaigns via fake LinkedIn recruiter profiles targeting OT personnel
+- **Screening Serpens**: Fraudulent employment portals delivering malware as job application materials, signed with valid code-signing certificates
+- **POWSSHNET** (Pioneer Kitten custom tool): RDP over SSH tunnels for persistent access
+
+### LSASS Credential Dumping Detection Specifics
+
+Monitor these `GrantedAccess` patterns on `lsass.exe`:
+- `0x1010` - process read access (Mimikatz)
+- `0x1410` - process query + read (ProcDump)
+- `0x1438` - full access (comsvcs.dll MiniDump)
+
+**Mitigation**: Enable LSASS PPL (Protected Process Light) protection
+
+### Healthcare Sector Specific Threats
+
+- Iranian attacks on healthcare tend toward "lock and leak" (ransomware + data leak for discrediting)
+- Health-ISAC issued sector-wide alert
+- Social engineering campaigns targeting frontline healthcare workers observed
+- FBI/CISA warned hospitals about Iranian targeting of HVAC, water, life-safety, and building automation OT systems
+
+### Additional Source References
+
+- [CISA Emergency Advisory AA26-059A](https://www.cisa.gov/topics/cyber-threats-and-advisories/advanced-persistent-threats/iran)
+- [CISA: CVE-2026-24858 FortiOS](https://www.cisa.gov/news-events/alerts/2026/01/28/fortinet-releases-guidance-address-ongoing-exploitation-authentication-bypass-vulnerability-cve-2026)
+- [NSA SD-WAN Advisory PDF](https://media.defense.gov/2026/Feb/25/2003880301/-1/-1/0/CSA_Exploitation_of_SD-WAN_Appliances.PDF)
+- [Dragos 2026 OT Report](https://www.dragos.com/blog/dragos-8th-annual-ot-cybersecurity-year-in-review-is-now-available)
+- [Recorded Future: Iran War Assessment](https://www.recordedfuture.com/blog/the-iran-war-what-you-need-to-know)
+- [CrowdStrike: Charming Kitten](https://www.crowdstrike.com/en-us/adversaries/charming-kitten/)
+- [Eclypsium: Fortinet Under Fire](https://eclypsium.com/blog/fortinet-authentication-bypass-network-edge-attacks-cve-2020-12812/)
+- [CISA AA22-320A: Federal Network Compromise](https://www.cisa.gov/news-events/cybersecurity-advisories/aa22-320a)
+- [MITechNews: Stryker Attack](https://mitechnews.com/cyber-defense/iran-linked-hackers-target-25b-michigan-medical-device-company-stryker/)
+- [HFMA: Hospital Cybersecurity](https://www.hfma.org/technology/iran-linked-hospital-cybersecurity-threats/)
+
+---
+
 ## END OF PROMPT
 
 Use this intelligence to build detections appropriate for the target platform. When building rules, prioritize the CRITICAL indicators first, then HIGH, then MEDIUM. Always include MITRE ATT&CK mappings and source references in metadata.
