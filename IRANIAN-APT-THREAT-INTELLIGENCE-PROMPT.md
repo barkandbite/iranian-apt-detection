@@ -515,6 +515,157 @@ These are confirmed attack chains where Stage 1 -> Stage 2 correlation provides 
 
 ---
 
+## PART 10: EXPANDED INTELLIGENCE FROM ISRAELI AND US SOURCES
+
+### Stryker Corporation Attack - Deep Technical Detail (March 11, 2026)
+
+**Attack Chain Specifics:**
+1. Initial access via compromised administrator credentials - likely credential theft or brute-force against VPN using commercial VPN nodes with hostnames in `DESKTOP-XXXXXX` / `WIN-XXXXXX` format (hundreds of logon attempts observed)
+2. Escalated to Intune Global Administrator
+3. Issued Microsoft Intune remote wipe commands to ALL enrolled devices simultaneously
+4. No traditional malware deployed for the MDM wipe phase - pure living-off-the-land
+5. Lifenet EKG transmission systems went non-functional across Maryland
+6. Ireland operations (5,500 employees) sent home
+
+**Handala's Traditional Wiper Technical Details (from prior Israeli campaigns):**
+- **handala.exe**: Delphi-coded second-stage loader / AutoIt injector
+- **Hatef.exe**: Windows wiper, overwrites files in 4096-byte chunks with random data via `OverwriteFileBlockSize4096` function, then deletes; targets MBR/MFT
+- **Hamsa**: Linux wiper variant
+- **Singleton check**: Checks if machine name equals `Gaza hackers Team Handala Machine` (dev machine exclusion)
+- **C2**: Telegram channel for status updates (pre-wipe/post-wipe per drive category)
+- **Distribution**: Group Policy logon scripts via `handala.bat`; executable launched remotely from Domain Controller, not written to disk
+- **PowerShell wiper**: Enumerates user directories, deletes files, places `handala.gif` propaganda image on all logical drives; likely AI-assisted development
+- **Additional tool**: NetBird for tunneling traffic into target networks
+- **Pairing**: Rhadamanthys commercial infostealer paired with wipers in campaigns impersonating F5 updates
+
+**Known Handala IOCs:**
+- SHA256 (second loader): `ca9bf13897af109cb354f2629c10803966eb757ee4b2e468abc04e7681d0d74a`
+- MSI installer: `6eb7dbf27a25639c7f11c05fd88ea2a301e0ca93d3c3bdee1eb5917fc60a56ff` (hosted on Mega)
+- Starlink IP ranges used for C2 to bypass Iran's internet blackout
+
+**Leadership Context:** Seyed Yahya Hosseini Panjaki (MOIS Counter-Terrorism Division, supervised Handala/Karma/Homeland Justice personas) was reportedly killed March 2, 2026. The Stryker attack occurred 9 days later - indicating pre-positioned access or autonomous cell operation.
+
+### RedAlert APK - Deep Technical Chain
+
+**Multi-Stage Infection:**
+1. **Stage 1**: Outer APK uses Package Manager Hooking via Java reflection to intercept system calls, returning hardcoded certificate impersonating official Home Front Command app's 2014 credential. Forces system to report installation source as Google Play Store.
+2. **Stage 2**: Extracts hidden file `umgdn` (no extension) from APK assets directory, loads as Dalvik Executable in memory - evades static scanners.
+3. **Stage 3**: Deploys `DebugProbesKt.dex` - primary spyware/banking trojan with overlay phishing capabilities.
+
+**Capabilities:** Real-time GPS tracking (weaponizable for shelter mapping, population movement, IDF reservist location), SMS/contacts/accounts exfiltration, phishing overlay injection (OTP/credential interception), full rocket alert functionality maintained as cover.
+
+**RedAlert IOCs:**
+| Indicator | Value |
+|-----------|-------|
+| Package name | `com.red.alertx` |
+| Dropper | `RedAlert.apk` |
+| Hidden payload | `umgdn` (assets directory) |
+| Final stage | `DebugProbesKt.dex` |
+| C2 protection | Cloudflare + AWS routing |
+
+### DCHSpy - New Samples (Post-Feb 28)
+
+- Lookout acquired **four new DCHSpy samples** approximately one week after February 28 strikes
+- One sample distributed using **Starlink lures** exploiting reports of Starlink services during Iranian internet outages
+- Shares infrastructure with **SandStrike** (Kaspersky 2022) targeting Baha'i Faith practitioners
+- Part of broader ecosystem: Lookout has identified **17 mobile malware families** across **10 Iranian APTs**
+
+### Hacktivist Coalition Scale
+
+**First 72 Hours (Feb 28 - Mar 2):**
+- **149 DDoS attacks** targeting **110 organizations** across **16 countries**
+- Geographic concentration: Kuwait (28%), Israel (27.1%), Jordan (21.5%)
+- Sector targeting: Government (48%), Finance (12%), Telecommunications (7%)
+- ~70% of DDoS activity attributed to Keymous+ and DieNet
+
+**Pro-Russian Convergence (March 3):**
+- Russian Legion and NoName057(16) formally joined pro-Iran coalition
+- Shifted from Ukraine-focused to anti-Israel/anti-Western operations
+
+**ICS Claims:**
+- Z-Pentest Alliance: Claimed real-time control of Israeli water pump HMI (valves/alarms)
+- APT Iran: Claimed month-long intrusion into Jordan grain storage systems
+
+### Iran's Complete Wiper Arsenal (15+ Families)
+
+ZeroCleare, Meteor, Dustman, DEADWOOD, Apostle, Fantasy Wiper, BFG Agonizer, MultiLayer, PartialWasher, BibiWiper, Hatef/Handala Wiper, Hamsa (Linux), SHAPESHIFT/STONEDRILL, No-Justice, Cl Wiper, ROADSWEEP, Sicarii (destructive ransomware - discards keys)
+
+### PowerLess Backdoor Evolution (APT35)
+
+Per Trellix "The Iranian Cyber Capability 2026":
+- AMSI bypass: patches `AmsiScanBuffer` at runtime
+- ETW bypass: patches `NtTraceControl` to prevent telemetry
+- AES-encrypted payloads delivered via malicious LNK files
+- **BellaCPP**: C++ reimplementation of BellaCiao .NET implant - webshell-tunneling hybrid ported to harder-to-detect language
+
+### Infrastructure Attribution Patterns
+
+| Pattern | Detail |
+|---------|--------|
+| Registrar | NameCheap (preferred across multiple groups) |
+| DNS provider | Cloudflare (consistently used) |
+| Hosting | AS136557 (Hosterdaddy Private Limited) |
+| Activity hours | Tehran business hours (UTC+3:30) |
+| VPN exit nodes | Mullvad, ProtonVPN, Surfshark, NordVPN (for reconnaissance) |
+| Login patterns | Commercial VPN nodes with DESKTOP-XXXXXX / WIN-XXXXXX hostnames |
+
+### INCD / Government Warnings
+
+**Israel National Cyber Directorate (March 9, 2026):**
+- Detecting wave of cyberattacks aimed at destroying data and systems across multiple Israeli economic sectors
+- Attacks exploit stolen credentials and remote-access vulnerabilities
+- Shift from espionage to attempted data destruction
+- INCD issued 2,480 alerts in past year - 2.5x increase year-over-year
+- Cyber Dome (AI-driven centralized threat detection) reportedly thwarted dozens of attacks
+
+**FBI (March 3, 2026):**
+- Specifically warned about Iranian targeting of hospital HVAC, water systems, life-safety, and building automation systems
+
+**CISA:**
+- Investigating Stryker attack; operating at approximately 38% staffing due to DHS funding standoff
+
+### Operational Pause Analysis
+
+- Feb 28: Iran connectivity dropped to 1-4% following kinetic strikes
+- Operational pause observed Jan 8-27, 2026 (earlier internet blackout) provides circumstantial evidence of direct state coordination
+- APT34/OilRig has been operationally silent since Feb 28 - assessed as "covert pre-positioning" rather than disruption
+- Pre-positioned access on US/Israeli networks provides capability for destructive pivot regardless of connectivity
+
+---
+
+## PART 11: ADDITIONAL SOURCED REFERENCES
+
+### Israeli Sources
+- [Check Point Research: "Handala Hack" - Unveiling Group's Modus Operandi](https://research.checkpoint.com/2026/handala-hack-unveiling-groups-modus-operandi/)
+- [Splunk: Handala's Wiper Threat Analysis and Detections](https://www.splunk.com/en_us/blog/security/handalas-wiper-threat-analysis-and-detections.html)
+- [Check Point Research: Iranian MOIS Actors & the Cyber Crime Connection](https://research.checkpoint.com/2026/iranian-mois-actors-the-cyber-crime-connection/)
+- [Intezer: Operation HamsaUpdate](https://intezer.com/blog/stealth-wiper-israeli-infrastructure/)
+- [Haaretz: How Iranian Hackers Plan to Retaliate (INCD)](https://www.haaretz.com/israel-news/security-aviation/2026-03-09/)
+- [Jerusalem Post: Israel releases video countering Iranian cyber warfare](http://www.jpost.com/israel-news/defense-news/article-889462)
+- [Lookout: MuddyWater Leveraging DCHSpy](https://www.lookout.com/threat-intelligence/article/lookout-discovers-iranian-dchsy-surveillanceware)
+
+### US Sources
+- [Krebs on Security: Iran-Backed Hackers Claim Wiper Attack on Stryker](https://krebsonsecurity.com/2026/03/iran-backed-hackers-claim-wiper-attack-on-medtech-firm-stryker/)
+- [BleepingComputer: Medtech giant Stryker offline after Iran-linked wiper malware attack](https://www.bleepingcomputer.com/news/security/medtech-giant-stryker-offline-after-iran-linked-wiper-malware-attack/)
+- [The Hacker News: MuddyWater Hackers Target U.S. Networks With Dindoor Backdoor](https://thehackernews.com/2026/03/iran-linked-muddywater-hackers-target.html)
+- [The Register: Iran intelligence backdoored US bank, airport networks](https://www.theregister.com/2026/03/05/mudywater_backdoor_us_networks/)
+- [SecurityWeek: Iranian APT Targets Android Users With DCHSpy](https://www.securityweek.com/new-variants-of-dchspy-spyware-used-by-iranian-apt-to-target-android-users/)
+- [Unit 42: Threat Brief — March 2026 Escalation](https://unit42.paloaltonetworks.com/iranian-cyberattacks-2026/)
+- [SentinelOne: Intelligence Brief — Iranian Cyber Activity Outlook](https://www.sentinelone.com/blog/sentinelone-intelligence-brief-iranian-cyber-activity-outlook/)
+
+### Coalition / International
+- [SOCRadar: Iran vs. Israel & US Cyber War 2026](https://socradar.io/blog/cyber-reflections-us-israel-iran-war/)
+- [Flashpoint: Escalation in the Middle East — Tracking Operation Epic Fury](https://flashpoint.io/blog/escalation-in-the-middle-east-operation-epic-fury/)
+- [Tenable: Cyber Retaliation Analyzing Iranian Cyber Activity](https://www.tenable.com/blog/cyber-retaliation-analyzing-iranian-cyber-activity-following-operation-epic-fury/)
+- [CloudSEK: RedAlert Trojan Campaign](https://www.cloudsek.com/blog/redalert-trojan-campaign-fake-emergency-alert-app-spread-via-sms-spoofing-israeli-home-front-command)
+- [CloudSEK: ICS/OT Targeting Assessment](https://www.cloudsek.com/blog/a-threat-actor-landscape-assessment-of-ics-ot-targeting-in-the-2026-iran-us-conflict-and-the-scale-of-the-risk)
+- [Canadian Centre for Cyber Security: Cyber Threat Bulletin](https://www.cyber.gc.ca/en/guidance/cyber-threat-bulletin-iranian-cyber-threat-response-usisrael-strikes-february-2026)
+- [Picus Security: Iranian Threat Actors — What Defenders Need to Know](https://www.picussecurity.com/resource/iranian-threat-actors-what-defenders-need-to-know)
+- [Trellix: The Iranian Cyber Capability 2026](https://www.trellix.com/blogs/research/the-iranian-cyber-capability-2026/)
+- [Rescana: 149 Hacktivist DDoS Attacks](https://www.rescana.com/post/global-surge-149-hacktivist-ddos-attacks-target-scada-and-critical-infrastructure-across-16-countri)
+
+---
+
 ## END OF PROMPT
 
 Use this intelligence to build detections appropriate for the target platform. When building rules, prioritize the CRITICAL indicators first, then HIGH, then MEDIUM. Always include MITRE ATT&CK mappings and source references in metadata.
