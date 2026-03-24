@@ -89,7 +89,7 @@ alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT GitH
 alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT GitHub C2 Instructions Retrieved"; flow:to_client,established; flowbits:isset,iranian.github.c2; content:"200"; http_stat_code; content:"base64"; http_server_body; pcre:"/\"content\"\s*:\s*\"[A-Za-z0-9+\/]{50,}/"; classtype:trojan-activity; sid:2000021; rev:1; metadata:policy max-detect-ips drop, created_at 2025_07_06, updated_at 2026_03_12;)
 
 # Havoc C2 Framework (Iranian APT standard) - COMPLETELY REWRITTEN
-alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Havoc C2 Beacon"; flow:to_server,established; content:"GET"; http_method; urilen:2<>10; content:"Mozilla/5.0"; http.user_agent; content:"Cookie"; http_header; flowbits:set,iranian.havoc; classtype:trojan-activity; sid:2000022; rev:9; metadata:policy max-detect-ips drop, created_at 2025_07_06, updated_at 2026_03_12;)
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Havoc C2 Beacon"; flow:to_server,established; content:"GET"; http_method; urilen:2<>10; http.user_agent; content:"Mozilla/5.0"; http.cookie; content:"="; flowbits:set,iranian.havoc; classtype:trojan-activity; sid:2000022; rev:11; metadata:policy max-detect-ips drop, created_at 2025_07_06, updated_at 2026_03_24;)
 
 # Remote Access Tools (Pioneer Kitten ransomware handoff)
 alert tcp $HOME_NET any -> $EXTERNAL_NET 7070 (msg:"Bark&Bite - Iranian APT AnyDesk Remote Access"; flow:to_server,established; content:"|01 00 00 00 21 12 a4 42|"; depth:8; content:"anynet"; distance:0; within:50; threshold:type limit, track by_src, count 1, seconds 86400; classtype:policy-violation; sid:2000024; rev:2; metadata:policy max-detect-ips drop, created_at 2025_07_06, updated_at 2026_03_12;)
@@ -102,7 +102,7 @@ alert tls $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MeshC
 #==============================================================================
 
 # Living-off-the-land PowerShell (All Iranian groups) - FIXED STICKY BUFFERS
-alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT PowerShell Download Cradle"; flow:to_server,established; content:"GET"; http_method; content:"WindowsPowerShell"; http.user_agent; pkt_data; content:"/"; http_uri; content:".ps1"; http_uri; flowbits:set,iranian.powershell.download; classtype:trojan-activity; sid:2000026; rev:8; metadata:policy max-detect-ips drop, created_at 2025_07_06, updated_at 2026_03_12;)
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT PowerShell Download Cradle"; flow:to_server,established; content:"GET"; http_method; http.user_agent; content:"WindowsPowerShell"; http.uri; content:"/"; content:".ps1"; flowbits:set,iranian.powershell.download; classtype:trojan-activity; sid:2000026; rev:9; metadata:policy max-detect-ips drop, created_at 2025_07_06, updated_at 2026_03_24;)
 
 alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT PowerShell Payload Delivery"; flow:to_client,established; flowbits:isset,iranian.powershell.download; content:"200"; http_stat_code; file_data; pcre:"/(\\$[a-zA-Z0-9_]+\\s*=|function\\s+[a-zA-Z0-9_]+|Invoke-|IEX|downloadstring)/i"; classtype:trojan-activity; sid:2000027; rev:2; metadata:policy max-detect-ips drop, created_at 2025_07_06, updated_at 2026_03_12;)
 

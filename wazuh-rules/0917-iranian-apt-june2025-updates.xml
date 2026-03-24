@@ -26,7 +26,7 @@
       <id>T1014</id>
       <id>T1547.001</id>
     </mitre>
-    <group>attack,kernel_driver,templedrop,pci_dss_10.6.1,gdpr_IV_35.7.d,</group>
+    <group>attack,kernel_driver,templedrop,pci_dss_10.6.1,gdpr_IV_35.7.d,iranian_june2025,</group>
   </rule>
 
   <!-- TEMPLELOCK Event Log Manipulation -->
@@ -38,7 +38,7 @@
       <id>T1070.001</id>
       <id>T1562.002</id>
     </mitre>
-    <group>attack,log_evasion,templelock,pci_dss_10.2.7,</group>
+    <group>attack,log_evasion,templelock,pci_dss_10.2.7,iranian_june2025,</group>
   </rule>
 
   <!-- Event Log Service Thread Termination -->
@@ -89,7 +89,7 @@
       <id>T1205</id>
       <id>T1571</id>
     </mitre>
-    <group>attack,passive_backdoor,unc1860,</group>
+    <group>attack,passive_backdoor,unc1860,iranian_june2025,</group>
   </rule>
 
   <!-- IOCONTROL MQTT Communication -->
@@ -102,7 +102,7 @@
       <id>T0884</id>
       <id>T1071.002</id>
     </mitre>
-    <group>attack,iocontrol,mqtt,ics,critical_infrastructure,</group>
+    <group>attack,iocontrol,mqtt,ics,critical_infrastructure,iranian_june2025,</group>
   </rule>
 
   <!-- Cryptocurrency Exchange API Abuse -->
@@ -115,7 +115,7 @@
       <id>T1496</id>
       <id>T1657</id>
     </mitre>
-    <group>attack,cryptocurrency,api_abuse,</group>
+    <group>attack,cryptocurrency,api_abuse,iranian_june2025,</group>
   </rule>
 
   <!-- Azure Resource Manager Abuse -->
@@ -147,7 +147,7 @@
 
   <!-- June 2025 Campaign Correlation -->
   <rule id="101132" level="16" frequency="3" timeframe="7200">
-    <if_matched_sid>101122,101123,101127,101128,101129</if_matched_sid>
+    <if_matched_group>iranian_june2025</if_matched_group>
     <description>Iranian APT: June 2025 multi-technique campaign detected - active nation-state threat</description>
     <mitre>
       <id>T1204</id>
@@ -165,7 +165,7 @@
       <id>T1070.001</id>
       <id>T1489</id>
     </mitre>
-    <group>attack,service_disruption,templelock,pci_dss_10.2.7,</group>
+    <group>attack,service_disruption,templelock,pci_dss_10.2.7,iranian_june2025,</group>
   </rule>
 
   <!-- Kernel Driver Certificate Abuse -->
@@ -177,7 +177,7 @@
       <id>T1014</id>
       <id>T1547.006</id>
     </mitre>
-    <group>attack,kernel_driver,certificate_abuse,pci_dss_10.6.1,</group>
+    <group>attack,kernel_driver,certificate_abuse,pci_dss_10.6.1,iranian_june2025,</group>
   </rule>
 
   <!-- Selective Event Log Disabling -->
@@ -202,7 +202,7 @@
       <id>T1055</id>
       <id>T1106</id>
     </mitre>
-    <group>attack,http_sys_abuse,ioctl,unc1860,</group>
+    <group>attack,http_sys_abuse,ioctl,unc1860,iranian_june2025,</group>
   </rule>
 
   <!-- Azure PowerShell Module Abuse -->
@@ -252,7 +252,7 @@
       <id>T0889</id>
       <id>T0871</id>
     </mitre>
-    <group>attack,iocontrol,industrial_manipulation,critical_infrastructure,</group>
+    <group>attack,iocontrol,industrial_manipulation,critical_infrastructure,iranian_june2025,</group>
   </rule>
 
   <!-- Cryptocurrency Exchange PowerShell Interaction -->
@@ -283,7 +283,7 @@
 
   <!-- Multiple Windows Technique Correlation -->
   <rule id="101143" level="16" frequency="2" timeframe="3600">
-    <if_matched_sid>101133,101134,101136,101140</if_matched_sid>
+    <if_matched_group>iranian_june2025</if_matched_group>
     <description>Iranian APT: Multiple Windows-specific attack techniques detected - sophisticated compromise</description>
     <mitre>
       <id>T1204</id>
@@ -304,7 +304,7 @@
       <id>T0884</id>
       <id>T1071.002</id>
     </mitre>
-    <group>attack,mqtt,iocontrol,critical_infrastructure,pci_dss_11.4,</group>
+    <group>attack,mqtt,iocontrol,critical_infrastructure,pci_dss_11.4,iranian_june2025,</group>
   </rule>
 
   <!-- Azure Subdomain C2 Pattern -->
@@ -329,7 +329,7 @@
       <id>T1566.002</id>
       <id>T1071.001</id>
     </mitre>
-    <group>attack,websocket_phishing,apt35,react_kit,</group>
+    <group>attack,websocket_phishing,apt35,react_kit,iranian_june2025,</group>
   </rule>
 
   <!-- Cryptocurrency Exchange API Pattern -->
@@ -342,7 +342,7 @@
       <id>T1496</id>
       <id>T1657</id>
     </mitre>
-    <group>attack,cryptocurrency,api_theft,</group>
+    <group>attack,cryptocurrency,api_theft,iranian_june2025,</group>
   </rule>
 
   <!-- Passive Backdoor Inbound Connections -->
@@ -358,7 +358,7 @@
       <id>T1205</id>
       <id>T1571</id>
     </mitre>
-    <group>attack,passive_backdoor,off_hours,unc1860,</group>
+    <group>attack,passive_backdoor,off_hours,unc1860,iranian_june2025,</group>
   </rule>
 
   <!-- Industrial Protocol Abuse -->
@@ -372,7 +372,7 @@
       <id>T0886</id>
       <id>T0885</id>
     </mitre>
-    <group>attack,industrial_protocols,scada,critical_infrastructure,</group>
+    <group>attack,industrial_protocols,scada,critical_infrastructure,iranian_june2025,</group>
   </rule>
 
   <!-- Azure Resource Manager Mass Queries -->
@@ -444,7 +444,7 @@
 
   <!-- June 2025 Network Campaign Correlation -->
   <rule id="101155" level="16" frequency="3" timeframe="7200">
-    <if_matched_sid>101144,101146,101147,101148,101149</if_matched_sid>
+    <if_matched_group>iranian_june2025</if_matched_group>
     <description>Iranian APT: June 2025 multi-vector network campaign - active nation-state operation</description>
     <mitre>
       <id>T1204</id>

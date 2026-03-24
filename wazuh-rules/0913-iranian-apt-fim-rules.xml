@@ -19,7 +19,7 @@
       <id>T1505.003</id>
       <id>T1027</id>
     </mitre>
-    <group>attack,webshell,pci_dss_11.5,gdpr_IV_35.7.d,</group>
+    <group>attack,webshell,pci_dss_11.5,gdpr_IV_35.7.d,iranian_fim,</group>
   </rule>
 
   <rule id="100961" level="15">
@@ -31,7 +31,7 @@
       <id>T1036.007</id>
       <id>T1505.003</id>
     </mitre>
-    <group>attack,webshell,</group>
+    <group>attack,webshell,iranian_fim,</group>
   </rule>
 
   <!-- Iranian APT Tool Drops -->
@@ -43,7 +43,7 @@
       <id>T1105</id>
       <id>T1608.001</id>
     </mitre>
-    <group>attack,malware,pci_dss_11.5,</group>
+    <group>attack,malware,pci_dss_11.5,iranian_fim,</group>
   </rule>
 
   <rule id="100963" level="14">
@@ -54,7 +54,7 @@
       <id>T1105</id>
       <id>T1059</id>
     </mitre>
-    <group>attack,suspicious_file,</group>
+    <group>attack,suspicious_file,iranian_fim,</group>
   </rule>
 
   <!-- Configuration File Tampering -->
@@ -91,7 +91,7 @@
       <id>T1003</id>
       <id>T1552</id>
     </mitre>
-    <group>attack,credential_theft,pci_dss_11.5,gdpr_IV_32.2,</group>
+    <group>attack,credential_theft,pci_dss_11.5,gdpr_IV_32.2,iranian_fim,</group>
   </rule>
 
   <!-- Log Deletion/Tampering -->
@@ -194,7 +194,7 @@
 
   <!-- Combined FIM Indicators -->
   <rule id="100972" level="16" frequency="5" timeframe="300">
-    <if_matched_sid>100960,100961,100962,100963,100966</if_matched_sid>
+    <if_matched_group>iranian_fim</if_matched_group>
     <description>Iranian APT: Multiple suspicious file operations detected</description>
     <mitre>
       <id>T1055</id>

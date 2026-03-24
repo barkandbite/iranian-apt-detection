@@ -18,7 +18,7 @@
       <id>T1219</id>
       <id>T1072</id>
     </mitre>
-    <group>attack,remote_access,pci_dss_10.6.1,gdpr_IV_35.7.d,</group>
+    <group>attack,remote_access,pci_dss_10.6.1,gdpr_IV_35.7.d,iranian_behavior,</group>
   </rule>
 
   <rule id="100921" level="14">
@@ -29,7 +29,7 @@
       <id>T1572</id>
       <id>T1090</id>
     </mitre>
-    <group>attack,command_control,</group>
+    <group>attack,command_control,iranian_behavior,</group>
   </rule>
 
   <!-- Web Shell Detection -->
@@ -65,7 +65,7 @@
       <id>T1055</id>
       <id>T1106</id>
     </mitre>
-    <group>attack,backdoor,pci_dss_10.6.1,</group>
+    <group>attack,backdoor,pci_dss_10.6.1,iranian_behavior,</group>
   </rule>
 
   <!-- Persistence Mechanisms -->
@@ -101,7 +101,7 @@
       <id>T1003</id>
       <id>T1555</id>
     </mitre>
-    <group>attack,credential_access,pci_dss_10.6.1,gdpr_IV_32.2,</group>
+    <group>attack,credential_access,pci_dss_10.6.1,gdpr_IV_32.2,iranian_behavior,</group>
   </rule>
 
   <rule id="100928" level="14">
@@ -137,7 +137,7 @@
       <id>T1021.006</id>
       <id>T1047</id>
     </mitre>
-    <group>attack,lateral_movement,</group>
+    <group>attack,lateral_movement,iranian_behavior,</group>
   </rule>
 
   <!-- Defense Evasion -->
@@ -228,7 +228,7 @@
 
   <!-- Combined Indicators -->
   <rule id="100935" level="16" frequency="3" timeframe="300">
-    <if_matched_sid>100920,100921,100924,100927,100930</if_matched_sid>
+    <if_matched_group>iranian_behavior</if_matched_group>
     <description>Iranian APT: Multiple attack stages detected - likely active compromise</description>
     <mitre>
       <id>T1486</id>

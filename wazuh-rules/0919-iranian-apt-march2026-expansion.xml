@@ -611,19 +611,19 @@
 
   <!-- ========== CORRELATION RULES (101440-101450) ========== -->
 
-  <!-- Multi-group: Handala techniques combined -->
+  <!-- Multi-group: Handala techniques combined (uses shared group tag) -->
   <rule id="101440" level="16" frequency="2" timeframe="3600">
-    <if_matched_sid>101320,101321,101322,101323,101324</if_matched_sid>
+    <if_matched_group>handala</if_matched_group>
     <description>Iranian APT: Handala/Void Manticore multi-technique wiper campaign detected</description>
     <mitre>
       <id>T1485</id>
     </mitre>
-    <group>attack,wiper_campaign,handala,nation_state,pci_dss_11.4,gdpr_IV_35.7.d,</group>
+    <group>attack,wiper_campaign,nation_state,pci_dss_11.4,gdpr_IV_35.7.d,</group>
   </rule>
 
   <!-- Multi-group: UNC1549 toolset correlation -->
   <rule id="101441" level="16" frequency="2" timeframe="7200">
-    <if_matched_sid>101370,101371,101372,101373,101374</if_matched_sid>
+    <if_matched_group>unc1549</if_matched_group>
     <description>Iranian APT: UNC1549 multi-tool compromise detected - aerospace/defense targeting</description>
     <mitre>
       <id>T1574.001</id>
@@ -633,17 +633,17 @@
 
   <!-- Multi-group: Cotton Sandstorm WezRat + WhiteLock chain -->
   <rule id="101442" level="16" frequency="2" timeframe="7200">
-    <if_matched_sid>101310,101311,101312,101350,101351</if_matched_sid>
+    <if_matched_group>cotton_sandstorm</if_matched_group>
     <description>Iranian APT: Cotton Sandstorm WezRat-to-WhiteLock attack chain detected</description>
     <mitre>
       <id>T1486</id>
     </mitre>
-    <group>attack,ransomware_chain,cotton_sandstorm,pci_dss_11.4,</group>
+    <group>attack,ransomware_chain,pci_dss_11.4,</group>
   </rule>
 
   <!-- Cross-group: Iranian APT multi-actor campaign (any 3 groups in 4 hours) -->
   <rule id="101450" level="17" frequency="3" timeframe="14400">
-    <if_matched_sid>101304,101313,101320,101340,101360,101370,101392,101411,101420</if_matched_sid>
+    <if_matched_group>iranian_apt</if_matched_group>
     <description>Iranian APT: Multi-actor campaign detected - coordinated nation-state operation</description>
     <mitre>
       <id>T1204</id>

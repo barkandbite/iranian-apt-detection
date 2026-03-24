@@ -18,7 +18,7 @@
       <id>T1552.005</id>
       <id>T1078.004</id>
     </mitre>
-    <group>attack,cloud,aws,</group>
+    <group>attack,cloud,aws,iranian_cloud,</group>
   </rule>
 
   <rule id="101101" level="15">
@@ -52,7 +52,7 @@
     <mitre>
       <id>T1078.004</id>
     </mitre>
-    <group>attack,cloud,azure,</group>
+    <group>attack,cloud,azure,iranian_cloud,</group>
   </rule>
 
   <rule id="101104" level="15">
@@ -76,7 +76,7 @@
     <mitre>
       <id>T1530</id>
     </mitre>
-    <group>attack,cloud,gcp,</group>
+    <group>attack,cloud,gcp,iranian_cloud,</group>
   </rule>
 
   <!-- Kubernetes/Container Attacks -->
@@ -218,7 +218,7 @@
       <id>T0821</id>
       <id>T0843</id>
     </mitre>
-    <group>attack,ics,critical,</group>
+    <group>attack,ics,critical,iranian_cloud,</group>
   </rule>
 
   <!-- Advanced Evasion -->
@@ -246,8 +246,7 @@
 
   <!-- Critical Infrastructure Correlation -->
   <rule id="101120" level="17" frequency="2" timeframe="7200">
-    <if_matched_sid>101117</if_matched_sid>
-    <if_matched_sid>101017,101018</if_matched_sid>
+    <if_matched_group>iranian_cloud</if_matched_group>
     <description>Iranian APT: ICS attack combined with wiper preparation - imminent threat</description>
     <mitre>
       <id>T0813</id>
@@ -258,7 +257,7 @@
 
   <!-- Cloud Campaign Detection -->
   <rule id="101121" level="16" frequency="3" timeframe="3600">
-    <if_matched_sid>101100,101103,101105</if_matched_sid>
+    <if_matched_group>iranian_cloud</if_matched_group>
     <description>Iranian APT: Multi-cloud targeting detected - organized campaign</description>
     <mitre>
       <id>T1078.004</id>

@@ -19,7 +19,7 @@
       <id>T1059.001</id>
       <id>T1105</id>
     </mitre>
-    <group>attack,powershell,pci_dss_10.6.1,</group>
+    <group>attack,powershell,pci_dss_10.6.1,iranian_windows,</group>
   </rule>
 
   <rule id="100981" level="15">
@@ -53,7 +53,7 @@
       <id>T1070.001</id>
       <id>T1562.002</id>
     </mitre>
-    <group>attack,log_clear,</group>
+    <group>attack,log_clear,iranian_windows,</group>
   </rule>
 
   <!-- Service Manipulation -->
@@ -125,7 +125,7 @@
       <id>T1490</id>
       <id>T1485</id>
     </mitre>
-    <group>attack,ransomware,pci_dss_10.6.1,</group>
+    <group>attack,ransomware,pci_dss_10.6.1,iranian_windows,</group>
   </rule>
 
   <!-- WMI Activity -->
@@ -150,7 +150,7 @@
       <id>T1003.001</id>
       <id>T1555</id>
     </mitre>
-    <group>attack,credential_access,pci_dss_10.6.1,gdpr_IV_32.2,</group>
+    <group>attack,credential_access,pci_dss_10.6.1,gdpr_IV_32.2,iranian_windows,</group>
   </rule>
 
   <!-- Registry Persistence -->
@@ -232,13 +232,13 @@
 
   <!-- Combined Windows Indicators -->
   <rule id="100995" level="16" frequency="3" timeframe="300">
-    <if_matched_sid>100980,100983,100989,100991</if_matched_sid>
+    <if_matched_group>iranian_windows</if_matched_group>
     <description>Iranian APT: Multiple Windows attack techniques detected - active compromise</description>
     <mitre>
       <id>T1486</id>
       <id>T1055</id>
     </mitre>
-    <group>attack,active_compromise,pci_dss_11.4,gdpr_IV_35.7.d</group>
+    <group>attack,active_compromise,pci_dss_11.4,gdpr_IV_35.7.d,</group>
   </rule>
 
 </group>
