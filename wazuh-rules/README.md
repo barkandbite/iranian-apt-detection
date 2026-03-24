@@ -15,7 +15,8 @@ This directory contains modular Wazuh SIEM rules for detecting Iranian APT activ
 | 0915-iranian-apt-unique-behaviors.xml | 101000-101023 | Unique Iranian signatures | 24 rules |
 | 0916-iranian-apt-cloud-container.xml | 101100-101121 | Cloud and container security | 22 rules |
 | 0917-iranian-apt-june2025-updates.xml | 101122-101199 | June 2025 threat updates | 78 rules |
-| 0918-iranian-apt-march2026-updates.xml | 101200-101299 | March 2026 threat updates | 41 rules |
+| 0918-iranian-apt-march2026-updates.xml | 101200-101299 | March 2026 threat updates | 11 rules |
+| 0919-iranian-apt-march2026-expansion.xml | 101300-101450 | March 2026 expansion (deep research) | 45 rules |
 
 ## Deployment Options
 
@@ -118,6 +119,20 @@ grep -h "rule id=" /var/ossec/etc/rules/09*.xml | sort | uniq -d
 - CyberAv3ngers OT/ICS: IOCONTROL
 - Cloud Exfiltration: Wasabi, Backblaze B2
 - Telegram Bot API C2
+
+### March 2026 Expansion (0919)
+- MuddyViper/Fooder backdoor (MuddyWater/ESET)
+- WezRat infostealer (Cotton Sandstorm/Check Point)
+- Handala/Void Manticore wiper + Stryker attack (Check Point)
+- Sicarii RaaS (Check Point)
+- WhiteLock ransomware (Cotton Sandstorm)
+- Crafty Camel/Sosano backdoor (Proofpoint)
+- SloppyMIO/RedKitten steganography (HarfangLab)
+- UNC1549 full toolset: LIGHTRAIL, CRASHPAD, DCSYNCER, SIGHTGRAB, MINIBIKE (Mandiant)
+- APT42 TAMECAT fileless backdoor (Mandiant)
+- IOCONTROL expanded IOCs (Claroty)
+- BQT.Lock/Baqiyat Hezbollah RaaS
+- Cross-actor correlation rules
 
 ## Integration with Active Response
 
