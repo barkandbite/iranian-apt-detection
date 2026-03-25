@@ -773,4 +773,181 @@
     <group>attack,c2,apt34,pci_dss_11.4,</group>
   </rule>
 
+  <!-- ========== HEALTHCARE EMERGENCY UPDATE - MARCH 25, 2026 ========== -->
+  <!-- Three concurrent Iranian campaigns targeting U.S. healthcare -->
+
+  <!-- ========== PAY2KEY v3 RANSOMWARE (101480-101499) ========== -->
+
+  <!-- Pay2Key v3: BitLocker suspension (pre-encryption) -->
+  <rule id="101480" level="15">
+    <if_sid>91322</if_sid>
+    <field name="win.eventdata.scriptBlockText" type="pcre2">(?i)Get-BitLockerVolume.*Suspend-BitLocker</field>
+    <description>HEALTHCARE Iranian APT: Pay2Key v3 BitLocker suspension pre-encryption</description>
+    <mitre>
+      <id>T1486</id>
+      <id>T1490</id>
+    </mitre>
+    <group>attack,ransomware,pay2key,healthcare,iranian_apt,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- Pay2Key v3: Hyper-V VM termination (pre-encryption) -->
+  <rule id="101481" level="15">
+    <if_sid>91322</if_sid>
+    <field name="win.eventdata.scriptBlockText" type="pcre2">(?i)Get-VM.*Stop-VM</field>
+    <description>HEALTHCARE Iranian APT: Pay2Key v3 Hyper-V VM termination pre-encryption</description>
+    <mitre>
+      <id>T1489</id>
+    </mitre>
+    <group>attack,ransomware,pay2key,healthcare,iranian_apt,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- Pay2Key v3: System state backup deletion -->
+  <rule id="101482" level="15">
+    <if_group>sysmon_event_1</if_group>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)wbadmin.*DELETE.*SYSTEMSTATEBACKUP</field>
+    <description>HEALTHCARE Iranian APT: Pay2Key v3 system state backup deletion</description>
+    <mitre>
+      <id>T1490</id>
+    </mitre>
+    <group>attack,ransomware,pay2key,healthcare,iranian_apt,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- Pay2Key v3: Triple event log wipe (security + system + application) -->
+  <rule id="101483" level="15">
+    <if_group>sysmon_event_1</if_group>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)wevtutil.*cl.*(security|system|application)</field>
+    <description>HEALTHCARE Iranian APT: Pay2Key v3 event log wipe - $(win.eventdata.commandLine)</description>
+    <mitre>
+      <id>T1070.001</id>
+    </mitre>
+    <group>attack,defense_evasion,pay2key,healthcare,iranian_apt,pci_dss_10.2.7,</group>
+  </rule>
+
+  <!-- Pay2Key v3: Fake Avast AV registration (Windows Security Center bypass) -->
+  <rule id="101484" level="15">
+    <if_group>sysmon_event_1</if_group>
+    <field name="win.eventdata.image" type="pcre2">(?i)wsc_proxy\.exe</field>
+    <description>HEALTHCARE Iranian APT: Pay2Key v3 fake Avast Windows Security Center bypass</description>
+    <mitre>
+      <id>T1562.001</id>
+    </mitre>
+    <group>attack,defense_evasion,pay2key,healthcare,iranian_apt,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- Pay2Key v3: Ransom note HowToRestoreFiles.txt creation -->
+  <rule id="101485" level="15">
+    <if_sid>550,553,554</if_sid>
+    <field name="file" type="pcre2">(?i)HowToRestoreFiles\.txt</field>
+    <description>HEALTHCARE Iranian APT: Pay2Key v3 ransom note detected</description>
+    <mitre>
+      <id>T1486</id>
+    </mitre>
+    <group>attack,ransomware,pay2key,healthcare,iranian_apt,pci_dss_11.5,</group>
+  </rule>
+
+  <!-- Pay2Key v3: Encrypted file extension .6zldh_p2k -->
+  <rule id="101486" level="15">
+    <if_sid>550,553,554</if_sid>
+    <field name="file" type="pcre2">\.6zldh_p2k$</field>
+    <description>HEALTHCARE Iranian APT: Pay2Key v3 encrypted file extension detected</description>
+    <mitre>
+      <id>T1486</id>
+    </mitre>
+    <group>attack,ransomware,pay2key,healthcare,iranian_apt,pci_dss_11.5,</group>
+  </rule>
+
+  <!-- Pay2Key v3: NoDefender tool execution (powrprof.exe) -->
+  <rule id="101487" level="15">
+    <if_group>sysmon_event_1</if_group>
+    <field name="win.eventdata.originalFileName" type="pcre2">(?i)powrprof</field>
+    <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)system32</field>
+    <description>HEALTHCARE Iranian APT: Pay2Key v3 NoDefender tool execution</description>
+    <mitre>
+      <id>T1562.001</id>
+    </mitre>
+    <group>attack,defense_evasion,pay2key,healthcare,iranian_apt,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- Pay2Key v3: Hibernation disabled (pre-encryption) -->
+  <rule id="101488" level="14">
+    <if_group>sysmon_event_1</if_group>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)powercfg.*-H\s+off</field>
+    <description>HEALTHCARE Iranian APT: Pay2Key v3 hibernation disabled pre-encryption</description>
+    <mitre>
+      <id>T1490</id>
+    </mitre>
+    <group>attack,ransomware,pay2key,healthcare,iranian_apt,</group>
+  </rule>
+
+  <!-- ========== MUDDYWATER HEALTHCARE CAMPAIGN (101500-101509) ========== -->
+
+  <!-- TWINTASK: Persistence polling file C:\ProgramData\PolGuid\in.txt -->
+  <rule id="101500" level="15">
+    <if_sid>550,553,554</if_sid>
+    <field name="file" type="pcre2">(?i)ProgramData\\PolGuid\\in\.txt</field>
+    <description>HEALTHCARE Iranian APT: MuddyWater TWINTASK persistence file detected</description>
+    <mitre>
+      <id>T1574.002</id>
+    </mitre>
+    <group>attack,persistence,muddywater,healthcare,iranian_apt,pci_dss_11.5,</group>
+  </rule>
+
+  <!-- MuddyWater: Malicious libvlc.dll DLL sideload -->
+  <rule id="101501" level="15">
+    <if_group>sysmon_event_7</if_group>
+    <field name="win.eventdata.imageLoaded" type="pcre2">(?i)libvlc\.dll</field>
+    <field name="win.eventdata.signed">false</field>
+    <description>HEALTHCARE Iranian APT: MuddyWater TWINTASK malicious libvlc.dll sideload</description>
+    <mitre>
+      <id>T1574.002</id>
+    </mitre>
+    <group>attack,defense_evasion,muddywater,healthcare,iranian_apt,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- MuddyWater: goopdate.dll DLL sideload (PowGoop) -->
+  <rule id="101502" level="15">
+    <if_group>sysmon_event_7</if_group>
+    <field name="win.eventdata.imageLoaded" type="pcre2">(?i)goopdate\.dll</field>
+    <field name="win.eventdata.signed">false</field>
+    <description>HEALTHCARE Iranian APT: MuddyWater PowGoop goopdate.dll sideload</description>
+    <mitre>
+      <id>T1574.002</id>
+    </mitre>
+    <group>attack,defense_evasion,muddywater,healthcare,iranian_apt,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- MuddyWater: FMAPP.exe known malware filename -->
+  <rule id="101503" level="14">
+    <if_group>sysmon_event_1</if_group>
+    <field name="win.eventdata.image" type="pcre2">(?i)FMAPP\.exe</field>
+    <description>HEALTHCARE Iranian APT: MuddyWater FMAPP.exe malware execution</description>
+    <mitre>
+      <id>T1059</id>
+    </mitre>
+    <group>attack,execution,muddywater,healthcare,iranian_apt,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- MuddyWater: Healthcare C2 domain resolution -->
+  <rule id="101504" level="15">
+    <if_group>sysmon_event_22</if_group>
+    <field name="win.eventdata.queryName" type="pcre2">(?i)(uppdatefile\.com|serialmenot\.com|moonzonet\.com|meetingapp\.site|lecturegenieltd\.pro|girlsbags\.shop|web14\.info)</field>
+    <description>HEALTHCARE Iranian APT: MuddyWater healthcare campaign C2 domain</description>
+    <mitre>
+      <id>T1071.001</id>
+    </mitre>
+    <group>attack,c2,muddywater,healthcare,iranian_apt,pci_dss_11.4,</group>
+  </rule>
+
+  <!-- ========== PAY2KEY v3 CORRELATION (101510) ========== -->
+
+  <!-- Pay2Key v3: Multi-technique pre-encryption chain -->
+  <rule id="101510" level="16" frequency="2" timeframe="1800">
+    <if_matched_group>pay2key</if_matched_group>
+    <description>HEALTHCARE Iranian APT: Pay2Key v3 ransomware attack chain detected - IMMEDIATE ACTION REQUIRED</description>
+    <mitre>
+      <id>T1486</id>
+    </mitre>
+    <group>attack,ransomware_chain,pay2key,healthcare,critical,iranian_apt,pci_dss_11.4,gdpr_IV_35.7.d,</group>
+  </rule>
+
 </group>

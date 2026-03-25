@@ -472,8 +472,84 @@ alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT APT34 Spearal D
 # EtherHiding - Known MuddyWater smart contract getString() call
 alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater EtherHiding getString C2 2026"; flow:to_server,established; content:"POST"; http_method; content:"eth_call"; http_client_body; content:"2B77671cfEE4907776a95abbb9681eee598c102E"; http_client_body; nocase; classtype:command-and-control; sid:2000275; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_24, updated_at 2026_03_24;)
 
+#==============================================================================
+# SECTION 39: HEALTHCARE EMERGENCY UPDATE - MARCH 25, 2026
+# Three concurrent Iranian campaigns targeting U.S. healthcare:
+#   1. Handala/Void Manticore Stryker wipe via Microsoft Intune
+#   2. Pay2Key v3 ransomware vs unnamed U.S. healthcare org
+#   3. MuddyWater CVE-2025-59287 WSUS exploitation
+#
+# Sources:
+#   - Halcyon: Pay2Key v3 Technical Report (March 24, 2026)
+#   - Centripetal: Pre-Positioned Access Brief (March 2026)
+#   - CSA Labs: Handala/Stryker Research Note (March 2026)
+#   - DOJ: Iranian Cyber Actor Attribution (March 20, 2026)
+#   - The Record: Stryker Malware Confirmed (March 24, 2026)
+#==============================================================================
+
+# --- CVE-2025-59287: Windows WSUS Deserialization RCE (MuddyWater) ---
+# Unauthenticated RCE via unsafe SoapFormatter deserialization
+# CVSS 9.8; MuddyWater confirmed exploitation
+# MITRE: T1190
+
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - HEALTHCARE Iranian APT CVE-2025-59287 WSUS Deserialization RCE 2026"; flow:to_server,established; content:"POST"; http_method; content:"/ReportingWebService/ReportingWebService.asmx"; http_uri; fast_pattern; reference:cve,2025-59287; classtype:attempted-admin; sid:2000276; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_03_25, updated_at 2026_03_25;)
+
+# CVE-2025-59287 exploitation staging IPs (MuddyWater)
+alert ip [194.68.32.90,45.84.107.17,185.69.24.18] any -> $HOME_NET any (msg:"Bark&Bite - HEALTHCARE Iranian APT MuddyWater WSUS Exploit Staging IPs 2026"; classtype:command-and-control; sid:2000277; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_03_25, updated_at 2026_03_25;)
+
+alert ip $HOME_NET any -> [194.68.32.90,45.84.107.17,185.69.24.18] any (msg:"Bark&Bite - HEALTHCARE Iranian APT MuddyWater WSUS Staging Outbound 2026"; classtype:command-and-control; sid:2000278; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_03_25, updated_at 2026_03_25;)
+
+# --- Microsoft Intune MDM Abuse (Handala Stryker-style wipe) ---
+# Detect bulk device wipe commands via Microsoft Graph API
+# MITRE: T1485
+
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - HEALTHCARE Iranian APT Handala Intune Mass Wipe API 2026"; flow:to_server,established; content:"POST"; http_method; content:"graph.microsoft.com"; http_host; content:"/deviceManagement/"; http_uri; content:"/wipe"; http_uri; classtype:attempted-dos; sid:2000279; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_03_25, updated_at 2026_03_25;)
+
+# --- Pay2Key v3 Ransomware (IRGC / Fox Kitten) ---
+# ChaCha20 + Curve25519 encryption; I2P C2; fake Avast AV bypass
+# File extension: .6zldh_p2k; Ransom note: HowToRestoreFiles.txt
+# MITRE: T1486, T1562.001, T1490
+
+# Pay2Key v3 - I2P network bootstrap (UDP high ports)
+# I2P uses NTCP2/SSU2 on random high UDP ports
+alert udp $HOME_NET any -> $EXTERNAL_NET 9000:65535 (msg:"Bark&Bite - HEALTHCARE Iranian APT Pay2Key I2P SSU2 Bootstrap 2026"; dsize:>200; content:"|00 00 00 00|"; offset:0; depth:4; threshold:type both, track by_src, count 10, seconds 120; classtype:policy-violation; sid:2000280; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_25, updated_at 2026_03_25;)
+
+# Pay2Key v3 - Pre-encryption: BitLocker suspension via PowerShell
+# Detects PowerShell Suspend-BitLocker in HTTP traffic (lateral/C2 context)
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - HEALTHCARE Iranian APT Pay2Key BitLocker Suspend 2026"; flow:to_server,established; content:"Suspend-BitLocker"; http_client_body; nocase; classtype:trojan-activity; sid:2000281; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_25, updated_at 2026_03_25;)
+
+# --- MuddyWater Healthcare Campaign Expanded C2 ---
+# New domains from March 2026 healthcare targeting
+# MITRE: T1071.001
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - HEALTHCARE Iranian APT MuddyWater uppdatefile.com 2026"; dns.query; content:"uppdatefile.com"; nocase; classtype:command-and-control; sid:2000282; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_25, updated_at 2026_03_25;)
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - HEALTHCARE Iranian APT MuddyWater serialmenot.com 2026"; dns.query; content:"serialmenot.com"; nocase; classtype:command-and-control; sid:2000283; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_25, updated_at 2026_03_25;)
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - HEALTHCARE Iranian APT MuddyWater moonzonet.com 2026"; dns.query; content:"moonzonet.com"; nocase; classtype:command-and-control; sid:2000284; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_25, updated_at 2026_03_25;)
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - HEALTHCARE Iranian APT MuddyWater lecturegenieltd.pro 2026"; dns.query; content:"lecturegenieltd.pro"; nocase; classtype:command-and-control; sid:2000285; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_25, updated_at 2026_03_25;)
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - HEALTHCARE Iranian APT MuddyWater girlsbags.shop 2026"; dns.query; content:"girlsbags.shop"; nocase; classtype:command-and-control; sid:2000286; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_25, updated_at 2026_03_25;)
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - HEALTHCARE Iranian APT meetingapp.site 2026"; dns.query; content:"meetingapp.site"; nocase; classtype:command-and-control; sid:2000287; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_25, updated_at 2026_03_25;)
+
+# --- MuddyWater DLL Sideloading (Healthcare Campaign) ---
+# TWINTASK persistence via malicious libvlc.dll sideload
+# Polls C:\ProgramData\PolGuid\in.txt every 15 seconds
+# MITRE: T1574.002
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - HEALTHCARE Iranian APT MuddyWater web14.info 2026"; dns.query; content:"web14.info"; nocase; classtype:command-and-control; sid:2000288; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_25, updated_at 2026_03_25;)
+
+# --- Handala Malware Delivery Filenames via Telegram ---
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - HEALTHCARE Iranian APT Handala Telegram Fake App Download 2026"; flow:to_server,established; content:"GET"; http_method; pcre:"/\/(Telegram_authenticator|WhatssApp|KeePass)\.exe/i"; classtype:trojan-activity; sid:2000289; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_25, updated_at 2026_03_25;)
+
+# --- FBI-Seized Handala Domains (post-attribution monitor) ---
+# These domains were seized March 20 but may still appear in historical logs
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - HEALTHCARE Iranian APT Handala FBI-Seized Domain 2026"; dns.query; pcre:"/(justicehomeland\.org|handala-hack\.to|karmabelow80\.org|handala-redwanted\.to|handala\.to|handala-alert\.to)/i"; classtype:command-and-control; sid:2000290; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_25, updated_at 2026_03_25;)
+
 # --------------------------------------------------------------------
-# END OF MARCH 2026 EXPANSION
-# Total new rules: 82 (SID 2000194-2000275)
-# Combined with original update: 145 rules (SID 2000131-2000275)
+# END OF MARCH 2026 EXPANSION + HEALTHCARE EMERGENCY UPDATE
+# Total new rules: 97 (SID 2000194-2000290)
+# Combined with original update: 160 rules (SID 2000131-2000290)
 # --------------------------------------------------------------------
