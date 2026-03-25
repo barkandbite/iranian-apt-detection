@@ -1,6 +1,6 @@
 # Iranian APT Detection Rules
 
-[![Version](https://img.shields.io/badge/version-0.6.0--pre-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.6.2-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![MITRE ATT&CK](https://img.shields.io/badge/MITRE%20ATT%26CK-v13-orange.svg)](documentation/MITRE-ATT&CK-Mapping.md)
 
@@ -8,13 +8,26 @@
 
 Enterprise-grade detection rules for Iranian Advanced Persistent Threat (APT) groups targeting critical infrastructure, defense, and technology sectors. This repository provides comprehensive Wazuh SIEM rules and Suricata IDS signatures to detect and respond to Iranian cyber operations.
 
-## 🚨 Recent Threats (March 2026 Update)
+## HEALTHCARE EMERGENCY (March 25, 2026)
+
+Three concurrent Iranian campaigns targeting U.S. healthcare disclosed March 24:
+
+- **Handala/Void Manticore** wiped 200K+ Stryker devices via **Microsoft Intune MDM** abuse — no malware needed. Maryland EKG transmission went dark statewide. DOJ attributed; $10M reward.
+- **Pay2Key v3** (IRGC) hit unnamed U.S. healthcare org with **ChaCha20 + Curve25519** ransomware. Fake Avast AV bypass. **I2P C2** (not Tor). Purely destructive — no ransom demand.
+- **MuddyWater** exploiting **CVE-2025-59287** (WSUS CVSS 9.8) to pre-position on healthcare networks.
+
+## Recent Threats (v0.6.2)
 
 - **CRITICAL**: Operation Epic Fury (Feb 28, 2026) response signatures
-- **NEW**: MuddyWater's **UDPGangster**, **Dindoor**, and **Fakeset** malware families
-- **NEW**: CyberAv3ngers **IOCONTROL** OT/ICS malware targeting 400+ device types
-- **NEW**: Exploitation of **CVE-2026-1281** (Ivanti EPMM) and **CVE-2025-59718** (FortiOS)
-- **NEW**: C2 via Telegram Bot API, Wasabi/Backblaze cloud storage, and MQTT-TLS
+- **NEW**: 28+ Iranian APT threat families with dedicated detection rules
+- **NEW**: MuddyWater toolset — **UDPGangster**, **Dindoor**, **Fakeset**, **MuddyViper**, **CHAR**, **Phoenix**, **PowGoop**, **TWINTASK**
+- **NEW**: CyberAv3ngers **IOCONTROL** OT malware — full MQTT topic structure, PCOM protocol exploitation, DoH evasion
+- **NEW**: **Pay2Key v3** ransomware — ChaCha20, fake Avast bypass, I2P C2, full kill chain detection
+- **NEW**: UNC1549 full toolset — **LIGHTRAIL**, **TWOSTROKE**, **DEEPROOT**, **POLLBLEND**, **MINIBIKE**, **CRASHPAD**, **SIGHTGRAB**
+- **NEW**: **Handala/Void Manticore** wiper — Intune MDM abuse, NetBird tunneling, known infrastructure
+- **NEW**: **WezRat** infostealer, **TAMECAT** backdoor, **STEALHOOK**, **Sosano**, **SloppyMIO**, **Sicarii RaaS**, **WhiteLock**, **WINTAPIX**
+- **NEW**: Industrial protocol rules — BACnet, Modbus FC6/FC16, S7comm, Unitronics PCOM
+- **NEW**: 40+ CVEs covered including CVE-2025-59287, CVE-2026-1281, CVE-2025-59718, CVE-2024-55591, CVE-2024-38434
 
 ## Quick Start
 
@@ -38,9 +51,17 @@ sudo systemctl restart wazuh-manager
 
 ### 2. Deploy Suricata Rules
 ```bash
-sudo cp suricata/iranian_apt_v3.1.rules /etc/suricata/rules/
-sudo suricata-update
-sudo systemctl restart suricata
+# Deploy base rules + expansion
+sudo cp suricata/iranian_apt_v3_2.rules /etc/suricata/rules/
+sudo cp suricata/iranian_apt_v3_3_expansion.rules /etc/suricata/rules/
+
+# Add both to suricata.yaml rule-files section:
+#   - iranian_apt_v3_2.rules
+#   - iranian_apt_v3_3_expansion.rules
+
+# Validate and reload (no restart needed)
+sudo suricata -T -c /etc/suricata/suricata.yaml
+sudo kill -USR2 $(pidof suricata)
 ```
 
 ### 3. Enable Active Response
@@ -50,16 +71,26 @@ sudo chmod +x /var/ossec/active-response/bin/iranian-apt-active-response.sh
 # Add configuration from configurations/iranian-apt-active-response.xml to ossec.conf
 ```
 
-## Iranian APT Groups Covered
+## Iranian APT Groups Covered (28+)
 
-| Group | Also Known As | Primary Targets | Key Techniques |
+| Group | Also Known As | Primary Targets | Key Detections |
 |-------|---------------|-----------------|----------------|
-| **MuddyWater** | Mercury, Static Kitten | Government, Telecom, Finance | **UDPGangster**, **Dindoor**, **Fakeset**, PowerShell |
-| **CyberAv3ngers** | IRGC-CEC | Water, Energy, OT/ICS | **IOCONTROL**, PLC disruption, MQTT C2 |
-| **Pioneer Kitten** | Fox Kitten, UNC757, Parisite | VPN/Firewall vendors | CVE exploitation, Ransomware, I2P RaaS |
-| **UNC1549** | Nimbus Manticore | Defense, Aerospace | **TWOSTROKE**, **DEEPROOT**, Azure C2 |
-| **Infy** | Prince of Persia | Activists, Government | **Foudre**, **Tonnerre**, DGA, Telegram C2 |
-| **Lemon Sandstorm** | RUBIDIUM | Cloud services | Exchange exploitation |
+| **MuddyWater** | Seedworm, MERCURY | Healthcare, Gov, Telecom, Defense | MuddyViper, UDPGangster, Dindoor, Fakeset, CHAR, Phoenix, PowGoop, TWINTASK |
+| **CyberAv3ngers** | IRGC-CEC, BAUXITE | Water, Energy, OT/ICS, Healthcare | IOCONTROL (MQTT C2), PLC_Controller, PCOM exploitation, camera BDA |
+| **Handala** | Void Manticore, Storm-0842 | Healthcare, Defense, Tech | Intune MDM wipe, NetBird, wiper, GPO deployment |
+| **Pioneer Kitten** | Fox Kitten, Pay2Key | Healthcare, VPN vendors | Pay2Key v3 (ChaCha20, I2P), CVE exploitation |
+| **Cotton Sandstorm** | Emennet Pasargad | Healthcare, Media | WezRat, WhiteLock ransomware |
+| **UNC1549** | Nimbus Manticore | Aerospace, Defense, Telecom | TWOSTROKE, DEEPROOT, LIGHTRAIL, POLLBLEND, MINIBIKE, CRASHPAD |
+| **APT42** | Charming Kitten | Gov officials, Activists | TAMECAT (Discord/Cloudflare/Firebase C2) |
+| **APT34** | OilRig, Helix Kitten | Gov, Finance, Telecom | STEALHOOK, Veaty, Spearal, DNS tunneling |
+| **APT33** | Peach Sandstorm | Aerospace, Energy | Tickler, VHD delivery, SHAPESHIFT wiper |
+| **Infy** | Prince of Persia | Activists, Dissidents | Foudre v34, Tonnerre v50, Tornado v51 (blockchain DGA) |
+| **RedKitten** | IRGC-aligned | Human rights NGOs | SloppyMIO (steganography, GitHub dead-drop) |
+| **Crafty Camel** | UNK_CraftyCamel | Aviation, Transport (UAE) | Sosano (Golang), polyglot files |
+| **UNC1860** | MOIS | Government, Telecom | WINTAPIX, TOFUDRV, passive IIS backdoors |
+| **Sicarii** | Handala-linked RaaS | Multiple | AES-GCM, file.io exfil, fake WinDefender |
+| **Dark Scepter** | APT34 subcluster | Multiple | Cloudflare fronting, known infrastructure |
+| **BQT.Lock** | Hezbollah cyber | Israel, U.S., Saudi | Baqiyat RaaS platform |
 
 ## Detection Coverage
 
@@ -78,31 +109,45 @@ sudo chmod +x /var/ossec/active-response/bin/iranian-apt-active-response.sh
 - **Impact**: 14 techniques (+5)
 
 ### Rule Statistics
-- **Wazuh Rules**: 177 detection rules across 9 files
-- **Suricata Signatures**: 193 network signatures
-- **CVEs Covered**: 25+ including 2025/2026 zero-days
-- **Unique Behavioral Patterns**: 60+
+- **Wazuh Rules**: 319 detection rules across 10 files
+- **Suricata Signatures**: 318 network signatures across 2 rule files
+- **CVEs Covered**: 40+ including 2025/2026 zero-days
+- **Known C2 IPs**: 35+
+- **Known C2 Domains**: 25+
+- **Unique Behavioral Patterns**: 100+
+- **Threat Families**: 28+
 
 ## Key Features
 
-### 🎯 Targeted CVE Detection
-- **CVE-2026-1281** (Ivanti EPMM RCE) **NEW**
-- **CVE-2025-59718** (FortiOS SAML Bypass) **NEW**
-- **CVE-2025-55182** (React Server Components RCE) **NEW**
-- **CVE-2024-55591** (FortiOS Auth Bypass) **NEW**
-- CVE-2024-24919 (Check Point Security Gateway)
-- CVE-2024-3400 (Palo Alto PAN-OS)
+### Targeted CVE Detection
+- **CVE-2025-59287** (Windows WSUS Deserialization RCE, CVSS 9.8) **HEALTHCARE**
+- **CVE-2026-1281** (Ivanti EPMM RCE via bash arithmetic)
+- **CVE-2025-59718** (FortiOS SAML Bypass)
+- **CVE-2024-55591** (FortiOS WebSocket Auth Bypass — MuddyWater modified PoC)
+- **CVE-2025-64446** (FortiWeb Path Traversal)
+- **CVE-2025-23006** (SonicWall SMA Deserialization)
+- **CVE-2025-9316** (N-able N-central SOAP RCE)
+- **CVE-2024-38434** (Unitronics PCOM Password Reset)
+- **CVE-2025-31701** (Dahua Camera RCE)
+- CVE-2024-24919, CVE-2024-3400, CVE-2021-36260, CVE-2021-33044, and 25+ more
 
-### 🔍 Unique Iranian Signatures
-- **Cloud Storage Exfiltration** (Wasabi, Backblaze)
-- **Telegram Bot API** Command & Control
-- **MQTT-TLS** Industrial Control System communication
-- **Deno Runtime** evasion artifacts (Dindoor)
-- Tehran business hours activity (UTC+3:30)
-- Farsi language artifacts
-- DNS hijacking with Let's Encrypt
-- Cryptocurrency mining for funding
-- Passive implants (no outbound C2)
+### Unique Iranian Signatures
+- **Microsoft Intune MDM** weaponized as wiper (Handala/Stryker)
+- **Pay2Key v3** kill chain — BitLocker suspend, fake Avast, I2P C2
+- **Cloud Storage Exfiltration** (Wasabi, Backblaze via Rclone)
+- **Telegram Bot API** C2 (CHAR, Tonnerre, SloppyMIO, Handala)
+- **MQTT-TLS** Industrial Control System C2 (IOCONTROL)
+- **Ethereum blockchain** C2 resolution (EtherHiding — smart contract getString())
+- **Discord/Cloudflare Workers/Firebase** C2 (APT42 TAMECAT)
+- **PCOM protocol** exploitation (Unitronics PLCs, magic bytes + opcodes)
+- **BACnet/Modbus/S7comm** industrial protocol abuse
+- **GitHub Gist dead-drop** resolver (SloppyMIO steganography chain)
+- **DLL sideloading** via VMware VGAuth and Windows Defender components
+- **WINTAPIX** passive IIS backdoor heartbeat detection
+- MuddyViper distinctive WinHTTP User-Agent fingerprint
+- LIGHTRAIL obsolete Chrome/42 + Edge/12 User-Agent combo
+- Tehran business hours activity (UTC+3:30), Farsi language artifacts
+- Passive implants (no outbound C2), DNS hijacking
 
 ### 🛡️ Active Response
 - Automated IP blocking
@@ -124,9 +169,12 @@ iranian-apt-detection/
 │   ├── 0915-iranian-apt-unique-behaviors.xml
 │   ├── 0916-iranian-apt-cloud-container.xml
 │   ├── 0917-iranian-apt-june2025-updates.xml
+│   ├── 0918-iranian-apt-march2026-updates.xml
+│   ├── 0919-iranian-apt-march2026-expansion.xml
 │   └── README.md
 ├── suricata/                  # Network IDS signatures
-│   ├── iranian_apt_v3.1.rules
+│   ├── iranian_apt_v3_2.rules
+│   ├── iranian_apt_v3_3_expansion.rules
 │   └── README.md
 ├── configurations/            # Agent and system configs
 │   ├── sysmon-config-iranian-apt.xml
@@ -214,11 +262,12 @@ index=wazuh rule.groups="iranian_apt" rule.level>=14
 We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ### Needed Contributions
-- macOS/Linux specific rules
-- Cloud provider detections (AWS, GCP)
-- ICS/SCADA protocol signatures
-- False positive tuning
-- Translations
+- macOS/Linux specific endpoint rules
+- Cloud provider detections (AWS GuardDuty, GCP SCC integration)
+- Additional ICS/SCADA protocol signatures (DNP3, OPC DA)
+- False positive tuning and threshold optimization
+- Splunk/Elastic SIEM rule translations
+- YARA rules for file-level detection
 
 ## Support
 
@@ -243,4 +292,4 @@ These rules are provided as-is for defensive purposes. Users are responsible for
 
 ---
 
-**Last Updated**: March 9, 2026 | **Version**: 0.6.0-pre | **Maintainer**: Bark&Bite Security Intelligence
+**Last Updated**: March 25, 2026 | **Version**: 0.6.2 | **Maintainer**: Bark&Bite Security Intelligence
