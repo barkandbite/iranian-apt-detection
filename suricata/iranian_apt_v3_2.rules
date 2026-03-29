@@ -1141,10 +1141,33 @@ alert tcp $HOME_NET any -> $EXTERNAL_NET 443 (msg:"Bark&Bite - Iranian APT SSH o
 # RMM + Telegram correlation
 alert tcp any any -> any any (msg:"Bark&Bite - Iranian APT RMM + Telegram Correlation Chain"; flowbits:isset,iranian.havoc; flowbits:isset,iranian.telegram; classtype:successful-admin; sid:2000359; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_03_12, updated_at 2026_03_12;)
 
+#==============================================================================
+# SECTION: CRESCENTHARVEST Espionage Campaign (APT35/Charming Kitten)
+# MITRE ATT&CK: T1566.001, T1204.002, T1574.002, T1041, T1056.001
+# Source: Acronis TRU, Recorded Future, The Hacker News (Feb-Mar 2026)
+# Campaign targets Farsi-speaking activists/diaspora via DLL sideloading
+# through signed Google binary (software_reporter_tool.exe)
+#==============================================================================
+
+# CRESCENTHARVEST RAT C2 registration — POST /register_agent with system profile
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT CRESCENTHARVEST RAT C2 Registration 2026"; flow:to_server,established; content:"POST"; http_method; content:"/register_agent"; http_uri; fast_pattern; classtype:trojan-activity; sid:2000457; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_29, updated_at 2026_03_29; reference:url,acronis.com/en/tru/posts/crescentharvest-iranian-protestors-and-dissidents-targeted-in-cyberespionage-campaign;)
+
+# CRESCENTHARVEST RAT C2 command polling — GET /info (retrieves tasking)
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT CRESCENTHARVEST RAT Command Polling 2026"; flow:to_server,established; content:"GET"; http_method; content:"/info"; http_uri; fast_pattern; threshold:type both, track by_src, count 5, seconds 300; classtype:trojan-activity; sid:2000458; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_29, updated_at 2026_03_29;)
+
+# CRESCENTHARVEST RAT C2 output exfiltration — POST /Out
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT CRESCENTHARVEST RAT Output Exfil 2026"; flow:to_server,established; content:"POST"; http_method; content:"/Out"; http_uri; fast_pattern; classtype:trojan-activity; sid:2000459; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_29, updated_at 2026_03_29;)
+
+# CRESCENTHARVEST RAT C2 file upload exfiltration — POST /upload
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT CRESCENTHARVEST RAT File Exfil 2026"; flow:to_server,established; content:"POST"; http_method; content:"/upload"; http_uri; content:"Content-Type|3a 20|multipart/form-data"; http_header; flowbits:set,iranian.crescentharvest; classtype:trojan-activity; sid:2000460; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_29, updated_at 2026_03_29;)
+
+# CRESCENTHARVEST correlation — registration followed by file exfiltration
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT CRESCENTHARVEST Correlation Registration then Exfil 2026"; flow:to_server,established; content:"POST"; http_method; content:"/upload"; http_uri; flowbits:isset,iranian.crescentharvest; classtype:trojan-activity; sid:2000461; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_29, updated_at 2026_03_29;)
+
 # =============================================================================
 # End of Iranian APT Detection Rules File
-# Total Rules: 280
+# Total Rules: 285
 # Coverage: All major Iranian APT groups + CRITICAL IOCs from March 2026 briefing
-# Last Updated: 2026-03-12
+# Last Updated: 2026-03-29
 # SYNTAX STATUS: ALL VALIDATED
 # =============================================================================

@@ -5,6 +5,20 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.3] - 2026-03-29
+
+### Added
+- **CRESCENTHARVEST espionage campaign** (APT35/Charming Kitten overlap): 5 new Suricata rules (SID 2000457-2000461) detecting the structured C2 protocol used by this campaign targeting Farsi-speaking activists and diaspora communities.
+  - RAT registration (`/register_agent`), command polling (`/info`), output exfiltration (`/Out`), file upload (`/upload`)
+  - Correlation rule linking registration with subsequent exfiltration
+  - DLL sideloading via signed Google binary (software_reporter_tool.exe)
+- Source: Acronis TRU, Recorded Future, The Hacker News (Feb-Mar 2026)
+- MITRE ATT&CK: T1566.001, T1204.002, T1574.002, T1041, T1056.001
+
+### Notes
+- The CRESCENTHARVEST campaign exploits Iran protest narratives to deliver RAT/infostealer malware via malicious RAR archives containing LNK files with double extensions. The implant supports command execution, keylogging, credential theft, and Telegram data extraction.
+- Validated: 241 rules in v3.2 pass `suricata -T` (Suricata 7.0.3), 0 errors.
+
 ## [0.6.1] - 2026-03-12
 
 ### Fixed
