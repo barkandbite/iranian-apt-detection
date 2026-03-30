@@ -12,7 +12,8 @@ iranian-apt-detection/
 │   ├── 0915-iranian-apt-unique-behaviors.xml        # Unique Iranian signatures
 │   ├── 0916-iranian-apt-cloud-container.xml         # Cloud and container security
 │   ├── 0917-iranian-apt-june2025-updates.xml        # June 2025 threat updates
-│   ├── 0918-iranian-apt-march2026-updates.xml       # March 2026 threat updates (v0.6.0)
+│   ├── 0918-iranian-apt-march2026-updates.xml       # March 2026 threat updates
+│   ├── 0919-iranian-apt-march2026-expansion.xml     # March 2026 expansion
 │   └── README.md                                     # Wazuh rules documentation
 │
 ├── configurations/
@@ -22,7 +23,7 @@ iranian-apt-detection/
 │   └── README.md                                     # Configuration guide
 │
 ├── suricata/
-│   ├── iranian_apt_v3.1.rules                       # Current Suricata IDS signatures (v3.1)
+│   ├── iranian-apt-detection.rules                  # Consolidated Suricata IDS signatures (v4.0)
 │   └── README.md                                     # Suricata deployment guide
 │
 ├── documentation/
@@ -41,7 +42,12 @@ iranian-apt-detection/
 │   └── README.md                                     # Tools documentation
 │
 ├── archive/
-│   ├── 0900-iranian-apt-detection-master.xml        # Consolidated rules (optional)
+│   ├── suricata-v3-legacy/                          # Archived v3.x Suricata files
+│   │   ├── iranian_apt_v3.1.rules                   # v3.1 (199 rules, superseded)
+│   │   ├── iranian_apt_v3_2.rules                   # v3.2 (241 rules, superseded)
+│   │   ├── iranian_apt_v3_3_expansion.rules         # v3.3 expansion (97 rules, superseded)
+│   │   └── README.md                                # Migration notes
+│   ├── 0900-iranian-apt-detection-master.xml        # Consolidated Wazuh rules (optional)
 │   ├── iranian-apt.rules                            # Original Suricata rules v1.0
 │   ├── iranian-apt-cloud-ai.rules                   # Cloud rules (merged)
 │   ├── iranian-apt-2025-06-29                       # June updates archive
@@ -57,33 +63,37 @@ iranian-apt-detection/
 
 ## Quick Start
 
-1. **Wazuh Rules**: Deploy all files from `wazuh-rules/09*.xml` or use master from archive
+1. **Wazuh Rules**: Deploy all files from `wazuh-rules/09*.xml`
 2. **Sysmon**: Deploy `configurations/sysmon-config-iranian-apt.xml` to Windows endpoints
 3. **Agent Config**: Add content from `configurations/ossec-agent-iranian-apt.conf` to agents
-4. **Suricata**: Copy `suricata/iranian_apt_v3.1.rules` to your rules directory
+4. **Suricata**: Copy `suricata/iranian-apt-detection.rules` to your rules directory
 5. **Active Response**: Run `tools/deploy-active-response.sh` for automated response
 
 ## Rule ID Allocation
 
-### Wazuh Rules (100900-101299)
+### Wazuh Rules (100900-101510)
 - **100900-100924**: CVE exploitation detection (0910)
 - **100925-100959**: Behavioral detection (0911)
-- **100940-100959**: Network detection (0912) - overlaps with behavioral
+- **100940-100959**: Network detection (0912)
 - **100960-100979**: File integrity monitoring (0913)
 - **100980-100999**: Windows-specific detection (0914)
 - **101000-101023**: Unique Iranian behaviors (0915)
 - **101100-101121**: Cloud and container security (0916)
 - **101122-101199**: June 2025 updates (0917)
 - **101200-101299**: March 2026 updates (0918)
+- **101300-101477**: March 2026 expansion (0919)
+- **101480-101510**: Healthcare emergency (0919)
 
-### Suricata SID Ranges (2000001-2000230)
-- **2000001-2000014**: CVE exploitation signatures
-- **2000015-2000025**: C2 infrastructure detection
-- **2000026-2000089**: Various detection categories
-- **2000090-2000114**: Cloud and AI attacks
-- **2000115-2000124**: Tool-specific signatures
-- **2000125-2000130**: June 2025 updates
-- **2000131-2000230**: March 2026 updates
+### Suricata SID Ranges (1000039-2000461)
+- **1000039-2000014**: CVE exploitation signatures
+- **2000015-2000030**: C2 infrastructure, post-exploitation, exfiltration
+- **2000031-2000050**: Reconnaissance, web shells, ICS/SCADA, correlation
+- **2000090-2000130**: Cloud targeting, tool-specific, June 2025 updates
+- **2000131-2000193**: March 2026 v3.0 (MuddyWater, CyberAv3ngers OT)
+- **2000194-2000230**: MuddyViper, WezRat, UNC1549, Handala, Sicarii, IOCONTROL
+- **2000231-2000359**: March 2026 expansion (healthcare, correlation, IOCs)
+- **2000360-2000456**: ICS/PCOM, TAMECAT, Infy blockchain, FortiOS/Ivanti chains
+- **2000457-2000461**: CRESCENTHARVEST RAT (APT35/Charming Kitten)
 
 ## File Naming Conventions
 

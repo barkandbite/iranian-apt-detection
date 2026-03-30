@@ -5,79 +5,81 @@ This directory contains Suricata IDS signatures for detecting Iranian APT networ
 
 ## Current Ruleset
 
-### Main File: iranian_apt_v3.1.rules
-- **Version**: 3.1
-- **Last Updated**: 2026-03-12
-- **SID Range**: 1000039-2000322
-- **Total Rules**: 199 signatures
+### Canonical File: `iranian-apt-detection.rules`
+- **Version**: 4.0 (consolidated from v3.1, v3.2, v3.3)
+- **Last Updated**: 2026-03-30
+- **SID Range**: 1000039–2000461
+- **Total Rules**: 338 signatures
+- **Zero duplicate SIDs**
+- **Requires**: Suricata 7.0+
 
-### Rule Categories
+### SID Allocation
 
-| Category | SID Range | Count | Description |
-|----------|-----------|-------|-------------|
-| CVE Exploitation | 2000001-2000014 | 14 | Network exploitation attempts |
-| C2 Infrastructure | 2000015-2000025 | 11 | Command & control detection |
-| Post-Exploitation | 2000026-2000029 | 4 | Lateral movement patterns |
-| Data Exfiltration | 2000030-2000032 | 3 | Large transfers, DNS tunneling |
-| Web Shells | 2000033-2000035 | 3 | Web shell activity |
-| Reconnaissance | 2000036-2000037 | 2 | Scanning patterns |
-| Destructive | 2000038-2000039 | 2 | Wiper deployment |
-| ICS/SCADA | 2000040-2000041 | 2 | Water sector targeting |
-| AI-Enhanced | 2000042 | 1 | AI phishing infrastructure |
-| Cloud Targeting | 2000090-2000114 | 25 | Cloud and container attacks |
-| Tool-Specific | 2000115-2000124 | 10 | Iranian APT tools |
-| June 2025 Updates | 2000125-2000130 | 6 | Latest threat signatures |
-| March 2026 v3.0 | 2000131-2000193 | 63 | MuddyWater malware, CyberAv3ngers OT |
-| **March 2026 v3.1** | **2000231-2000322** | **92** | **Emergency update (see below)** |
+| Range | Count | Description |
+|-------|-------|-------------|
+| 1000039–2000014 | 14 | CVE exploitation detection (Check Point, PAN-OS, Fortinet, Cisco, Ivanti) |
+| 2000015–2000030 | 16 | C2 infrastructure, post-exploitation, data exfiltration |
+| 2000031–2000050 | 20 | Reconnaissance, web shells, destructive, ICS/SCADA, correlation |
+| 2000090–2000130 | 41 | Cloud targeting, tool-specific, June 2025 updates |
+| 2000131–2000193 | 63 | March 2026 v3.0: MuddyWater malware, CyberAv3ngers OT |
+| 2000194–2000230 | 37 | MuddyViper, WezRat, UNC1549, Handala, Sicarii, IOCONTROL (from v3.3) |
+| 2000231–2000359 | 129 | March 2026 expansion: Cisco SD-WAN, MDM wiper, Olalampo, healthcare, correlation |
+| 2000360–2000456 | 97 | ICS/PCOM, TAMECAT, Infy blockchain DGA, FortiOS/Ivanti chains (renumbered from v3.3) |
+| 2000457–2000461 | 5 | CRESCENTHARVEST RAT (APT35/Charming Kitten, Feb 2026) |
 
-### v3.1 Emergency Update Coverage (March 12, 2026)
+### Threat Group Coverage
 
-| Section | SID Range | Count | Description |
-|---------|-----------|-------|-------------|
-| Cisco SD-WAN | 2000231-2000234 | 4 | CVE-2026-20122/20128 exploitation |
-| MDM Wiper (Stryker) | 2000235-2000238 | 4 | Intune/Workspace ONE bulk wipe |
-| Sicarii Ransomware | 2000239-2000242 | 4 | .sicarii extension, file.io exfil |
-| Operation Olalampo | 2000243-2000247 | 5 | GhostFetch, HTTP_VIP patterns |
-| MuddyWater C2 Domains | 2000248-2000252 | 5 | New C2 infrastructure |
-| RedAlert APK | 2000253-2000256 | 4 | Phishing campaign IOCs |
-| RMM Tool Abuse | 2000257-2000263 | 7 | SimpleHelp, Syncro, NetBird, etc. |
-| Backdoor Patterns | 2000264-2000266 | 3 | BugSleep, TameCat, PowerLess |
-| Privilege Escalation | 2000267 | 1 | CVE-2024-30088 |
-| Deno Runtime | 2000268-2000269 | 2 | BYOR evasion detection |
-| Cobalt Strike | 2000270-2000272 | 3 | HTTP/DNS beacon, named pipes |
-| Wiper Detection | 2000273-2000274 | 2 | Mass distribution, disk overwrite |
-| DDoS/Hacktivist | 2000275-2000277 | 3 | UDP/HTTP/SYN flood |
-| SOCKS5 Proxy | 2000278-2000279 | 2 | MuddyWater tunneling |
-| Credential Theft | 2000280-2000282 | 3 | Kerberoasting, LSASS, browser |
-| DCHSpy Mobile | 2000283 | 1 | SFTP exfiltration |
-| Infrastructure | 2000284-2000287 | 4 | .online TLD, polyglot, double ext |
-| Cloud Abuse | 2000288-2000292 | 5 | OneDrive, Drive, Discord, Firebase |
-| Correlation Chains | 2000293-2000297 | 5 | Multi-stage attack detection |
-| Encryption Evasion | 2000298-2000300 | 3 | Self-signed cert, SSH/443, DoH |
-| Enhanced OT/ICS | 2000301-2000305 | 5 | Modbus, DNP3, BACnet, EtherNet/IP |
-| NTP Manipulation | 2000306 | 1 | Time source attacks |
-| Stagecomp/Darkcomp | 2000307-2000308 | 2 | MuddyWater tools |
-| Sosano/GhostForm | 2000309-2000310 | 2 | Go/WebSocket backdoors |
-| React2Shell | 2000311 | 1 | CVE-2025-55182 |
-| FortiOS fgfmd | 2000312 | 1 | CVE-2024-23113 |
-| AMSI/ETW Bypass | 2000313-2000314 | 2 | Evasion detection |
-| Mobile Targeting | 2000315 | 1 | Shortened URL APK delivery |
-| Known C2 IPs | 2000316-2000317 | 2 | MuddyWater infrastructure |
-| DGA Detection | 2000318-2000319 | 2 | OilRig high-entropy DNS |
-| Wiper Pre-cursors | 2000320-2000322 | 3 | Backup deletion, boot tamper |
+| Group | Malware/Tools | SIDs |
+|-------|---------------|------|
+| MuddyWater | Dindoor, RustyWater, MuddyViper/Fooder, TWINTASK, PowGoop, CHAR | ~40 |
+| CyberAv3ngers | IOCONTROL, PCOM PLC exploitation, RabbitMQ, DoH | ~25 |
+| APT34 (OilRig) | Spearal DNS, Veaty, STEALHOOK, Dark Scepter | ~10 |
+| APT35 (Charming Kitten) | BellaCPP, PowerLess v3, CRESCENTHARVEST RAT | ~12 |
+| APT42 (RedKitten) | TAMECAT, WezRat, SloppyMIO, GitHub dead-drop | ~10 |
+| Handala/Void Manticore | Stryker MDM wiper, Telegram C2, Intune mass wipe | ~15 |
+| UNC1549 (Nimbus Manticore) | LIGHTRAIL, POLLBLEND, TWOSTROKE, DEEPROOT, MINIBIKE | ~10 |
+| Pioneer Kitten | CVE-2024-24919, CVE-2024-3400, Backblaze exfil | ~8 |
+| Infy (Prince of Persia) | Tornado, Tonnerre, blockchain DGA, Telegram bot | ~6 |
+| CottonSandstorm | WezRat, credential theft | ~5 |
+| Sicarii RaaS | Connectivity burst, file.io exfil | ~4 |
+| Crafty Camel (Sosano) | PDF+HTA polyglot, C2 domains | ~4 |
+| WINTAPIX/UNC1860 | IIS passive C2, heartbeat | ~3 |
+
+### Key Detection Features
+- **xbits cross-flow correlation**: FortiOS→Wasabi, Ivanti→Telegram, Havoc+Telegram multi-stage chains
+- **ICS/OT protocols**: PCOM (Unitronics), Modbus, BACnet, S7comm
+- **Healthcare emergency**: CVE-2025-59287 WSUS, Pay2Key v3, Intune MDM mass wipe
+- **Blockchain C2**: Ethereum DGA resolution (eth_getStorageAt)
+
+## Migration from v3.x
+
+If you were loading multiple v3.x files, replace them with the single consolidated file:
+
+```yaml
+# Old (REMOVE):
+rule-files:
+  - iranian_apt_v3.1.rules       # archived
+  - iranian_apt_v3_2.rules       # archived
+  - iranian_apt_v3_3_expansion.rules  # archived
+
+# New:
+rule-files:
+  - iranian-apt-detection.rules
+```
+
+The v3.x files are preserved in `archive/suricata-v3-legacy/` for reference.
 
 ## Deployment
 
 ### 1. Copy Rules File
 ```bash
-sudo cp iranian_apt_v3.1.rules /etc/suricata/rules/
+sudo cp iranian-apt-detection.rules /etc/suricata/rules/
 ```
 
 ### 2. Update suricata.yaml
-Add to the `rule-files` section:
 ```yaml
 rule-files:
-  - iranian_apt_v3.1.rules
+  - iranian-apt-detection.rules
 ```
 
 ### 3. Test Configuration
@@ -131,35 +133,6 @@ outputs:
 </localfile>
 ```
 
-## Custom Variables
-
-Define in suricata.yaml:
-```yaml
-vars:
-  HOME_NET: "[192.168.0.0/16,10.0.0.0/8,172.16.0.0/12]"
-  EXTERNAL_NET: "!$HOME_NET"
-```
-
-## Testing Rules
-
-### Generate Safe Test Traffic
-```bash
-# Test DNS tunneling detection
-dig TXT $(echo "test" | base64).malicious.com
-
-# Test web shell detection
-curl -X POST http://testserver/shell.aspx?cmd=whoami
-
-# Test C2 pattern
-curl -H "User-Agent: Mozilla/5.0" http://testserver/a
-```
-
-### Monitor Alerts
-```bash
-tail -f /var/log/suricata/fast.log
-tail -f /var/log/suricata/eve.json | jq '.alert'
-```
-
 ## False Positive Tuning
 
 Common false positives and fixes:
@@ -168,14 +141,12 @@ Common false positives and fixes:
 |------|----------------|-----|
 | 2000018 | Legitimate ngrok usage | Whitelist specific IPs |
 | 2000026 | PowerShell automation | Tune User-Agent string |
+| 2000030 | International data transfers | Increase threshold dramatically |
 | 2000031 | Large DNS responses | Increase threshold |
-| 2000094 | Cloud storage backup | Whitelist backup servers |
-
-## Archived Rules
-
-Historical rules are preserved in the archive directory:
-- `iranian-apt.rules` - Original v1.0 ruleset
-- `iranian-apt-cloud-ai.rules` - Cloud-specific rules (merged into v2)
+| 2000172/2000188 | Legitimate non-22 SSH | Whitelist known SSH ports |
+| 2000182-2000183 | Authorized AnyDesk/MeshCentral | Suppress for approved RMM |
+| 2000284 | .online TLD legitimate traffic | Consider disabling |
+| 2000315 | bit.ly legitimate usage | Increase threshold |
 
 ## Updates
 

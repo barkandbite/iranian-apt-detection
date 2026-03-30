@@ -9,11 +9,11 @@
 
 ```bash
 # Deploy the consolidated v3.1 ruleset
-sudo cp iranian_apt_v3.1.rules /etc/suricata/rules/
+sudo cp iranian-apt-detection.rules /etc/suricata/rules/
 
 # Update suricata.yaml:
 #   rule-files:
-#     - iranian_apt_v3.1.rules
+#     - iranian-apt-detection.rules
 
 # Validate syntax
 sudo suricata -T -c /etc/suricata/suricata.yaml

@@ -5,6 +5,31 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.0] - 2026-03-30
+
+### Changed — BREAKING
+- **Consolidated three Suricata rule files into one canonical file**: `suricata/iranian-apt-detection.rules` (338 rules, zero duplicate SIDs). Replaces `iranian_apt_v3.1.rules` (199 rules), `iranian_apt_v3_2.rules` (241 rules), and `iranian_apt_v3_3_expansion.rules` (97 rules).
+- The old v3.x files had **199 duplicate SIDs** (v3.1 was a complete subset of v3.2) and **60 SID collisions** (v3.2 and v3.3 assigned the same SIDs 2000231-2000290 to completely different rules). Loading multiple files caused silent rule overrides.
+- Colliding v3.3 rules renumbered to SIDs 2000360-2000456 to match the barkandbite/barkbite-suricata-by-country distribution.
+- Old files archived to `archive/suricata-v3-legacy/`.
+- Updated all deployment scripts, documentation, and STRUCTURE.md to reference the new filename.
+
+### Fixed
+- **SID 2000359** (RMM + Telegram Correlation Chain): Converted from `flowbits:isset` to `xbits:isset` for cross-flow correlation. The rule previously required both `iranian.havoc` and `iranian.telegram` bits set on the same TCP connection, which is impossible (Havoc C2 and Telegram are separate connections). Now uses `xbits:isset,iranian.havoc,track ip_src` and `xbits:isset,iranian.telegram,track ip_src` for proper cross-connection detection. (rev 1 -> 2)
+- **SID 2000022** (Havoc C2 Beacon): Added `xbits:set,iranian.havoc,track ip_src,expire 3600` alongside existing flowbits, enabling cross-flow correlation with SID 2000359. (rev 11 -> 12)
+- **SID 2000346** (Telegram Bot API sendDocument Exfil): Added `xbits:set,iranian.telegram,track ip_src,expire 3600` to provide the missing setter for the correlation chain. Previously, the `iranian.telegram` xbit/flowbit was never set by any rule. (rev 1 -> 2)
+
+### Migration
+Users loading v3.x files should update `suricata.yaml`:
+```yaml
+# Remove:
+#   - iranian_apt_v3.1.rules
+#   - iranian_apt_v3_2.rules
+#   - iranian_apt_v3_3_expansion.rules
+# Add:
+  - iranian-apt-detection.rules
+```
+
 ## [0.6.3] - 2026-03-29
 
 ### Added

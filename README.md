@@ -51,13 +51,11 @@ sudo systemctl restart wazuh-manager
 
 ### 2. Deploy Suricata Rules
 ```bash
-# Deploy base rules + expansion
-sudo cp suricata/iranian_apt_v3_2.rules /etc/suricata/rules/
-sudo cp suricata/iranian_apt_v3_3_expansion.rules /etc/suricata/rules/
+# Deploy consolidated rules (v4.0 — single file, 338 signatures)
+sudo cp suricata/iranian-apt-detection.rules /etc/suricata/rules/
 
-# Add both to suricata.yaml rule-files section:
-#   - iranian_apt_v3_2.rules
-#   - iranian_apt_v3_3_expansion.rules
+# Add to suricata.yaml rule-files section:
+#   - iranian-apt-detection.rules
 
 # Validate and reload (no restart needed)
 sudo suricata -T -c /etc/suricata/suricata.yaml
@@ -173,8 +171,7 @@ iranian-apt-detection/
 │   ├── 0919-iranian-apt-march2026-expansion.xml
 │   └── README.md
 ├── suricata/                  # Network IDS signatures
-│   ├── iranian_apt_v3_2.rules
-│   ├── iranian_apt_v3_3_expansion.rules
+│   ├── iranian-apt-detection.rules  # Consolidated v4.0 (338 rules)
 │   └── README.md
 ├── configurations/            # Agent and system configs
 │   ├── sysmon-config-iranian-apt.xml
