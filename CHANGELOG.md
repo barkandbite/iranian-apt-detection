@@ -5,6 +5,12 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.1] - 2026-03-30
+
+### Added
+- **5 Boggy Serpens (MuddyWater) BlackBeard rules** (SIDs 2000462-2000466): Backported from barkbite-suricata-by-country. Covers BlackBeard Rust C2 beacon, header-based exfiltration, Nuso HTTP backdoor novaservice fingerprint, Phoenix VBA macro delivery, and diplomatic "Sustainable Peace" phishing lure. Source: Unit 42 Boggy Serpens Threat Assessment (March 2026). Campaign: 4-wave attack against UAE marine/energy company, Aug 2025 – Feb 2026.
+- **Total: 343 rules** (338 from v4.0 + 5 new)
+
 ## [4.0.0] - 2026-03-30
 
 ### Changed — BREAKING
