@@ -5,6 +5,23 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.2] - 2026-04-03
+
+### Added
+- **1 Infy/Prince of Persia replacement C2 rule** (SID 2000467): New C2 IP 45.80.148.249 identified via SafeBreach research. Actor migrated from 45.80.148.195 in late Dec 2025.
+- **Total: 344 rules** (343 from v4.0.1 + 1 new)
+
+### Changed
+- **SID 2000169** (Infy Tonnerre C2 IP-1): Annotated as abandoned, lowered to priority:3. IP 45.80.148.195 decommissioned by actor in early Jan 2026. (rev 1 -> 2)
+- **SID 2000327** (Infy Tonnerre C2 IP-1 duplicate): Same annotation and priority change. (rev 1 -> 2)
+
+### IOC Currency Audit
+Verified 4 Iranian APT-associated IPs:
+- **194.11.246.101** (MuddyWater/Handala): ACTIVE — HosterDaddy AS215117, confirmed Mar 2026
+- **157.20.182.75** (MuddyWater UDPGangster C2): ACTIVE — same hosting block
+- **157.20.182.49** (MuddyWater Sliver C2): ACTIVE — open directory, Feb/Mar 2026
+- **45.80.148.195** (Infy/Prince of Persia): ABANDONED — migrated to .249 in Jan 2026
+
 ## [4.0.1] - 2026-03-30
 
 ### Added
