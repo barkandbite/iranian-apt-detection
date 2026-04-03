@@ -387,7 +387,12 @@ alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT Infy Foudre DGA
 alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT Infy Tonnerre DGA .privatedns.org 2025"; dns.query; content:".privatedns.org"; endswith; classtype:domain-c2; sid:2000168; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_12;)
 
 # Tonnerre v50 - Known C2 IP (45.80.148.195)
-alert ip $HOME_NET any -> 45.80.148.195 any (msg:"Bark&Bite - Iranian APT Infy Tonnerre Known C2 IP-1 2025"; classtype:command-and-control; sid:2000169; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_12;)
+# IOC AUDIT 2026-04-03: IP abandoned by Infy/Prince of Persia in early Jan 2026.
+# Actor migrated to 45.80.148.249 (see SID 2000467). Domain querylist.online no
+# longer resolves. Keep rule active — alerts indicate infected hosts still phoning
+# home to decommissioned C2. Lowered priority from default.
+# Source: SafeBreach "Prince of Persia Part II" (2026)
+alert ip $HOME_NET any -> 45.80.148.195 any (msg:"Bark&Bite - Iranian APT Infy Tonnerre Known C2 IP-1 (Abandoned Jan 2026) 2025"; classtype:command-and-control; sid:2000169; rev:2; priority:3; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_04_03;)
 
 # Tonnerre v50 - Known C2 IP (45.80.148.124)
 alert ip $HOME_NET any -> 45.80.148.124 any (msg:"Bark&Bite - Iranian APT Infy Tonnerre Known C2 IP-2 2025"; classtype:command-and-control; sid:2000170; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_12;)
@@ -1074,9 +1079,15 @@ alert udp $HOME_NET any -> 157.20.182.75 any (msg:"Bark&Bite - Iranian APT Muddy
 
 alert tcp $HOME_NET any -> 157.20.182.49 31337 (msg:"Bark&Bite - Iranian APT MuddyWater Sliver C2 IP"; classtype:command-and-control; sid:2000326; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_12, updated_at 2026_03_12;)
 
-alert ip $HOME_NET any -> 45.80.148.195 any (msg:"Bark&Bite - Iranian APT Infy Tonnerre C2 IP-1"; classtype:command-and-control; sid:2000327; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_12, updated_at 2026_03_12;)
+# IOC AUDIT 2026-04-03: 45.80.148.195 abandoned by Infy in early Jan 2026 (see SID 2000169 note)
+alert ip $HOME_NET any -> 45.80.148.195 any (msg:"Bark&Bite - Iranian APT Infy Tonnerre C2 IP-1 (Abandoned Jan 2026)"; classtype:command-and-control; sid:2000327; rev:2; priority:3; metadata:policy max-detect-ips drop, created_at 2026_03_12, updated_at 2026_04_03;)
 
 alert ip $HOME_NET any -> 45.80.148.124 any (msg:"Bark&Bite - Iranian APT Infy Tonnerre C2 IP-2"; classtype:command-and-control; sid:2000328; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_12, updated_at 2026_03_12;)
+
+# Infy/Prince of Persia — Replacement C2 IP (45.80.148.249)
+# IOC AUDIT 2026-04-03: Infy migrated from 45.80.148.195 to .249 on 2025-12-21.
+# Source: SafeBreach "Prince of Persia Part II" (2026)
+alert ip $HOME_NET any -> 45.80.148.249 any (msg:"Bark&Bite - Iranian APT Infy Tonnerre Replacement C2 IP 2026"; classtype:command-and-control; sid:2000467; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_04_03, updated_at 2026_04_03;)
 
 # Telegram Bots
 alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater CHAR Telegram Bot stager_51_bot"; flow:to_server,established; content:"api.telegram.org"; http_host; content:"stager_51_bot"; nocase; classtype:command-and-control; sid:2000329; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_12, updated_at 2026_03_12;)
