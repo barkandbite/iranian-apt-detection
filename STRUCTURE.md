@@ -84,7 +84,7 @@ iranian-apt-detection/
 - **101300-101477**: March 2026 expansion (0919)
 - **101480-101510**: Healthcare emergency (0919)
 
-### Suricata SID Ranges (1000039-2000461)
+### Suricata SID Ranges (1000039-2000466)
 - **1000039-2000014**: CVE exploitation signatures
 - **2000015-2000030**: C2 infrastructure, post-exploitation, exfiltration
 - **2000031-2000050**: Reconnaissance, web shells, ICS/SCADA, correlation
@@ -94,6 +94,7 @@ iranian-apt-detection/
 - **2000231-2000359**: March 2026 expansion (healthcare, correlation, IOCs)
 - **2000360-2000456**: ICS/PCOM, TAMECAT, Infy blockchain, FortiOS/Ivanti chains
 - **2000457-2000461**: CRESCENTHARVEST RAT (APT35/Charming Kitten)
+- **2000462-2000466**: Boggy Serpens/BlackBeard + Nuso backdoor
 
 ## File Naming Conventions
 
