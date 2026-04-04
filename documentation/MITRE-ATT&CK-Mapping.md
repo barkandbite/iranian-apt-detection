@@ -27,7 +27,7 @@
 - **T1505.003 - Web Shell**
   - Rules: 100915, 100922, 100923, 100936, 100960, 100961, 100973
 - **T1547.001 - Registry Run Keys**
-  - Rules: 100926, 100965, 100992
+  - Rules: 100926, 100965, 100992, 101511 (RustyWater CertificationKit.ini)
 - **T1543.003 - Windows Service**
   - Rules: 100965, 100984, 100985
 - **T1098 - Account Manipulation**
@@ -100,6 +100,8 @@
   - Rules: 100900, 100909, 100913, 100941
 - **T1595.001 - Scanning IP Blocks**
   - Rules: 100946
+- **T1518.001 - Security Software Discovery**
+  - Rules: 101514 (RustyWater AV/EDR enumeration)
 - **T1595.002 - Vulnerability Scanning**
   - Rules: 100900, 100913
 
@@ -129,7 +131,7 @@
 
 ## Command and Control
 - **T1071.001 - Web Protocols**
-  - Rules: 100934, 100941, 100945, 100949
+  - Rules: 100934, 100941, 100945, 100949, 101513 (RustyWater nomercys C2)
 - **T1071.004 - DNS**
   - Rules: 100948
 - **T1090 - Proxy**
@@ -141,7 +143,7 @@
 - **T1102 - Web Service**
   - Rules: 100934, 100954
 - **T1102.002 - Bidirectional Communication**
-  - Rules: 100949
+  - Rules: 100949, 101515 (MuddyWater Telegram Bot C2)
 - **T1132 - Data Encoding**
   - Rules: 100945
 - **T1219 - Remote Access Software**

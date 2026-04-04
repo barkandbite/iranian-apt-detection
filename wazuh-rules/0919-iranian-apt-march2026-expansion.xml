@@ -950,4 +950,66 @@
     <group>attack,ransomware_chain,pay2key,healthcare,critical,iranian_apt,pci_dss_11.4,gdpr_IV_35.7.d,</group>
   </rule>
 
+  <!-- ========== MUDDYWATER RUSTYWATER (101511-101515) ========== -->
+  <!-- CloudSEK TRIAD, The Hacker News (January-March 2026) -->
+  <!-- RustyWater: Rust-based RAT targeting Middle East, Israeli gov -->
+
+  <!-- RustyWater: CertificationKit.ini persistence via registry Run key -->
+  <rule id="101511" level="15">
+    <if_group>sysmon_event_13</if_group>
+    <field name="win.eventdata.targetObject" type="pcre2">(?i)\\Software\\Microsoft\\Windows\\CurrentVersion\\Run</field>
+    <field name="win.eventdata.details" type="pcre2">(?i)CertificationKit</field>
+    <description>Iranian APT: MuddyWater RustyWater CertificationKit.ini registry persistence</description>
+    <mitre>
+      <id>T1547.001</id>
+    </mitre>
+    <group>attack,persistence,muddywater,rustywater,iranian_apt,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- RustyWater: Payload file creation at ProgramData\CertificationKit.ini -->
+  <rule id="101512" level="15">
+    <if_sid>550,553,554</if_sid>
+    <field name="file" type="pcre2">(?i)ProgramData\\CertificationKit\.ini</field>
+    <description>Iranian APT: MuddyWater RustyWater payload artifact CertificationKit.ini detected</description>
+    <mitre>
+      <id>T1036.005</id>
+    </mitre>
+    <group>attack,execution,muddywater,rustywater,iranian_apt,pci_dss_11.5,</group>
+  </rule>
+
+  <!-- RustyWater: Known C2 domain nomercys resolution -->
+  <rule id="101513" level="15">
+    <if_group>sysmon_event_22</if_group>
+    <field name="win.eventdata.queryName" type="pcre2">(?i)nomercys</field>
+    <description>Iranian APT: MuddyWater RustyWater C2 domain nomercys resolution</description>
+    <mitre>
+      <id>T1071.001</id>
+    </mitre>
+    <group>attack,c2,muddywater,rustywater,iranian_apt,pci_dss_11.4,</group>
+  </rule>
+
+  <!-- RustyWater: AV/EDR enumeration via file system scanning (25+ products) -->
+  <rule id="101514" level="14">
+    <if_group>sysmon_event_11</if_group>
+    <field name="win.eventdata.image" type="pcre2">(?i)CertificationKit</field>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?i)(kaspersky|avast|avg|eset|bitdefender|mcafee|norton|sophos|crowdstrike|sentinel)</field>
+    <description>Iranian APT: MuddyWater RustyWater AV/EDR product enumeration</description>
+    <mitre>
+      <id>T1518.001</id>
+    </mitre>
+    <group>attack,discovery,muddywater,rustywater,iranian_apt,</group>
+  </rule>
+
+  <!-- MuddyWater: Telegram Bot API access from non-browser process -->
+  <rule id="101515" level="14">
+    <if_group>sysmon_event_22</if_group>
+    <field name="win.eventdata.queryName" type="pcre2">(?i)api\.telegram\.org</field>
+    <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)(telegram|chrome|firefox|edge|brave|opera|vivaldi)</field>
+    <description>Iranian APT: MuddyWater Telegram Bot C2 DNS resolution from non-browser</description>
+    <mitre>
+      <id>T1102.002</id>
+    </mitre>
+    <group>attack,c2,muddywater,iranian_apt,pci_dss_11.4,</group>
+  </rule>
+
 </group>

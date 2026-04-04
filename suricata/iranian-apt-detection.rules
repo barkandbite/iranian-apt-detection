@@ -1,7 +1,7 @@
 # Bark & Bite — Iranian APT Detection Rules (Consolidated)
 # File: iranian-apt-detection.rules
 # Version: 4.0
-# Last Updated: 2026-03-30
+# Last Updated: 2026-04-04
 # Credit: Bark & Bite Security
 # License: MIT
 # Repository: https://github.com/barkandbite/iranian-apt-detection
@@ -14,7 +14,7 @@
 # UNC1860, UNC1549, Handala/Void Manticore, APT42/RedKitten, Infy, and emerging groups.
 # Optimized for extremely high accuracy with minimal false positives.
 #
-# Total signatures: 338 rules (SID 1000039-2000461)
+# Total signatures: 349 rules (SID 1000039-2000472)
 # SID Allocation:
 #   1000039-2000030: Core CVE + behavioral detection (v3.1 legacy range)
 #   2000031-2000193: Extended behavioral + C2 patterns
@@ -1667,3 +1667,40 @@ alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT Bogg
 # targeting embassies. Detects outbound email to multiple recipients with
 # "Sustainable Peace" or subsea/pipeline themed subjects from HOME_NET
 alert smtp $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Boggy Serpens Diplomatic Phish Lure 2026"; flow:to_server,established; content:"Subject|3a|"; content:"Sustainable Peace"; nocase; distance:0; within:200; classtype:social-engineering; sid:2000466; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_30, updated_at 2026_03_30;)
+
+#==============================================================================
+# SECTION: MuddyWater RustyWater — Rust-Based RAT (January 2026+)
+# CloudSEK TRIAD, The Hacker News, SOC Prime (January-March 2026)
+# RustyWater: Rust-based implant delivered via spear-phishing with macro'd
+# Word docs. HTTP C2 with 3-layer obfuscation (JSON→Base64→XOR). Mimics
+# Dropbox/WordPress domains. Randomized sleep jitter for evasion.
+# Targets: Israeli government, Middle East diplomatic/maritime/financial/telecom.
+# Known C2 domain: nomercys.it[.]com
+# MITRE: T1071.001 (Web Protocols), T1059 (Command Execution), T1547.001 (Registry Run Keys)
+#==============================================================================
+
+# RustyWater — C2 domain nomercys.it.com
+# Known MuddyWater RustyWater C2 domain identified by CloudSEK TRIAD.
+alert dns $HOME_NET any -> any 53 (msg:"Bark&Bite - Iranian APT MuddyWater RustyWater C2 Domain nomercys 2026"; dns.query; content:"nomercys"; nocase; fast_pattern; reference:url,cloudsek.com/blog/reborn-in-rust-muddywater-evolves-tooling-with-rustywater-implant; classtype:command-and-control; sid:2000468; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_04_04, updated_at 2026_04_04;)
+
+# RustyWater — behavioral: Rust reqwest HTTP client C2 beacon
+# RustyWater uses the Rust reqwest library for HTTP C2 with distinctive
+# connection pooling behavior. Detects non-browser User-Agent with Base64
+# encoded body (JSON→Base64→XOR obfuscation) POSTed at randomized intervals.
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater RustyWater Rust HTTP C2 Beacon 2026"; flow:to_server,established; http.method; content:"POST"; http.user_agent; content:!"Mozilla"; content:!"Chrome"; content:!"Safari"; content:!"curl"; content:!"python"; content:!"Go-http"; http.request_body; content:!"<"; content:!"{"; pcre:"/^[A-Za-z0-9+\/=]{32,}/"; threshold:type both, track by_src, count 5, seconds 600; reference:url,cloudsek.com/blog/reborn-in-rust-muddywater-evolves-tooling-with-rustywater-implant; classtype:command-and-control; sid:2000469; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_04, updated_at 2026_04_04;)
+
+# RustyWater — persistence artifact: CertificationKit.ini registry run key
+# RustyWater persists by writing to HKCU\...\Run pointing to
+# C:\ProgramData\CertificationKit.ini (the payload binary).
+# Detect HTTP download of file named CertificationKit.
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT MuddyWater RustyWater CertificationKit Payload Delivery 2026"; flow:to_client,established; file_data; content:"CertificationKit"; nocase; fast_pattern; reference:url,cloudsek.com/blog/reborn-in-rust-muddywater-evolves-tooling-with-rustywater-implant; classtype:trojan-activity; sid:2000470; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_04, updated_at 2026_04_04;)
+
+# MuddyWater — Telegram Bot C2 channel (post-airstrike escalation)
+# Since Feb 2026 airstrikes, MuddyWater uses Telegram bot API as C2.
+# Detect Telegram Bot API polling from HOME_NET at elevated frequency.
+alert http $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT MuddyWater Telegram Bot C2 Polling 2026"; flow:to_server,established; http.host; content:"api.telegram.org"; http.uri; content:"/bot"; content:"/getUpdates"; distance:0; within:100; threshold:type both, track by_src, count 10, seconds 120; flowbits:set,iranian.muddywater.telegram; reference:url,group-ib.com/blog/muddywater-operation-olalampo; classtype:command-and-control; sid:2000471; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_04, updated_at 2026_04_04;)
+
+# MuddyWater — Telegram Bot C2 command execution exfiltration
+# After polling getUpdates, MuddyWater's implant posts command output
+# back via sendMessage. Detect POST with command output patterns.
+alert http $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT MuddyWater Telegram Bot C2 Exfil sendMessage 2026"; flow:to_server,established; http.host; content:"api.telegram.org"; http.method; content:"POST"; http.uri; content:"/sendMessage"; http.request_body; content:"chat_id"; content:"text"; distance:0; within:50; flowbits:set,iranian.muddywater.telegram.exfil; reference:url,group-ib.com/blog/muddywater-operation-olalampo; classtype:command-and-control; sid:2000472; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_04, updated_at 2026_04_04;)

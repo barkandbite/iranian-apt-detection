@@ -5,6 +5,19 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.3] - 2026-04-04
+
+### Added
+- **5 MuddyWater RustyWater Suricata rules** (SIDs 2000468-2000472): New Rust-based RAT targeting Israeli government and Middle East critical infrastructure. Covers nomercys C2 domain, Rust reqwest HTTP C2 beacon with Base64-XOR obfuscation, CertificationKit.ini payload delivery, and Telegram Bot API C2 polling/exfiltration. Source: CloudSEK TRIAD, The Hacker News (January-March 2026).
+- **5 Wazuh rules** (IDs 101511-101515): Host-side detection for RustyWater CertificationKit.ini registry persistence, payload artifact on disk, nomercys C2 domain resolution, AV/EDR product enumeration, and Telegram Bot API access from non-browser processes.
+- **Total: 349 Suricata rules** (344 from v4.0.2 + 5 new), **265 Wazuh rules** (260 + 5 new)
+
+### Intelligence Context
+- MuddyWater escalated operations post-February 28, 2026 Iran airstrikes, targeting US critical infrastructure (bank, airport, nonprofit) and Israeli entities
+- RustyWater represents a significant tooling evolution from PowerShell/VBS to compiled Rust binaries with 3-layer obfuscation
+- Telegram Bot C2 channel identified via Group-IB Operation Olalampo monitoring
+- MITRE: T1071.001, T1059, T1547.001, T1036.005, T1518.001, T1102.002
+
 ## [4.0.2] - 2026-04-03
 
 ### Added

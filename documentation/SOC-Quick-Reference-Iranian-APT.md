@@ -27,7 +27,16 @@ gupdate[.]net
 *.localhost.run
 microsoft-update[.]net
 windows-update[.]org
+nomercys.it[.]com          # MuddyWater RustyWater C2 (Jan 2026+)
 ```
+
+### MuddyWater RustyWater Indicators (April 2026)
+- **C2 Domain**: `nomercys.it[.]com` (mimics legitimate service)
+- **Persistence**: `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` → `C:\ProgramData\CertificationKit.ini`
+- **C2 Protocol**: HTTP POST with Base64-encoded body (JSON→Base64→XOR), non-browser User-Agent, randomized sleep jitter
+- **Telegram C2**: `api.telegram.org/bot<token>/getUpdates` polling, `sendMessage` for exfil
+- **Suricata SIDs**: 2000468-2000472
+- **Wazuh IDs**: 101511-101515
 
 ## Investigation Checklist
 
