@@ -1018,7 +1018,11 @@ alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT ETW 
 #==============================================================================
 
 # Trojanized APK download via bit.ly shortened URLs (common delivery method)
-alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Shortened URL APK Delivery 2026"; flow:to_server,established; content:"GET"; http_method; content:"bit.ly"; http_host; classtype:social-engineering; sid:2000315; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_12, updated_at 2026_03_12;)
+# FP reduction (rev 2): added threshold — bare bit.ly matching is too broad
+# for production. Threshold limits to 10 unique bit.ly requests per source
+# per hour, which is still useful for burst delivery campaigns while reducing
+# noise from legitimate bit.ly usage.
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Shortened URL APK Delivery 2026"; flow:to_server,established; content:"GET"; http_method; content:"bit.ly"; http_host; threshold:type both, track by_src, count 10, seconds 3600; classtype:social-engineering; sid:2000315; rev:2; metadata:policy max-detect-ips drop, created_at 2026_03_12, updated_at 2026_04_05;)
 
 #==============================================================================
 # SECTION 40: MUDDYWATER KNOWN C2 IPS (MARCH 2026)
