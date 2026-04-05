@@ -188,3 +188,18 @@
   - Rules: 100916, 100957
 - **T1657 - Financial Theft**
   - Rules: 100951
+
+---
+
+## April 2026 Additions — Dust Specter (TwinTalk/SPLITDROP)
+
+### Command and Control
+- **T1071.001 - Web Protocols**: SIDs 2000468-2000477, Wazuh 101511, 101515
+- **T1132.001 - Standard Encoding**: SID 2000468 (JWT/Base64 encoded C2)
+- **T1001.003 - Protocol Impersonation**: SID 2000468 (HTTPS mimicry with randomized URIs)
+
+### Persistence
+- **T1547.001 - Registry Run Keys**: Wazuh 101514 (VLC/WingetUI Run key persistence)
+
+### Defense Evasion
+- **T1574.002 - DLL Side-Loading**: Wazuh 101512, 101513 (libvlc.dll/hostfxr.dll sideloading)

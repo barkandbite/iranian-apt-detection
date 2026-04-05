@@ -27,7 +27,23 @@ gupdate[.]net
 *.localhost.run
 microsoft-update[.]net
 windows-update[.]org
+
+# Dust Specter C2 domains (April 2026)
+lecturegenieltd[.]pro
+meetingapp[.]site
+afterworld[.]store
+girlsbags[.]shop
+onlinepettools[.]shop
+web14[.]info
+web27[.]info
 ```
+
+### Dust Specter (April 2026) — Key Indicators
+- **TwinTalk C2**: HTTPS GET with `Authorization: Bearer eyJ...` to randomized hex URI paths
+- **File artifacts**: `C:\ProgramData\PolGuid\in.txt` and `out.txt` (TwinTask polling)
+- **DLL sideloading**: Unsigned `libvlc.dll` (TwinTask) and `hostfxr.dll` (TwinTalk)
+- **Registry**: Run keys for `VLC` or `WingetUI` pointing to non-standard paths
+- **Lure**: Fake Webex installer from `meetingapp[.]site/webexdownload`
 
 ## Investigation Checklist
 

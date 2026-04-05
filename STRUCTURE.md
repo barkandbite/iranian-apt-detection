@@ -83,8 +83,9 @@ iranian-apt-detection/
 - **101200-101299**: March 2026 updates (0918)
 - **101300-101477**: March 2026 expansion (0919)
 - **101480-101510**: Healthcare emergency (0919)
+- **101511-101515**: Dust Specter TwinTalk/SPLITDROP host indicators (0919)
 
-### Suricata SID Ranges (1000039-2000466)
+### Suricata SID Ranges (1000039-2000477)
 - **1000039-2000014**: CVE exploitation signatures
 - **2000015-2000030**: C2 infrastructure, post-exploitation, exfiltration
 - **2000031-2000050**: Reconnaissance, web shells, ICS/SCADA, correlation
@@ -95,6 +96,8 @@ iranian-apt-detection/
 - **2000360-2000456**: ICS/PCOM, TAMECAT, Infy blockchain, FortiOS/Ivanti chains
 - **2000457-2000461**: CRESCENTHARVEST RAT (APT35/Charming Kitten)
 - **2000462-2000466**: Boggy Serpens/BlackBeard + Nuso backdoor
+- **2000467**: Infy Tonnerre replacement C2
+- **2000468-2000477**: Dust Specter TwinTalk/SPLITDROP C2 + domain IOCs
 
 ## File Naming Conventions
 

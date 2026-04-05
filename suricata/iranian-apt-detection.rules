@@ -1667,3 +1667,43 @@ alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT Bogg
 # targeting embassies. Detects outbound email to multiple recipients with
 # "Sustainable Peace" or subsea/pipeline themed subjects from HOME_NET
 alert smtp $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Boggy Serpens Diplomatic Phish Lure 2026"; flow:to_server,established; content:"Subject|3a|"; content:"Sustainable Peace"; nocase; distance:0; within:200; classtype:social-engineering; sid:2000466; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_30, updated_at 2026_03_30;)
+
+#==============================================================================
+# SECTION: DUST SPECTER (Iran-nexus) — TwinTalk/TwinTask/SPLITDROP/GhostForm
+# Ref: Zscaler ThreatLabz March 2026 — Dust Specter targets Iraqi officials
+# Ref: Trellix "The Iranian Cyber Capability 2026"
+# MITRE: T1071.001, T1132.001, T1574.002, T1001.003
+#==============================================================================
+
+# Dust Specter TwinTalk C2 — JWT Bearer token beacon with randomized hex URI
+# TwinTalk uses HTTPS GET with Authorization: Bearer <JWT> header where the
+# JWT is HS256-signed with a single underscore ('_') as the secret. URI paths
+# are 10-char hex strings followed by a 6-char checksum seeded with 0xABCDEF.
+# Detection: outbound HTTPS GET with JWT Authorization header to non-standard
+# URI paths matching hex pattern. Low FP due to unusual URI + JWT combination.
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Dust Specter TwinTalk JWT C2 Beacon 2026"; flow:to_server,established; content:"GET"; http.method; http.header; content:"Authorization|3a| Bearer eyJ"; fast_pattern; http.uri; pcre:"/^\/[0-9a-f]{10,20}$/"; threshold:type both, track by_src, count 3, seconds 600; reference:url,zscaler.com/blogs/security-research/dust-specter-apt-targets-government-officials-iraq; classtype:command-and-control; sid:2000468; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_05, updated_at 2026_04_05;)
+
+# Dust Specter C2 domain IOC — DNS resolution for known TwinTalk/SPLITDROP C2
+# Domains: lecturegenieltd.pro, meetingapp.site, afterworld.store,
+#          girlsbags.shop, onlinepettools.shop, web14.info, web27.info
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT Dust Specter TwinTalk C2 Domain DNS 2026"; dns.query; content:"lecturegenieltd.pro"; nocase; reference:url,zscaler.com/blogs/security-research/dust-specter-apt-targets-government-officials-iraq; classtype:command-and-control; sid:2000469; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_05, updated_at 2026_04_05;)
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT Dust Specter TwinTalk C2 Domain DNS 2026"; dns.query; content:"meetingapp.site"; nocase; reference:url,zscaler.com/blogs/security-research/dust-specter-apt-targets-government-officials-iraq; classtype:command-and-control; sid:2000470; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_05, updated_at 2026_04_05;)
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT Dust Specter TwinTalk C2 Domain DNS 2026"; dns.query; content:"afterworld.store"; nocase; reference:url,zscaler.com/blogs/security-research/dust-specter-apt-targets-government-officials-iraq; classtype:command-and-control; sid:2000471; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_05, updated_at 2026_04_05;)
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT Dust Specter C2 Domain DNS girlsbags 2026"; dns.query; content:"girlsbags.shop"; nocase; reference:url,zscaler.com/blogs/security-research/dust-specter-apt-targets-government-officials-iraq; classtype:command-and-control; sid:2000472; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_05, updated_at 2026_04_05;)
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT Dust Specter C2 Domain DNS onlinepettools 2026"; dns.query; content:"onlinepettools.shop"; nocase; reference:url,zscaler.com/blogs/security-research/dust-specter-apt-targets-government-officials-iraq; classtype:command-and-control; sid:2000473; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_05, updated_at 2026_04_05;)
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT Dust Specter C2 Domain DNS web14 2026"; dns.query; content:"web14.info"; nocase; reference:url,zscaler.com/blogs/security-research/dust-specter-apt-targets-government-officials-iraq; classtype:command-and-control; sid:2000474; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_05, updated_at 2026_04_05;)
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT Dust Specter C2 Domain DNS web27 2026"; dns.query; content:"web27.info"; nocase; reference:url,zscaler.com/blogs/security-research/dust-specter-apt-targets-government-officials-iraq; classtype:command-and-control; sid:2000475; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_05, updated_at 2026_04_05;)
+
+# Dust Specter SPLITDROP initial payload delivery — ZIP archive from ca.iq
+# SPLITDROP delivered as mofaSurvey_20_30_oct.zip from compromised ca.iq domain
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT Dust Specter SPLITDROP ZIP Payload Delivery 2026"; flow:to_client,established; http.header; content:"application/zip"; content:"mofaSurvey"; fast_pattern; reference:url,zscaler.com/blogs/security-research/dust-specter-apt-targets-government-officials-iraq; classtype:trojan-activity; sid:2000476; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_05, updated_at 2026_04_05;)
+
+# Dust Specter — Webex lure download from meetingapp.site
+# Attackers host fake Webex installer at meetingapp.site/webexdownload
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Dust Specter Fake Webex Lure Download 2026"; flow:to_server,established; http.host; content:"meetingapp.site"; http.uri; content:"/webexdownload"; reference:url,zscaler.com/blogs/security-research/dust-specter-apt-targets-government-officials-iraq; classtype:social-engineering; sid:2000477; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_05, updated_at 2026_04_05;)

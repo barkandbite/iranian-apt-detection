@@ -950,4 +950,64 @@
     <group>attack,ransomware_chain,pay2key,healthcare,critical,iranian_apt,pci_dss_11.4,gdpr_IV_35.7.d,</group>
   </rule>
 
+  <!-- ========== DUST SPECTER / TWINTALK / TWINTASK (101511-101515) ========== -->
+  <!-- Ref: Zscaler ThreatLabz March 2026, Trellix Iranian Cyber Capability 2026 -->
+
+  <!-- Dust Specter: TwinTask file-based C2 polling via ProgramData\PolGuid -->
+  <rule id="101511" level="14">
+    <if_group>sysmon_event_11</if_group>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?i)C:\\ProgramData\\PolGuid\\(in|out)\.txt</field>
+    <description>Iranian APT: Dust Specter TwinTask file-based C2 polling artifact</description>
+    <mitre>
+      <id>T1071.001</id>
+    </mitre>
+    <group>attack,c2,dust_specter,iranian_apt,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- Dust Specter: SPLITDROP DLL sideloading — unsigned libvlc.dll (TwinTask) -->
+  <rule id="101512" level="15">
+    <if_group>sysmon_event_7</if_group>
+    <field name="win.eventdata.imageLoaded" type="pcre2">(?i)libvlc\.dll</field>
+    <field name="win.eventdata.signed">false</field>
+    <description>Iranian APT: Dust Specter SPLITDROP DLL sideloading (TwinTask via libvlc.dll)</description>
+    <mitre>
+      <id>T1574.002</id>
+    </mitre>
+    <group>attack,defense_evasion,dust_specter,iranian_apt,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- Dust Specter: TwinTalk C2 orchestrator — unsigned hostfxr.dll -->
+  <rule id="101513" level="15">
+    <if_group>sysmon_event_7</if_group>
+    <field name="win.eventdata.imageLoaded" type="pcre2">(?i)hostfxr\.dll</field>
+    <field name="win.eventdata.signed">false</field>
+    <description>Iranian APT: Dust Specter TwinTalk C2 orchestrator DLL sideloading (hostfxr.dll)</description>
+    <mitre>
+      <id>T1574.002</id>
+    </mitre>
+    <group>attack,defense_evasion,dust_specter,iranian_apt,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- Dust Specter: Registry persistence via VLC/WingetUI Run key -->
+  <rule id="101514" level="14">
+    <if_group>sysmon_event_13</if_group>
+    <field name="win.eventdata.targetObject" type="pcre2">(?i)\\CurrentVersion\\Run\\(VLC|WingetUI)</field>
+    <description>Iranian APT: Dust Specter registry persistence via VLC/WingetUI Run key</description>
+    <mitre>
+      <id>T1547.001</id>
+    </mitre>
+    <group>attack,persistence,dust_specter,iranian_apt,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- Dust Specter: C2 domain resolution (extended list) -->
+  <rule id="101515" level="14">
+    <if_group>sysmon_event_22</if_group>
+    <field name="win.eventdata.queryName" type="pcre2">(?i)(afterworld\.store|onlinepettools\.shop|web27\.info)</field>
+    <description>Iranian APT: Dust Specter C2 domain resolution</description>
+    <mitre>
+      <id>T1071.001</id>
+    </mitre>
+    <group>attack,c2,dust_specter,iranian_apt,pci_dss_11.4,</group>
+  </rule>
+
 </group>

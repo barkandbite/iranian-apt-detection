@@ -5,6 +5,20 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.3] - 2026-04-05
+
+### Added
+- **10 Dust Specter (Iran-nexus) rules** (SIDs 2000468-2000477): New coverage for Dust Specter APT campaign targeting Iraqi government officials. Source: Zscaler ThreatLabz March 2026, Trellix "Iranian Cyber Capability 2026".
+  - SID 2000468: TwinTalk C2 beacon — behavioral detection of JWT Bearer auth with randomized hex URI paths (checksum seed 0xABCDEF)
+  - SIDs 2000469-2000475: DNS IOC rules for 7 known C2 domains (lecturegenieltd.pro, meetingapp.site, afterworld.store, girlsbags.shop, onlinepettools.shop, web14.info, web27.info)
+  - SID 2000476: SPLITDROP ZIP payload delivery (mofaSurvey archive from compromised ca.iq)
+  - SID 2000477: Fake Webex lure download from meetingapp.site
+- **5 Wazuh rules** (IDs 101511-101515): Host-side detection for Dust Specter artifacts — TwinTask file-based C2 polling (ProgramData\PolGuid), SPLITDROP DLL sideloading (libvlc.dll/hostfxr.dll), registry persistence via VLC/WingetUI Run keys, extended C2 domain DNS resolution.
+- **Total: 354 Suricata rules** (344 from v4.0.2 + 10 new), **~265 Wazuh rules**
+
+### MITRE ATT&CK
+- T1071.001 (Web Protocols), T1132.001 (Standard Encoding), T1574.002 (DLL Side-Loading), T1001.003 (Protocol Impersonation), T1547.001 (Registry Run Keys)
+
 ## [4.0.2] - 2026-04-03
 
 ### Added
