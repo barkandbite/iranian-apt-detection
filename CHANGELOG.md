@@ -5,6 +5,31 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.0.0] - 2026-04-07
+
+### Changed -- MAJOR RELEASE
+- **Standardized all 354 Suricata rule descriptions** to consistent format: `Bark&Bite IRANIAN-APT <Group> - <Description> [CVE-XXXX-XXXXX]`. Every rule now includes threat group attribution, making SOC triage and SIEM filtering significantly easier.
+- **Removed HEALTHCARE emergency framing** from rule descriptions and README. Healthcare is now one sector among many (energy, water, telecom, finance, defense, transportation, government) in a broader critical infrastructure defense posture.
+- **README rewritten** to reflect the project's role as an open-source defensive toolkit for the US-Iranian cyber conflict, accessible to organizations of all sizes.
+- **Version bump to 5.0.0** due to breaking change in all `msg:` fields (SIEM alert filters keyed on old msg strings will need updating).
+
+### Added
+- **Comprehensive automated test suite** (`tests/`) with synthetic packet generation for every Suricata rule. Uses scapy for pcap crafting and validates alerts via Suricata's eve.json output. Covers HTTP, DNS, TLS/SNI, TCP raw, UDP, IP, SMTP, SMB, RDP, and DCERPC protocols. Includes multi-packet chain tests for flowbit/xbit correlation rules.
+- `tests/test_suricata_rules.py` -- parameterized pytest suite covering all 354 SIDs
+- `tests/conftest.py` -- SuricataTestRunner class and shared fixtures
+- `tests/requirements.txt` -- test dependencies (scapy, pytest)
+
+### Fixed
+- **SID 2000462** (Boggy Serpens BlackBeard Rust C2 Beacon): Fixed mixed sticky buffer error -- converted `http.method`/`http.user_agent` sticky buffers to legacy modifiers for compatibility. (rev 1 -> 2)
+- **SID 2000463** (Boggy Serpens BlackBeard Header Exfil): Fixed `http_user_agent` seen with sticky buffer still set -- simplified to use consistent legacy modifiers. (rev 1 -> 3)
+- **SID 2000465** (Boggy Serpens Phoenix VBA Macro Document Delivery): Fixed `http_content_type` to `file_data` sticky buffer transition error -- switched to `http_stat_code` check. (rev 1 -> 3)
+- **SID 2000468** (Dust Specter TwinTalk JWT C2 Beacon): Fixed mixed sticky buffer error in `http.method`/`http.header`/`http.uri` chain -- converted to legacy modifiers with proper pcre `/U` flag. (rev 1 -> 2)
+- All 354 rules now pass `suricata -T` validation on Suricata 7.0.3 with zero errors.
+
+### Notes
+- Rule description format change is a **breaking change** for SIEM queries filtering on `msg:` content. Old format `"Bark&Bite - Iranian APT ..."` and `"Bark&Bite - HEALTHCARE ..."` are replaced by `"Bark&Bite IRANIAN-APT <Group> - ..."`.
+- The `IRANIAN-APT` keyword and group name prefix enable more precise SIEM filtering (e.g., `alert.signature:"*IRANIAN-APT MuddyWater*"`).
+
 ## [4.0.4] - 2026-04-07
 
 ### Changed

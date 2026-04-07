@@ -23,7 +23,7 @@ iranian-apt-detection/
 │   └── README.md                                     # Configuration guide
 │
 ├── suricata/
-│   ├── iranian-apt-detection.rules                  # Consolidated Suricata IDS signatures (v4.0)
+│   ├── iranian-apt-detection.rules                  # Consolidated Suricata IDS signatures (v5.0, 354 rules)
 │   └── README.md                                     # Suricata deployment guide
 │
 ├── documentation/
@@ -34,8 +34,15 @@ iranian-apt-detection/
 │   ├── MITRE-ATT&CK-Mapping.md                      # MITRE framework mapping
 │   └── Sector-Vulnerability-Analysis.md             # Sector-specific analysis
 │
+├── tests/
+│   ├── __init__.py                                  # Package marker
+│   ├── conftest.py                                  # Pytest fixtures / SuricataTestRunner
+│   ├── test_suricata_rules.py                       # Parameterized tests for all 354 SIDs
+│   └── requirements.txt                             # Test dependencies (scapy, pytest)
+│
 ├── tools/
 │   ├── test.sh                                      # Rule validation script
+│   ├── test_suricata.sh                             # Suricata validation + test runner
 │   ├── deploy-iranian-apt-rules.sh                  # Main deployment script
 │   ├── iranian-apt-active-response.sh               # Active response script
 │   ├── deploy-active-response.sh                    # Active response deployment
