@@ -5,6 +5,17 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.4] - 2026-04-07
+
+### Changed
+- **SID 2000030** (Data Exfiltration to Non-US Host): FP reduction — dsize threshold 5KB -> 50KB, alert threshold 1/hour -> 100/hour, type limit -> type both. (rev 3 -> 4)
+- **SID 2000284** (.online TLD Resolution): FP reduction — threshold 5/hour -> 50/hour. Added tuning note: .online is a legitimate gTLD; recommend disabling unless correlated with other Iranian APT indicators. (rev 1 -> 2)
+- **Total: 354 rules** (unchanged)
+
+### Notes
+- IOC currency spot-check: all 4 IPs from v4.0.2 audit (194.11.246.101, 157.20.182.75, 157.20.182.49, 45.80.148.195) verified <5 days ago; no re-check needed this session.
+- Dragos PYROXENE (IRGC-CEC aligned) tracked but no public IOCs available for rules yet.
+
 ## [4.0.3] - 2026-04-05
 
 ### Added
