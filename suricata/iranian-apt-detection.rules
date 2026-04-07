@@ -134,7 +134,10 @@ alert rdp $HOME_NET any -> $HOME_NET 3389 (msg:"Bark&Bite - Iranian APT RDP Late
 #==============================================================================
 
 # Large data transfer to non-US infrastructure (Iranian preference) - FIXED
-alert tcp $HOME_NET any -> ![$HOME_NET,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16] any (msg:"Bark&Bite - Iranian APT Data Exfiltration to Non-US Host"; flow:to_server,established; dsize:>5000; threshold:type limit, track by_src, count 1, seconds 3600; classtype:trojan-activity; sid:2000030; rev:3; metadata:policy max-detect-ips drop, created_at 2025_07_06, updated_at 2026_03_12;)
+# TUNING NOTE: This rule is intentionally broad. In environments with heavy
+# international traffic, raise the threshold or disable. For tighter detection,
+# pair with flowbits from a preceding compromise indicator.
+alert tcp $HOME_NET any -> ![$HOME_NET,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16] any (msg:"Bark&Bite - Iranian APT Data Exfiltration to Non-US Host"; flow:to_server,established; dsize:>50000; threshold:type both, track by_src, count 100, seconds 3600; classtype:trojan-activity; sid:2000030; rev:4; metadata:policy max-detect-ips drop, created_at 2025_07_06, updated_at 2026_04_07;)
 
 # DNS tunneling with Iranian encoding patterns
 alert dns $HOME_NET any -> any 53 (msg:"Bark&Bite - Iranian APT DNS Tunnel Exfiltration"; dns.query; pcre:"/^[a-f0-9]{32,}\./"; byte_test:1,>,50,0,relative; threshold:type both, track by_src, count 20, seconds 300; classtype:trojan-activity; sid:2000031; rev:2; metadata:policy max-detect-ips drop, created_at 2025_07_06, updated_at 2026_03_12;)
@@ -847,8 +850,12 @@ alert tcp $HOME_NET any -> $EXTERNAL_NET 22 (msg:"Bark&Bite - Iranian APT DCHSpy
 #          UPX modifications, polyglot files
 #==============================================================================
 
-# Iranian infrastructure - .online TLD resolution (high signal in enterprise)
-alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT Suspicious .online TLD Resolution 2026"; dns.query; content:".online"; endswith; threshold:type both, track by_src, count 5, seconds 3600; classtype:bad-unknown; sid:2000284; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_12, updated_at 2026_03_12;)
+# Iranian infrastructure - .online TLD resolution
+# TUNING NOTE: .online is a legitimate gTLD with millions of registrations.
+# This rule fires on ANY .online DNS query. In most environments this will be
+# extremely noisy. Recommended: disable unless correlated with other Iranian
+# APT indicators via flowbits. Threshold raised to 50/hour to reduce noise.
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT Suspicious .online TLD Resolution 2026"; dns.query; content:".online"; endswith; threshold:type both, track by_src, count 50, seconds 3600; classtype:bad-unknown; sid:2000284; rev:2; metadata:policy max-detect-ips drop, created_at 2026_03_12, updated_at 2026_04_07;)
 
 # Polyglot file download (PDF/HTA/ZIP combinations used by Crafty Camel/APT42)
 alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Polyglot PDF-HTA Download 2026"; flow:to_server,established; content:"GET"; http_method; content:".pdf"; http_uri; content:".hta"; http_uri; classtype:trojan-activity; sid:2000285; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_12, updated_at 2026_03_12;)
