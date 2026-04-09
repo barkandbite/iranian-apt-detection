@@ -1718,3 +1718,64 @@ alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT Dust
 # Dust Specter — Webex lure download from meetingapp.site
 # Attackers host fake Webex installer at meetingapp.site/webexdownload
 alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Dust Specter Fake Webex Lure Download 2026"; flow:to_server,established; http.host; content:"meetingapp.site"; http.uri; content:"/webexdownload"; reference:url,zscaler.com/blogs/security-research/dust-specter-apt-targets-government-officials-iraq; classtype:social-engineering; sid:2000477; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_05, updated_at 2026_04_05;)
+
+#==============================================================================
+# SECTION: CyberAv3ngers Rockwell Automation PLC Targeting (CISA AA26-097A)
+# MITRE ATT&CK: T0883, T0885, T1219, T1565
+# Group: CyberAv3ngers / Shahid Kaveh / Storm-0784 / UNC5691 (IRGC)
+# Source: CISA AA26-097A (April 7, 2026), FBI FLASH
+# Campaign: Active since March 2026 targeting Rockwell CompactLogix/Micro850
+#   PLCs across US Water/Wastewater, Energy, and Government sectors via
+#   CVE-2021-22681 auth bypass. Dropbear SSH for persistence.
+# Note: Deploy on OT-adjacent segments ONLY. These rules target EtherNet/IP
+#   CIP protocol traffic that is normal on OT networks — restrict to segments
+#   where external-to-PLC traffic is anomalous.
+#==============================================================================
+
+# CIP RegisterSession from external — EtherNet/IP session registration
+# CIP command 0x0065 (RegisterSession) on port 44818 from EXTERNAL_NET
+# initiates a legitimate CIP session with a PLC. External sources should
+# never directly register sessions with PLCs in a properly segmented network.
+alert tcp $EXTERNAL_NET any -> $HOME_NET 44818 (msg:"Bark&Bite - Iranian APT CyberAv3ngers Rockwell CIP RegisterSession External 2026"; flow:to_server,established; content:"|65 00|"; depth:2; content:"|01 00 00 00|"; offset:4; depth:4; threshold:type both, track by_src, count 3, seconds 60; reference:cve,2021-22681; reference:url,cisa.gov/news-events/cybersecurity-advisories/aa26-097a; classtype:attempted-admin; sid:2000478; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_04_09, updated_at 2026_04_09;)
+
+# CIP ListIdentity from external — EtherNet/IP device enumeration
+# CIP command 0x0063 (ListIdentity) is a broadcast/unicast discovery command
+# that returns PLC model, firmware version, and serial number. Adversaries
+# use this to fingerprint Rockwell devices before exploitation.
+alert tcp $EXTERNAL_NET any -> $HOME_NET 44818 (msg:"Bark&Bite - Iranian APT CyberAv3ngers Rockwell CIP ListIdentity Recon 2026"; flow:to_server,established; content:"|63 00|"; depth:2; threshold:type both, track by_src, count 3, seconds 60; reference:cve,2021-22681; reference:url,cisa.gov/news-events/cybersecurity-advisories/aa26-097a; classtype:attempted-recon; sid:2000479; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_04_09, updated_at 2026_04_09;)
+
+# CIP ForwardOpen from external — CIP connection establishment
+# CIP command 0x0054 (ForwardOpen) within an encapsulated SendRRData or
+# SendUnitData (0x006F) opens a Class 3 connection to a PLC program.
+# This is the precursor to reading/writing PLC project files (ACD).
+# External ForwardOpen to an internal PLC is a critical indicator.
+alert tcp $EXTERNAL_NET any -> $HOME_NET 44818 (msg:"Bark&Bite - Iranian APT CyberAv3ngers Rockwell CIP ForwardOpen Connection 2026"; flow:to_server,established; content:"|6f 00|"; depth:2; content:"|54|"; distance:20; within:30; threshold:type both, track by_src, count 2, seconds 60; reference:cve,2021-22681; reference:url,cisa.gov/news-events/cybersecurity-advisories/aa26-097a; classtype:attempted-admin; sid:2000480; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_04_09, updated_at 2026_04_09;)
+
+# CIP SendRRData from external — encapsulated CIP service requests
+# CIP command 0x006F (SendRRData) carries CIP service messages for reading
+# project files, uploading firmware, or modifying PLC logic. Any external
+# source sending encapsulated CIP data to internal PLCs is suspicious.
+alert tcp $EXTERNAL_NET any -> $HOME_NET 44818 (msg:"Bark&Bite - Iranian APT CyberAv3ngers Rockwell CIP SendRRData to PLC 2026"; flow:to_server,established; content:"|6f 00|"; depth:2; threshold:type both, track by_src, count 5, seconds 60; reference:url,cisa.gov/news-events/cybersecurity-advisories/aa26-097a; classtype:attempted-admin; sid:2000481; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_04_09, updated_at 2026_04_09;)
+
+# Dropbear SSH on OT ports — lightweight SSH server for PLC persistence
+# CyberAv3ngers install Dropbear SSH on compromised PLCs for persistent
+# remote access. Detect SSH handshake (SSH-2.0-dropbear) on OT-associated
+# ports (44818, 2222, 102, 502, 20256). Legitimate PLCs do not run Dropbear.
+alert tcp $HOME_NET [44818,2222,102,502,20256] -> any any (msg:"Bark&Bite - Iranian APT CyberAv3ngers Dropbear SSH on OT Port Persistence 2026"; flow:to_client,established; content:"SSH-2.0-dropbear"; depth:20; reference:url,cisa.gov/news-events/cybersecurity-advisories/aa26-097a; classtype:trojan-activity; sid:2000482; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_04_09, updated_at 2026_04_09;)
+
+# Rockwell Studio 5000 project file download — ACD file exfiltration
+# CyberAv3ngers extract .ACD project files containing ladder logic and
+# configuration blueprints. Detect outbound transfer of ACD file headers
+# from OT segments to external destinations.
+alert tcp $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT CyberAv3ngers Rockwell ACD Project File Exfil 2026"; flow:to_server,established; content:"|52 53 4C 6F 67 35|"; depth:10; reference:url,cisa.gov/news-events/cybersecurity-advisories/aa26-097a; classtype:bad-unknown; sid:2000483; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_04_09, updated_at 2026_04_09;)
+
+# CIP ListIdentity UDP broadcast — EtherNet/IP device discovery scan
+# CIP ListIdentity (0x0063) sent via UDP/44818 is used for broadcast
+# device enumeration. External UDP scans for industrial devices are
+# a hallmark of CyberAv3ngers reconnaissance.
+alert udp $EXTERNAL_NET any -> $HOME_NET 44818 (msg:"Bark&Bite - Iranian APT CyberAv3ngers EtherNet-IP UDP ListIdentity Scan 2026"; content:"|63 00|"; depth:2; threshold:type both, track by_src, count 3, seconds 60; reference:url,cisa.gov/news-events/cybersecurity-advisories/aa26-097a; classtype:attempted-recon; sid:2000484; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_04_09, updated_at 2026_04_09;)
+
+# SSH connection to OT port range from external — any SSH on PLC ports
+# Regardless of SSH implementation, SSH connections to known PLC service
+# ports from external sources indicate unauthorized access or persistence.
+alert tcp $EXTERNAL_NET any -> $HOME_NET [44818,2222,102,502,20256] (msg:"Bark&Bite - Iranian APT CyberAv3ngers SSH to OT Port External Access 2026"; flow:to_server,established; content:"SSH-"; depth:4; reference:url,cisa.gov/news-events/cybersecurity-advisories/aa26-097a; classtype:attempted-admin; sid:2000485; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_04_09, updated_at 2026_04_09;)

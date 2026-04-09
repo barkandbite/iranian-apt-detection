@@ -5,6 +5,29 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.5] - 2026-04-09
+
+### Added
+- **8 CyberAv3ngers Rockwell Automation PLC rules** (SIDs 2000478-2000485): New coverage per CISA Advisory AA26-097A (April 7, 2026). CyberAv3ngers (IRGC/Shahid Kaveh/Storm-0784/UNC5691) targeting Rockwell CompactLogix/Micro850 PLCs across US Water, Energy, and Government sectors since March 2026.
+  - SID 2000478: CIP RegisterSession from external (CVE-2021-22681 auth bypass)
+  - SID 2000479: CIP ListIdentity device enumeration recon
+  - SID 2000480: CIP ForwardOpen connection establishment (PLC project access)
+  - SID 2000481: CIP SendRRData encapsulated commands to PLC
+  - SID 2000482: Dropbear SSH on OT ports (PLC persistence indicator)
+  - SID 2000483: Rockwell ACD project file exfiltration
+  - SID 2000484: EtherNet/IP UDP ListIdentity broadcast scan
+  - SID 2000485: SSH to OT port from external source
+- **6 Wazuh rules** (IDs 101516-101521): Host-side detection for CyberAv3ngers PLC targeting — Dropbear SSH process detection, Studio 5000 connections to port 44818, ACD project file access, suspicious process connecting to EtherNet/IP, SSH to OT ports, Dropbear in syslog.
+- **Total: 362 Suricata rules** (354 from v4.0.4 + 8 new), **~271 Wazuh rules**
+
+### MITRE ATT&CK
+- T0883 (Internet Accessible Device), T0885/T1219 (Command and Control), T1565 (Stored Data Manipulation)
+
+### Notes
+- All 8 ICS/OT rules marked priority:1 with deployment guidance: enable ONLY on OT-adjacent segments.
+- These rules complement existing CyberAv3ngers coverage (Unitronics PCOM, S7comm, Modbus, DNP3, BACnet, IOCONTROL MQTT) with Rockwell-specific EtherNet/IP CIP protocol detection.
+- Source intelligence is public (CISA advisory) — safe for public repo.
+
 ## [4.0.4] - 2026-04-07
 
 ### Changed
