@@ -18,15 +18,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - SID 2000484: EtherNet/IP UDP ListIdentity broadcast scan
   - SID 2000485: SSH to OT port from external source
 - **6 Wazuh rules** (IDs 101516-101521): Host-side detection for CyberAv3ngers PLC targeting — Dropbear SSH process detection, Studio 5000 connections to port 44818, ACD project file access, suspicious process connecting to EtherNet/IP, SSH to OT ports, Dropbear in syslog.
-- **Total: 362 Suricata rules** (354 from v4.0.4 + 8 new), **~271 Wazuh rules**
+- **5 Infy/Prince of Persia IOC update rules** (SIDs 2000486-2000490): New C2 infrastructure discovered post-Iran internet blackout (Jan 2026). Source: SafeBreach, The Hacker News.
+  - SID 2000486: New C2 IP 45.80.149.3 (Tonnerre v12-16, Foudre v34)
+  - SID 2000487: Foudre C2 DNS f13.ddnsking.com
+  - SID 2000488: Tonnerre C2 DNS t13.ddnsking.com
+  - SID 2000489: Infy C2 DNS conningstone.net domain
+  - SID 2000490: Infy C2 DNS hbmc.net domain
+- **Total: 367 Suricata rules** (354 from v4.0.4 + 8 CyberAv3ngers + 5 Infy IOC), **~271 Wazuh rules**
 
 ### MITRE ATT&CK
 - T0883 (Internet Accessible Device), T0885/T1219 (Command and Control), T1565 (Stored Data Manipulation)
+
+### IOC Currency Audit
+- **194.11.246.101** (MuddyWater): ACTIVE — Hosterdaddy AS215117, confirmed active MuddyWater infra (15 OTX pulses, 64 IPs in /26 all running dnsmasq 2.85)
+- **157.20.182.75** (MuddyWater UDPGangster): Status unchanged from v4.0.2 audit
+- **157.20.182.49** (MuddyWater Sliver): Status unchanged from v4.0.2 audit
+- **45.80.148.195** (Infy): ABANDONED — confirmed migrated to .249 (Dec 2025), then to 45.80.149.3 (Jan 2026). New IOC rules added (SIDs 2000486-2000490)
+- **45.80.148.249** (Infy): ACTIVE — still serving Foudre/Tonnerre payloads alongside 45.80.149.3
+- **159.100.6.69** (CyberAv3ngers IOCONTROL): ACTIVE — Frankfurt DE, MQTT 1883/8883 + RabbitMQ 15672
 
 ### Notes
 - All 8 ICS/OT rules marked priority:1 with deployment guidance: enable ONLY on OT-adjacent segments.
 - These rules complement existing CyberAv3ngers coverage (Unitronics PCOM, S7comm, Modbus, DNP3, BACnet, IOCONTROL MQTT) with Rockwell-specific EtherNet/IP CIP protocol detection.
 - Source intelligence is public (CISA advisory) — safe for public repo.
+- Infy actor has established parallel C2 infrastructure: 45.80.148.249 + 45.80.149.3 both active. Domain pattern shifted from subdomain-based (conningstone/hbmc) to DDNS-based (ddnsking.com).
 
 ## [4.0.4] - 2026-04-07
 
