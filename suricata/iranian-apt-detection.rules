@@ -1799,3 +1799,34 @@ alert udp $EXTERNAL_NET any -> $HOME_NET 44818 (msg:"Bark&Bite - Iranian APT Cyb
 # Regardless of SSH implementation, SSH connections to known PLC service
 # ports from external sources indicate unauthorized access or persistence.
 alert tcp $EXTERNAL_NET any -> $HOME_NET [44818,2222,102,502,20256] (msg:"Bark&Bite - Iranian APT CyberAv3ngers SSH to OT Port External Access 2026"; flow:to_server,established; content:"SSH-"; depth:4; reference:url,cisa.gov/news-events/cybersecurity-advisories/aa26-097a; classtype:attempted-admin; sid:2000485; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_04_09, updated_at 2026_04_09;)
+
+#################################################################################
+# SECTION: MuddyWater ChainShell / CastleRAT — Russian MaaS Campaign (April 2026)
+# Source: JUMPSEC, CybersecurityNews, Ctrl-Alt-Intel (Mar-Apr 2026)
+# MuddyWater adopted TAG-150's CastleRAT Russian MaaS platform, deploying
+# ChainShell (Node.js agent) that resolves C2 from Ethereum smart contracts.
+# Targets Israeli government and infrastructure. C2 infrastructure includes
+# serialmenot.com domain shared across deployments and JWT tokens with
+# "Smokest" campaign ID. ChainShell delivered via reset.ps1 PowerShell deployer.
+# MITRE: T1059.007 (JavaScript), T1102.002 (Bidirectional Communication),
+#        T1573.002 (Asymmetric Cryptography), T1071.001 (Web Protocols)
+#################################################################################
+
+# MuddyWater ChainShell C2 DNS — serialmenot.com
+# Shared C2 domain used across ChainShell/CastleRAT deployments. Per-operation
+# JWT credentials separate access and tracking, but the domain is consistent.
+# JUMPSEC confirmed active use against Israeli targets in March 2026.
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT MuddyWater ChainShell C2 DNS serialmenot.com 2026"; flow:to_server; dns.query; content:"serialmenot.com"; nocase; fast_pattern; reference:url,jumpsec.com/guides/chainshell-muddywater-russian-criminal-infrastructure; classtype:command-and-control; sid:2000491; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_11, updated_at 2026_04_11;)
+
+# MuddyWater ChainShell CastleRAT HTTP beacon — "Smokest" campaign JWT
+# CastleRAT builds use JWT tokens containing the "Smokest" campaign identifier
+# and userID bb47c0615477a877. These appear in HTTP Authorization headers or
+# POST bodies during C2 check-in. The campaign ID is unique to MuddyWater's
+# TAG-150 MaaS subscription.
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater CastleRAT Smokest Campaign JWT Beacon 2026"; flow:to_server,established; http.method; content:"POST"; http.request_body; content:"Smokest"; fast_pattern; content:"bb47c0615477a877"; distance:0; within:200; reference:url,jumpsec.com/guides/chainshell-muddywater-russian-criminal-infrastructure; classtype:command-and-control; sid:2000492; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_11, updated_at 2026_04_11;)
+
+# MuddyWater ChainShell — Node.js HTTP POST to serialmenot.com
+# ChainShell is a Node.js agent; outbound HTTP from Node.js runtime to the
+# known C2 domain is a high-confidence indicator. Behavioral complement to
+# the DNS rule above.
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater ChainShell Node.js HTTP C2 serialmenot.com 2026"; flow:to_server,established; http.host; content:"serialmenot.com"; fast_pattern; http.user_agent; content:"node"; nocase; reference:url,cybersecuritynews.com/muddywater-turns-to-russian-malware-as-a-service; classtype:command-and-control; sid:2000493; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_11, updated_at 2026_04_11;)

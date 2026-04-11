@@ -5,6 +5,27 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.6] - 2026-04-11
+
+### Added
+- **3 MuddyWater ChainShell/CastleRAT rules** (SIDs 2000491-2000493): New coverage for MuddyWater's adoption of TAG-150's Russian MaaS platform. ChainShell is a Node.js-based C2 agent that resolves its control server address from an Ethereum smart contract, making traditional IP blocking largely ineffective.
+  - SID 2000491: ChainShell C2 DNS — serialmenot.com domain (shared across deployments)
+  - SID 2000492: CastleRAT "Smokest" campaign JWT beacon with userID bb47c0615477a877
+  - SID 2000493: ChainShell Node.js HTTP POST to serialmenot.com
+- **Total: 370 Suricata rules** (367 from v4.0.5 + 3 new), **~271 Wazuh rules**
+
+### MITRE ATT&CK
+- T1059.007 (JavaScript), T1102.002 (Bidirectional Communication), T1573.002 (Asymmetric Cryptography), T1071.001 (Web Protocols)
+
+### IOC Currency Audit
+- **157.20.182.49** (MuddyWater): ACTIVE — ChainShell/CastleRAT infrastructure confirmed by JUMPSEC, Ctrl-Alt-Intel (March 2026). Farsi-language code comments + Israeli IP range lists found on exposed server. Same IP as existing UDPGangster/FMAPP rules.
+- **serialmenot.com** (ChainShell C2): NEW IOC — shared domain across TAG-150 MaaS deployments. Per-operation JWT credentials separate tracking.
+
+### Notes
+- MuddyWater's adoption of Russian criminal MaaS (TAG-150/CastleRAT) represents a significant operational shift — MOIS is outsourcing tooling to Russian-speaking cybercriminal groups. The existing `eth_call` rule (SID 2000181) covers ChainShell's Ethereum smart contract C2 resolution; these new rules add domain and campaign-specific detection.
+- Source intelligence is public (JUMPSEC, CybersecurityNews) — safe for public repo.
+- All 3 rules synced with barkandbite/barkbite-suricata-by-country.
+
 ## [4.0.5] - 2026-04-09
 
 ### Added
