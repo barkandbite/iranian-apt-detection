@@ -71,7 +71,7 @@ iranian-apt-detection/
 
 ## Rule ID Allocation
 
-### Wazuh Rules (100900-101510)
+### Wazuh Rules (100900-101521)
 - **100900-100924**: CVE exploitation detection (0910)
 - **100925-100959**: Behavioral detection (0911)
 - **100940-100959**: Network detection (0912)
@@ -84,8 +84,9 @@ iranian-apt-detection/
 - **101300-101477**: March 2026 expansion (0919)
 - **101480-101510**: Healthcare emergency (0919)
 - **101511-101515**: Dust Specter TwinTalk/SPLITDROP host indicators (0919)
+- **101516-101521**: CyberAv3ngers Rockwell PLC host-side detection (0919)
 
-### Suricata SID Ranges (1000039-2000477)
+### Suricata SID Ranges (1000039-2000493)
 - **1000039-2000014**: CVE exploitation signatures
 - **2000015-2000030**: C2 infrastructure, post-exploitation, exfiltration
 - **2000031-2000050**: Reconnaissance, web shells, ICS/SCADA, correlation
@@ -98,6 +99,9 @@ iranian-apt-detection/
 - **2000462-2000466**: Boggy Serpens/BlackBeard + Nuso backdoor
 - **2000467**: Infy Tonnerre replacement C2
 - **2000468-2000477**: Dust Specter TwinTalk/SPLITDROP C2 + domain IOCs
+- **2000478-2000485**: CyberAv3ngers Rockwell CompactLogix/Micro850 PLC targeting (CISA AA26-097A)
+- **2000486-2000490**: Infy/Prince of Persia IOC update (45.80.149.3, ddnsking.com, conningstone.net, hbmc.net)
+- **2000491-2000493**: MuddyWater ChainShell/CastleRAT Russian MaaS (TAG-150)
 
 ## File Naming Conventions
 

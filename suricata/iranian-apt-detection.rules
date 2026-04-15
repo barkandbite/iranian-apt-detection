@@ -1830,3 +1830,26 @@ alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Mudd
 # known C2 domain is a high-confidence indicator. Behavioral complement to
 # the DNS rule above.
 alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater ChainShell Node.js HTTP C2 serialmenot.com 2026"; flow:to_server,established; http.host; content:"serialmenot.com"; fast_pattern; http.user_agent; content:"node"; nocase; reference:url,cybersecuritynews.com/muddywater-turns-to-russian-malware-as-a-service; classtype:command-and-control; sid:2000493; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_11, updated_at 2026_04_11;)
+
+# ================================================================================
+# SECTION: MuddyWater Fooder/MuddyViper C2 IOC Update (April 2026)
+# Source: Trellix "The Iranian Cyber Capability 2026" (April 2026)
+# Attribution: MuddyWater (MOIS / Mango Sandstorm / Seedworm)
+# Context: MuddyWater observed active in networks of US airport, bank, and
+#   Israel-linked software firm. Deploying Fooder loader to execute MuddyViper
+#   backdoor. Heavy use of legitimate RMM tools (Atera, AnyDesk, Syncro,
+#   SimpleHelp, NetBird) for persistence. Two new C2 IPs identified.
+# MITRE: T1071.001 (Web Protocols), T1573.002 (Asymmetric Cryptography),
+#   T1090 (Proxy), T1219 (Remote Access Software)
+# ================================================================================
+
+# MuddyWater Fooder/MuddyViper C2 IP 206.71.149.51 — HTTPS on port 443
+# Trellix identified this IP as active MuddyWater C2 serving Fooder loader
+# payloads and receiving MuddyViper beacon check-ins over HTTPS.
+alert tls $HOME_NET any -> 206.71.149.51 443 (msg:"Bark&Bite - Iranian APT MuddyWater Fooder/MuddyViper C2 206.71.149.51 2026"; flow:to_server,established; reference:url,trellix.com/blogs/research/the-iranian-cyber-capability-2026; classtype:command-and-control; sid:2000494; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_15, updated_at 2026_04_15;)
+
+# MuddyWater C2 IP 104.238.191.185 — SSH tunneled over port 443
+# Trellix observed MuddyWater tunneling SSH over port 443 to this IP for
+# interactive shell access and lateral movement coordination. SSH on 443
+# is a common MuddyWater evasion technique to bypass firewall rules.
+alert ssh $HOME_NET any -> 104.238.191.185 443 (msg:"Bark&Bite - Iranian APT MuddyWater SSH-over-443 C2 104.238.191.185 2026"; flow:to_server,established; reference:url,trellix.com/blogs/research/the-iranian-cyber-capability-2026; classtype:command-and-control; sid:2000495; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_15, updated_at 2026_04_15;)

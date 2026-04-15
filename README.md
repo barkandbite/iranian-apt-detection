@@ -1,8 +1,8 @@
 # Iranian APT Detection Rules
 
-[![Version](https://img.shields.io/badge/version-0.6.2-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.0.6-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![MITRE ATT&CK](https://img.shields.io/badge/MITRE%20ATT%26CK-v13-orange.svg)](documentation/MITRE-ATT&CK-Mapping.md)
+[![MITRE ATT&CK](https://img.shields.io/badge/MITRE%20ATT%26CK-v15-orange.svg)](documentation/MITRE-ATT&CK-Mapping.md)
 
 ## Overview
 
@@ -16,18 +16,24 @@ Three concurrent Iranian campaigns targeting U.S. healthcare disclosed March 24:
 - **Pay2Key v3** (IRGC) hit unnamed U.S. healthcare org with **ChaCha20 + Curve25519** ransomware. Fake Avast AV bypass. **I2P C2** (not Tor). Purely destructive — no ransom demand.
 - **MuddyWater** exploiting **CVE-2025-59287** (WSUS CVSS 9.8) to pre-position on healthcare networks.
 
-## Recent Threats (v0.6.2)
+## Recent Threats (v4.0.6)
 
+- **NEW (v4.0.6)**: MuddyWater **ChainShell/CastleRAT** — Russian MaaS (TAG-150) C2 domain, JWT beacon, Node.js HTTP pattern
+- **NEW (v4.0.5)**: CyberAv3ngers **Rockwell PLC targeting** — 8 EtherNet/IP CIP rules per CISA AA26-097A + 6 Wazuh host-side rules
+- **NEW (v4.0.5)**: **Infy/Prince of Persia** IOC refresh — 5 new C2 rules (45.80.149.3, ddnsking.com, conningstone.net, hbmc.net)
+- **NEW (v4.0.3)**: **Dust Specter** TwinTalk/SPLITDROP C2 — 10 rules targeting Iraqi government officials + 5 Wazuh rules
+- **NEW (v4.0.1)**: **Boggy Serpens/BlackBeard** Rust C2 beacon, Nuso HTTP backdoor, Phoenix VBA delivery
+- **v4.0.0**: **Consolidated from 3 files to 1** — zero duplicate SIDs, xbits correlation fixes
 - **CRITICAL**: Operation Epic Fury (Feb 28, 2026) response signatures
-- **NEW**: 28+ Iranian APT threat families with dedicated detection rules
-- **NEW**: MuddyWater toolset — **UDPGangster**, **Dindoor**, **Fakeset**, **MuddyViper**, **CHAR**, **Phoenix**, **PowGoop**, **TWINTASK**
-- **NEW**: CyberAv3ngers **IOCONTROL** OT malware — full MQTT topic structure, PCOM protocol exploitation, DoH evasion
-- **NEW**: **Pay2Key v3** ransomware — ChaCha20, fake Avast bypass, I2P C2, full kill chain detection
-- **NEW**: UNC1549 full toolset — **LIGHTRAIL**, **TWOSTROKE**, **DEEPROOT**, **POLLBLEND**, **MINIBIKE**, **CRASHPAD**, **SIGHTGRAB**
-- **NEW**: **Handala/Void Manticore** wiper — Intune MDM abuse, NetBird tunneling, known infrastructure
-- **NEW**: **WezRat** infostealer, **TAMECAT** backdoor, **STEALHOOK**, **Sosano**, **SloppyMIO**, **Sicarii RaaS**, **WhiteLock**, **WINTAPIX**
-- **NEW**: Industrial protocol rules — BACnet, Modbus FC6/FC16, S7comm, Unitronics PCOM
-- **NEW**: 40+ CVEs covered including CVE-2025-59287, CVE-2026-1281, CVE-2025-59718, CVE-2024-55591, CVE-2024-38434
+- 28+ Iranian APT threat families with dedicated detection rules
+- MuddyWater toolset — **UDPGangster**, **Dindoor**, **Fakeset**, **MuddyViper**, **CHAR**, **Phoenix**, **PowGoop**, **TWINTASK**
+- CyberAv3ngers **IOCONTROL** OT malware — full MQTT topic structure, PCOM protocol exploitation, DoH evasion
+- **Pay2Key v3** ransomware — ChaCha20, fake Avast bypass, I2P C2, full kill chain detection
+- UNC1549 full toolset — **LIGHTRAIL**, **TWOSTROKE**, **DEEPROOT**, **POLLBLEND**, **MINIBIKE**, **CRASHPAD**, **SIGHTGRAB**
+- **Handala/Void Manticore** wiper — Intune MDM abuse, NetBird tunneling, known infrastructure
+- **WezRat** infostealer, **TAMECAT** backdoor, **STEALHOOK**, **Sosano**, **SloppyMIO**, **Sicarii RaaS**, **WhiteLock**, **WINTAPIX**
+- Industrial protocol rules — BACnet, Modbus FC6/FC16, S7comm, Unitronics PCOM, **Rockwell EtherNet/IP CIP**
+- 40+ CVEs covered including CVE-2025-59287, CVE-2026-1281, CVE-2025-59718, CVE-2024-55591, CVE-2024-38434
 
 ## Quick Start
 
@@ -51,7 +57,7 @@ sudo systemctl restart wazuh-manager
 
 ### 2. Deploy Suricata Rules
 ```bash
-# Deploy consolidated rules (v4.0 — single file, 338 signatures)
+# Deploy consolidated rules (v4.0 — single file, 370 signatures)
 sudo cp suricata/iranian-apt-detection.rules /etc/suricata/rules/
 
 # Add to suricata.yaml rule-files section:
@@ -107,8 +113,8 @@ sudo chmod +x /var/ossec/active-response/bin/iranian-apt-active-response.sh
 - **Impact**: 14 techniques (+5)
 
 ### Rule Statistics
-- **Wazuh Rules**: 319 detection rules across 10 files
-- **Suricata Signatures**: 318 network signatures across 2 rule files
+- **Wazuh Rules**: 271 detection rules across 10 files
+- **Suricata Signatures**: 370 network signatures (1 consolidated rule file)
 - **CVEs Covered**: 40+ including 2025/2026 zero-days
 - **Known C2 IPs**: 35+
 - **Known C2 Domains**: 25+
@@ -171,7 +177,7 @@ iranian-apt-detection/
 │   ├── 0919-iranian-apt-march2026-expansion.xml
 │   └── README.md
 ├── suricata/                  # Network IDS signatures
-│   ├── iranian-apt-detection.rules  # Consolidated v4.0 (338 rules)
+│   ├── iranian-apt-detection.rules  # Consolidated v4.0 (370 rules)
 │   └── README.md
 ├── configurations/            # Agent and system configs
 │   ├── sysmon-config-iranian-apt.xml
@@ -289,4 +295,4 @@ These rules are provided as-is for defensive purposes. Users are responsible for
 
 ---
 
-**Last Updated**: March 25, 2026 | **Version**: 0.6.2 | **Maintainer**: Bark&Bite Security Intelligence
+**Last Updated**: April 15, 2026 | **Version**: 4.0.6 | **Maintainer**: Bark&Bite Security Intelligence
