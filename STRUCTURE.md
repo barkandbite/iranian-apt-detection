@@ -102,6 +102,7 @@ iranian-apt-detection/
 - **2000478-2000485**: CyberAv3ngers Rockwell CompactLogix/Micro850 PLC targeting (CISA AA26-097A)
 - **2000486-2000490**: Infy/Prince of Persia IOC update (45.80.149.3, ddnsking.com, conningstone.net, hbmc.net)
 - **2000491-2000493**: MuddyWater ChainShell/CastleRAT Russian MaaS (TAG-150)
+- **2000494-2000495**: MuddyWater Fooder/MuddyViper C2 IOC update (Trellix Apr 2026)
 
 ## File Naming Conventions
 

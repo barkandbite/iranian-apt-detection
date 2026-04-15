@@ -5,6 +5,33 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.7] - 2026-04-15
+
+### Added
+- **2 MuddyWater Fooder/MuddyViper C2 IOC rules** (SIDs 2000494-2000495): New C2 infrastructure from Trellix "The Iranian Cyber Capability 2026" report.
+  - SID 2000494: C2 IP 206.71.149.51 (Fooder/MuddyViper HTTPS C2)
+  - SID 2000495: C2 IP 104.238.191.185 (SSH tunneled over port 443)
+- **Total: 372 Suricata rules** (370 from v4.0.6 + 2 new), **~271 Wazuh rules**
+
+### Changed
+- **README.md**: Fixed version badge (0.6.2 -> 4.0.6), updated rule counts (318/338 -> 372), updated Recent Threats section with v4.0.1-v4.0.6 additions, fixed footer date and version, updated MITRE ATT&CK badge (v13 -> v15)
+- **STRUCTURE.md**: Added missing SID blocks for v4.0.5 (SIDs 2000478-2000490, Wazuh IDs 101516-101521) and v4.0.6 (SIDs 2000491-2000493). Updated header ranges.
+
+### MITRE ATT&CK
+- T1071.001 (Web Protocols), T1573.002 (Asymmetric Cryptography), T1090 (Proxy), T1219 (Remote Access Software)
+
+### IOC Currency Audit
+- **206.71.149.51** (MuddyWater): NEW — Trellix April 2026. Fooder loader payload server.
+- **104.238.191.185** (MuddyWater): NEW — Trellix April 2026. SSH-over-443 interactive access.
+- **194.11.246.101** (MuddyWater): ACTIVE — Verified by Trellix, OTX (15 pulses). HosterDaddy AS215117.
+- **157.20.182.{49,75}** (MuddyWater): ACTIVE — per v4.0.6 notes, no change.
+- **45.80.148.195** (Infy): ABANDONED — confirmed migrated (v4.0.2). No change.
+
+### Notes
+- MuddyWater continues operating in US airport, bank, and Israel-linked software firm networks per Trellix.
+- Source intelligence is public (Trellix blog) — safe for public repo.
+- All rules synced with barkandbite/barkbite-suricata-by-country.
+
 ## [4.0.6] - 2026-04-11
 
 ### Added
