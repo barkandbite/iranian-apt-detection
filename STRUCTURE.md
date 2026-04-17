@@ -24,6 +24,7 @@ iranian-apt-detection/
 │
 ├── suricata/
 │   ├── iranian-apt-detection.rules                  # Consolidated Suricata IDS signatures (v4.0)
+│   ├── cyberav3ngers-ioc-aa26-097a.rules            # CyberAv3ngers IOC IPs (CISA AA26-097A)
 │   └── README.md                                     # Suricata deployment guide
 │
 ├── documentation/
@@ -66,7 +67,7 @@ iranian-apt-detection/
 1. **Wazuh Rules**: Deploy all files from `wazuh-rules/09*.xml`
 2. **Sysmon**: Deploy `configurations/sysmon-config-iranian-apt.xml` to Windows endpoints
 3. **Agent Config**: Add content from `configurations/ossec-agent-iranian-apt.conf` to agents
-4. **Suricata**: Copy `suricata/iranian-apt-detection.rules` to your rules directory
+4. **Suricata**: Copy all `.rules` files from `suricata/` to your rules directory
 5. **Active Response**: Run `tools/deploy-active-response.sh` for automated response
 
 ## Rule ID Allocation
@@ -86,7 +87,7 @@ iranian-apt-detection/
 - **101511-101515**: Dust Specter TwinTalk/SPLITDROP host indicators (0919)
 - **101516-101521**: CyberAv3ngers Rockwell PLC host-side detection (0919)
 
-### Suricata SID Ranges (1000039-2000493)
+### Suricata SID Ranges (1000039-2000497)
 - **1000039-2000014**: CVE exploitation signatures
 - **2000015-2000030**: C2 infrastructure, post-exploitation, exfiltration
 - **2000031-2000050**: Reconnaissance, web shells, ICS/SCADA, correlation
@@ -103,6 +104,7 @@ iranian-apt-detection/
 - **2000486-2000490**: Infy/Prince of Persia IOC update (45.80.149.3, ddnsking.com, conningstone.net, hbmc.net)
 - **2000491-2000493**: MuddyWater ChainShell/CastleRAT Russian MaaS (TAG-150)
 - **2000494-2000495**: MuddyWater Fooder/MuddyViper C2 IOC update (Trellix Apr 2026)
+- **2000496-2000497**: CyberAv3ngers IOC infrastructure IPs (CISA AA26-097A) — in `cyberav3ngers-ioc-aa26-097a.rules`
 
 ## File Naming Conventions
 
