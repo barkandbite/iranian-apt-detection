@@ -1,7 +1,7 @@
 # Bark & Bite — Iranian APT Detection Rules (Consolidated)
 # File: iranian-apt-detection.rules
-# Version: 4.0
-# Last Updated: 2026-03-30
+# Version: 4.0.9
+# Last Updated: 2026-04-18
 # Credit: Bark & Bite Security
 # License: MIT
 # Repository: https://github.com/barkandbite/iranian-apt-detection
@@ -14,7 +14,7 @@
 # UNC1860, UNC1549, Handala/Void Manticore, APT42/RedKitten, Infy, and emerging groups.
 # Optimized for extremely high accuracy with minimal false positives.
 #
-# Total signatures: 338 rules (SID 1000039-2000461)
+# Total signatures: 376 rules (SID 1000039-2000501)
 # SID Allocation:
 #   1000039-2000030: Core CVE + behavioral detection (v3.1 legacy range)
 #   2000031-2000193: Extended behavioral + C2 patterns
@@ -23,6 +23,7 @@
 #   2000360-2000456: Additional March 2026 coverage (ICS, PCOM, FortiOS/Ivanti chains,
 #                     renumbered from v3.3 to resolve SID collisions with v3.2)
 #   2000457-2000461: CRESCENTHARVEST RAT (APT35/Charming Kitten, Feb 2026)
+#   2000462-2000501: Post-consolidation additions (v4.0.1-v4.0.9)
 #
 # Requires: Suricata 7.0+
 # Recommended: Enable xbits for cross-flow correlation rules
@@ -1853,3 +1854,29 @@ alert tls $HOME_NET any -> 206.71.149.51 443 (msg:"Bark&Bite - Iranian APT Muddy
 # interactive shell access and lateral movement coordination. SSH on 443
 # is a common MuddyWater evasion technique to bypass firewall rules.
 alert ssh $HOME_NET any -> 104.238.191.185 443 (msg:"Bark&Bite - Iranian APT MuddyWater SSH-over-443 C2 104.238.191.185 2026"; flow:to_server,established; reference:url,trellix.com/blogs/research/the-iranian-cyber-capability-2026; classtype:command-and-control; sid:2000495; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_15, updated_at 2026_04_15;)
+
+# ================================================================================
+# SECTION: CyberAv3ngers EtherNet/IP and ICS Protocol Behavioral Detection
+# Source: CISA Advisory AA26-097A (April 7, 2026)
+# Attribution: CyberAv3ngers (IRGC-CEC / Shahid Kaveh Group / Storm-0784 /
+#   Bauxite / UNC5691 / Hydro Kitten)
+# Context: Behavioral signatures that survive infrastructure rotation. Detect
+#   unauthorized EtherNet/IP, Modbus, and SSH access to ICS/OT segments
+#   regardless of source IP. Complements IOC rules in cyberav3ngers-ioc-aa26-097a.rules.
+# DEPLOY NOTE: Priority:1 ICS/OT rules. Enable ONLY on OT-adjacent segments.
+#   These rules will fire on legitimate engineering workstation traffic if
+#   deployed on IT segments — tune $HOME_NET to ICS/SCADA subnets only.
+# MITRE: T0883, T0885, T1219, T0855 (Unauthorized Command Message)
+# ================================================================================
+
+# External EtherNet/IP to internal PLCs on port 44818
+alert tcp $EXTERNAL_NET any -> $HOME_NET 44818 (msg:"Bark&Bite - Iranian CyberAv3ngers External EtherNet/IP to PLC Port 44818 2026"; flow:to_server; threshold:type limit, track by_src, count 1, seconds 300; reference:url,cisa.gov/news-events/cybersecurity-advisories/aa26-097a; classtype:attempted-admin; sid:2000498; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_04_18, updated_at 2026_04_18;)
+
+# External SSH on alt port 2222 to ICS segments (Dropbear SSH)
+alert tcp $EXTERNAL_NET any -> $HOME_NET 2222 (msg:"Bark&Bite - Iranian CyberAv3ngers Dropbear SSH Alt Port 2222 to ICS 2026"; flow:to_server,established; content:"SSH-"; depth:4; reference:url,cisa.gov/news-events/cybersecurity-advisories/aa26-097a; classtype:attempted-admin; sid:2000499; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_04_18, updated_at 2026_04_18;)
+
+# External Modbus TCP to internal OT on port 502
+alert tcp $EXTERNAL_NET any -> $HOME_NET 502 (msg:"Bark&Bite - Iranian CyberAv3ngers External Modbus TCP to OT Port 502 2026"; flow:to_server; threshold:type limit, track by_src, count 1, seconds 300; reference:url,cisa.gov/news-events/cybersecurity-advisories/aa26-097a; classtype:attempted-admin; sid:2000500; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_04_18, updated_at 2026_04_18;)
+
+# External S7comm/ISO-TSAP to internal OT on port 102
+alert tcp $EXTERNAL_NET any -> $HOME_NET 102 (msg:"Bark&Bite - Iranian CyberAv3ngers External S7comm ISO-TSAP to OT Port 102 2026"; flow:to_server; threshold:type limit, track by_src, count 1, seconds 300; reference:url,cisa.gov/news-events/cybersecurity-advisories/aa26-097a; classtype:attempted-admin; sid:2000501; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_04_18, updated_at 2026_04_18;)

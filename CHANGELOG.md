@@ -5,6 +5,24 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.9] - 2026-04-18
+
+### Added
+- **4 CyberAv3ngers ICS/OT behavioral detection rules** (SIDs 2000498-2000501): Protocol-level signatures that survive infrastructure rotation, complementing IOC rules SIDs 2000496-2000497 and behavioral CIP detection SIDs 2000478-2000485.
+  - SID 2000498: External EtherNet/IP to internal PLCs on port 44818
+  - SID 2000499: Dropbear SSH on alt port 2222 to ICS segments
+  - SID 2000500: External Modbus TCP to OT on port 502
+  - SID 2000501: External S7comm/ISO-TSAP to OT on port 102
+- **Total: 378 Suricata rules** (374 from v4.0.8 + 4 new), **~271 Wazuh rules**
+
+### MITRE ATT&CK
+- T0883 (Internet Accessible Device), T0885 (Commonly Used Port), T1219 (Remote Access Tools), T0855 (Unauthorized Command Message)
+
+### Deployment Notes
+- All 4 rules are Priority:1 ICS/OT rules. Enable ONLY on OT-adjacent segments.
+- $HOME_NET should be tuned to ICS/SCADA subnets; deploying on IT segments will cause false positives from legitimate engineering workstation traffic.
+- Backported from barkandbite/barkbite-suricata-by-country to maintain sync parity.
+
 ## [4.0.8] - 2026-04-17
 
 ### Added

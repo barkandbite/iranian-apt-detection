@@ -1,6 +1,6 @@
 # Iranian APT Detection Rules
 
-[![Version](https://img.shields.io/badge/version-4.0.6-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.0.9-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![MITRE ATT&CK](https://img.shields.io/badge/MITRE%20ATT%26CK-v15-orange.svg)](documentation/MITRE-ATT&CK-Mapping.md)
 
@@ -16,8 +16,11 @@ Three concurrent Iranian campaigns targeting U.S. healthcare disclosed March 24:
 - **Pay2Key v3** (IRGC) hit unnamed U.S. healthcare org with **ChaCha20 + Curve25519** ransomware. Fake Avast AV bypass. **I2P C2** (not Tor). Purely destructive — no ransom demand.
 - **MuddyWater** exploiting **CVE-2025-59287** (WSUS CVSS 9.8) to pre-position on healthcare networks.
 
-## Recent Threats (v4.0.6)
+## Recent Threats (v4.0.9)
 
+- **NEW (v4.0.9)**: CyberAv3ngers **ICS behavioral detection** — EtherNet/IP (44818), Dropbear SSH (2222), Modbus (502), S7comm (102) from external sources
+- **NEW (v4.0.8)**: CyberAv3ngers **IOC infrastructure** — 7 engineering workstation IPs + staging server per CISA AA26-097A
+- **NEW (v4.0.7)**: MuddyWater **Fooder/MuddyViper** — 2 new C2 IPs from Trellix April 2026 report
 - **NEW (v4.0.6)**: MuddyWater **ChainShell/CastleRAT** — Russian MaaS (TAG-150) C2 domain, JWT beacon, Node.js HTTP pattern
 - **NEW (v4.0.5)**: CyberAv3ngers **Rockwell PLC targeting** — 8 EtherNet/IP CIP rules per CISA AA26-097A + 6 Wazuh host-side rules
 - **NEW (v4.0.5)**: **Infy/Prince of Persia** IOC refresh — 5 new C2 rules (45.80.149.3, ddnsking.com, conningstone.net, hbmc.net)
@@ -57,7 +60,7 @@ sudo systemctl restart wazuh-manager
 
 ### 2. Deploy Suricata Rules
 ```bash
-# Deploy consolidated rules (v4.0 — single file, 370 signatures)
+# Deploy consolidated rules (v4.0 — single file, 378 signatures)
 sudo cp suricata/iranian-apt-detection.rules /etc/suricata/rules/
 
 # Add to suricata.yaml rule-files section:
@@ -177,7 +180,7 @@ iranian-apt-detection/
 │   ├── 0919-iranian-apt-march2026-expansion.xml
 │   └── README.md
 ├── suricata/                  # Network IDS signatures
-│   ├── iranian-apt-detection.rules  # Consolidated v4.0 (370 rules)
+│   ├── iranian-apt-detection.rules  # Consolidated v4.0 (378 rules)
 │   └── README.md
 ├── configurations/            # Agent and system configs
 │   ├── sysmon-config-iranian-apt.xml
@@ -295,4 +298,4 @@ These rules are provided as-is for defensive purposes. Users are responsible for
 
 ---
 
-**Last Updated**: April 15, 2026 | **Version**: 4.0.6 | **Maintainer**: Bark&Bite Security Intelligence
+**Last Updated**: April 18, 2026 | **Version**: 4.0.9 | **Maintainer**: Bark&Bite Security Intelligence

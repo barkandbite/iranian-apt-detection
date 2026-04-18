@@ -87,7 +87,7 @@ iranian-apt-detection/
 - **101511-101515**: Dust Specter TwinTalk/SPLITDROP host indicators (0919)
 - **101516-101521**: CyberAv3ngers Rockwell PLC host-side detection (0919)
 
-### Suricata SID Ranges (1000039-2000497)
+### Suricata SID Ranges (1000039-2000501)
 - **1000039-2000014**: CVE exploitation signatures
 - **2000015-2000030**: C2 infrastructure, post-exploitation, exfiltration
 - **2000031-2000050**: Reconnaissance, web shells, ICS/SCADA, correlation
@@ -105,6 +105,7 @@ iranian-apt-detection/
 - **2000491-2000493**: MuddyWater ChainShell/CastleRAT Russian MaaS (TAG-150)
 - **2000494-2000495**: MuddyWater Fooder/MuddyViper C2 IOC update (Trellix Apr 2026)
 - **2000496-2000497**: CyberAv3ngers IOC infrastructure IPs (CISA AA26-097A) — in `cyberav3ngers-ioc-aa26-097a.rules`
+- **2000498-2000501**: CyberAv3ngers ICS/OT behavioral (EtherNet/IP, Dropbear SSH, Modbus, S7comm)
 
 ## File Naming Conventions
 
