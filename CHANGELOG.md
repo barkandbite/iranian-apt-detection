@@ -5,6 +5,17 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.10] - 2026-04-19
+
+### Fixed
+- **Merged CyberAv3ngers IOC rules (SIDs 2000496-2000497) into main file** — Previously these rules existed only in the supplemental `cyberav3ngers-ioc-aa26-097a.rules` file, which the by-country repo's daily sync workflow does not pull. This caused the sync bot to overwrite the by-country Iran file without these 2 rules, silently dropping them from the production distribution. Merging into the main file ensures the sync workflow picks them up.
+- **Deprecated `cyberav3ngers-ioc-aa26-097a.rules`** — File retained for backward compatibility but marked as merged. Loading both files simultaneously will cause duplicate SID errors.
+- **Total: 378 Suricata rules** (same count — rules moved, not added), **~271 Wazuh rules**
+
+### Technical Detail
+- SID 2000496 (CyberAv3ngers engineering workstation 185.82.73.x) and SID 2000497 (staging server 135.136.1.133) inserted between MuddyWater C2 section and CyberAv3ngers behavioral section
+- Behavioral section comment updated to reference SIDs 2000496-2000497 instead of supplemental file
+
 ## [4.0.9] - 2026-04-18
 
 ### Added

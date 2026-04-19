@@ -1,7 +1,7 @@
 # Bark & Bite — Iranian APT Detection Rules (Consolidated)
 # File: iranian-apt-detection.rules
-# Version: 4.0.9
-# Last Updated: 2026-04-18
+# Version: 4.0.10
+# Last Updated: 2026-04-19
 # Credit: Bark & Bite Security
 # License: MIT
 # Repository: https://github.com/barkandbite/iranian-apt-detection
@@ -1856,13 +1856,36 @@ alert tls $HOME_NET any -> 206.71.149.51 443 (msg:"Bark&Bite - Iranian APT Muddy
 alert ssh $HOME_NET any -> 104.238.191.185 443 (msg:"Bark&Bite - Iranian APT MuddyWater SSH-over-443 C2 104.238.191.185 2026"; flow:to_server,established; reference:url,trellix.com/blogs/research/the-iranian-cyber-capability-2026; classtype:command-and-control; sid:2000495; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_15, updated_at 2026_04_15;)
 
 # ================================================================================
+# SECTION: CyberAv3ngers IOC Infrastructure — CISA Advisory AA26-097A
+# Source: CISA Advisory AA26-097A (April 7, 2026), Censys pivot analysis
+# Attribution: CyberAv3ngers (IRGC-CEC / Shahid Kaveh Group / Storm-0784 /
+#   Bauxite / UNC5691 / Hydro Kitten)
+# Context: IOC IPs for CyberAv3ngers engineering workstation and staging server
+#   used to connect to internet-exposed Rockwell CompactLogix/Micro850 PLCs via
+#   EtherNet/IP port 44818. Single multi-homed Windows box running Studio 5000.
+# DEPLOY NOTE: Priority:1 ICS/OT rules. If 185.82.73.0/24 is reassigned to
+#   legitimate hosting, disable SID 2000496.
+# MITRE: T0883, T0885, T1219, T1565.001
+# ================================================================================
+
+# CyberAv3ngers Engineering Workstation — 7 IPs on 185.82.73.0/24
+# Censys confirms single multi-homed Windows box (RDP cert CN=DESKTOP-BOE5MUC)
+# running full Rockwell toolchain. Active 14+ months (Jan 2025 - Mar 2026).
+alert ip [185.82.73.162,185.82.73.164,185.82.73.165,185.82.73.167,185.82.73.168,185.82.73.170,185.82.73.171] any -> $HOME_NET any (msg:"Bark&Bite - Iranian CyberAv3ngers Engineering Workstation IOC AA26-097A 2026"; priority:1; threshold:type limit, track by_src, count 1, seconds 300; reference:url,cisa.gov/news-events/cybersecurity-advisories/aa26-097a; classtype:trojan-activity; sid:2000496; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_17, updated_at 2026_04_19;)
+
+# CyberAv3ngers Staging Server — 135.136.1.133 (M247 Europe Romania)
+# Provisioned Feb 2026, activated 4-day window mid-Mar 2026, then abandoned.
+# Priority:2 — IP may have been reassigned. Valuable for historical correlation.
+alert ip 135.136.1.133 any -> $HOME_NET any (msg:"Bark&Bite - Iranian CyberAv3ngers Staging Server IOC AA26-097A 2026"; priority:2; threshold:type limit, track by_src, count 1, seconds 300; reference:url,cisa.gov/news-events/cybersecurity-advisories/aa26-097a; classtype:trojan-activity; sid:2000497; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_17, updated_at 2026_04_19;)
+
+# ================================================================================
 # SECTION: CyberAv3ngers EtherNet/IP and ICS Protocol Behavioral Detection
 # Source: CISA Advisory AA26-097A (April 7, 2026)
 # Attribution: CyberAv3ngers (IRGC-CEC / Shahid Kaveh Group / Storm-0784 /
 #   Bauxite / UNC5691 / Hydro Kitten)
 # Context: Behavioral signatures that survive infrastructure rotation. Detect
 #   unauthorized EtherNet/IP, Modbus, and SSH access to ICS/OT segments
-#   regardless of source IP. Complements IOC rules in cyberav3ngers-ioc-aa26-097a.rules.
+#   regardless of source IP. Complements IOC rules SID 2000496-2000497 above.
 # DEPLOY NOTE: Priority:1 ICS/OT rules. Enable ONLY on OT-adjacent segments.
 #   These rules will fire on legitimate engineering workstation traffic if
 #   deployed on IT segments — tune $HOME_NET to ICS/SCADA subnets only.

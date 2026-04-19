@@ -24,7 +24,7 @@ iranian-apt-detection/
 │
 ├── suricata/
 │   ├── iranian-apt-detection.rules                  # Consolidated Suricata IDS signatures (v4.0)
-│   ├── cyberav3ngers-ioc-aa26-097a.rules            # CyberAv3ngers IOC IPs (CISA AA26-097A)
+│   ├── cyberav3ngers-ioc-aa26-097a.rules            # DEPRECATED �� merged into main file (v4.0.10)
 │   └── README.md                                     # Suricata deployment guide
 │
 ├── documentation/
@@ -104,7 +104,7 @@ iranian-apt-detection/
 - **2000486-2000490**: Infy/Prince of Persia IOC update (45.80.149.3, ddnsking.com, conningstone.net, hbmc.net)
 - **2000491-2000493**: MuddyWater ChainShell/CastleRAT Russian MaaS (TAG-150)
 - **2000494-2000495**: MuddyWater Fooder/MuddyViper C2 IOC update (Trellix Apr 2026)
-- **2000496-2000497**: CyberAv3ngers IOC infrastructure IPs (CISA AA26-097A) — in `cyberav3ngers-ioc-aa26-097a.rules`
+- **2000496-2000497**: CyberAv3ngers IOC infrastructure IPs (CISA AA26-097A) — merged into main file (v4.0.10)
 - **2000498-2000501**: CyberAv3ngers ICS/OT behavioral (EtherNet/IP, Dropbear SSH, Modbus, S7comm)
 
 ## File Naming Conventions
