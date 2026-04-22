@@ -1,7 +1,7 @@
 # Bark & Bite — Iranian APT Detection Rules (Consolidated)
 # File: iranian-apt-detection.rules
-# Version: 4.0.10
-# Last Updated: 2026-04-19
+# Version: 4.0.11
+# Last Updated: 2026-04-22
 # Credit: Bark & Bite Security
 # License: MIT
 # Repository: https://github.com/barkandbite/iranian-apt-detection
@@ -1903,3 +1903,24 @@ alert tcp $EXTERNAL_NET any -> $HOME_NET 502 (msg:"Bark&Bite - Iranian CyberAv3n
 
 # External S7comm/ISO-TSAP to internal OT on port 102
 alert tcp $EXTERNAL_NET any -> $HOME_NET 102 (msg:"Bark&Bite - Iranian CyberAv3ngers External S7comm ISO-TSAP to OT Port 102 2026"; flow:to_server; threshold:type limit, track by_src, count 1, seconds 300; reference:url,cisa.gov/news-events/cybersecurity-advisories/aa26-097a; classtype:attempted-admin; sid:2000501; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_04_18, updated_at 2026_04_18;)
+
+# ================================================================================
+# SECTION: MuddyWater RustyWater RAT C2 Infrastructure (April 2026)
+# Source: Rescana Threat Intelligence — "RustyWater: Iranian MuddyWater APT
+#   Targets Israeli Government and Infrastructure with Advanced Rust RAT"
+# Attribution: MuddyWater (MOIS / Seedworm / Mercury / Static Kitten)
+# Context: RustyWater is a Rust-based RAT targeting Israeli government, military,
+#   and financial organizations. Delivered via spear-phishing with Hebrew-language
+#   decoy documents. C2 via HTTP JSON with Base64+XOR encoding. Persistence via
+#   Registry Run key. Anti-VM via VEH handler. Part of MuddyWater's post-Feb 2026
+#   retaliatory escalation following US/Israeli strikes on Iran.
+# MITRE: T1071.001, T1573.001, T1547.001, T1497.001
+# ================================================================================
+
+# RustyWater C2 domain DNS lookup — nomercys.it.com
+# Primary C2 for Rust-based RAT. HTTP JSON beacon with Base64+XOR encoding.
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian MuddyWater RustyWater RAT C2 Domain nomercys.it.com DNS 2026"; dns.query; content:"nomercys.it.com"; nocase; fast_pattern; reference:url,rescana.com/post/rustywater-iranian-muddywater-apt-targets-israeli-government; classtype:command-and-control; sid:2000502; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_22, updated_at 2026_04_22;)
+
+# RustyWater C2 IP 159.198.66.153 — direct connection
+# Hosting infrastructure for nomercys.it.com C2 server.
+alert ip $HOME_NET any -> 159.198.66.153 any (msg:"Bark&Bite - Iranian MuddyWater RustyWater RAT C2 IP 159.198.66.153 2026"; threshold:type limit, track by_src, count 1, seconds 300; reference:url,rescana.com/post/rustywater-iranian-muddywater-apt-targets-israeli-government; classtype:trojan-activity; sid:2000503; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_22, updated_at 2026_04_22;)

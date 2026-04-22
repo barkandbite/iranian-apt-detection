@@ -5,6 +5,22 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.11] - 2026-04-22
+
+### Added
+- **2 MuddyWater RustyWater RAT C2 rules** (SIDs 2000502-2000503): New Rust-based RAT targeting Israeli government, military, and financial organizations. Delivered via spear-phishing with Hebrew-language decoy documents. C2 via HTTP JSON with Base64+XOR encoding.
+  - SID 2000502: RustyWater C2 domain DNS — nomercys[.]it[.]com
+  - SID 2000503: RustyWater C2 IP 159.198.66.153
+- **Total: 380 Suricata rules** (378 from v4.0.10 + 2 new), **~271 Wazuh rules**
+
+### MITRE ATT&CK
+- T1071.001 (Web Protocols), T1573.001 (Symmetric Cryptography), T1547.001 (Registry Run Keys), T1497.001 (System Checks)
+
+### IOC Currency Notes
+- **nomercys[.]it[.]com** (MuddyWater RustyWater): NEW — Rescana April 2026 report. Primary C2 for Rust RAT.
+- **159.198.66.153** (MuddyWater RustyWater): NEW — Rescana April 2026. Hosting for nomercys C2.
+- Source intelligence is public (Rescana blog) — safe for public repo.
+
 ## [4.0.10] - 2026-04-19
 
 ### Fixed
