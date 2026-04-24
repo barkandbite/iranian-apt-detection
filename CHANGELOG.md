@@ -5,6 +5,12 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.11] - 2026-04-24
+
+### Fixed
+- **Disabled duplicate rules in deprecated `cyberav3ngers-ioc-aa26-097a.rules`** — SIDs 2000496-2000497 were still active in this file despite being merged into `iranian-apt-detection.rules` in v4.0.10. Loading both files caused Suricata to reject the ruleset with duplicate SID errors. Rules are now commented out with migration notes.
+- **Total: 378 Suricata rules** (unchanged), **~271 Wazuh rules**
+
 ## [4.0.10] - 2026-04-19
 
 ### Fixed
