@@ -30,15 +30,11 @@
 # Requires: Suricata 7.0+
 
 # CyberAv3ngers Engineering Workstation — 7 IPs on 185.82.73.0/24
-# CISA confirms these represent a single multi-homed Windows box running the
-# full Rockwell toolchain (Studio 5000 Logix Designer). Active 14+ months
-# (Jan 2025 - Mar 2026). Targets EtherNet/IP (44818), alt SSH (2222),
-# Modbus TCP (502), SSH (22), S7comm/ISO-TSAP (102).
-alert ip [185.82.73.162,185.82.73.164,185.82.73.165,185.82.73.167,185.82.73.168,185.82.73.170,185.82.73.171] any -> $HOME_NET any (msg:"Bark&Bite - Iranian CyberAv3ngers Engineering Workstation IOC AA26-097A 2026"; priority:1; threshold:type limit, track by_src, count 1, seconds 300; reference:url,cisa.gov/news-events/cybersecurity-advisories/aa26-097a; classtype:trojan-activity; sid:2000496; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_17, updated_at 2026_04_17;)
+# DISABLED (2026-04-24): Rules merged into iranian-apt-detection.rules v4.0.10.
+# These duplicates cause SID conflict errors when both files are loaded.
+# See iranian-apt-detection.rules SID 2000496-2000497 for active versions.
+#alert ip [185.82.73.162,185.82.73.164,185.82.73.165,185.82.73.167,185.82.73.168,185.82.73.170,185.82.73.171] any -> $HOME_NET any (msg:"Bark&Bite - Iranian CyberAv3ngers Engineering Workstation IOC AA26-097A 2026"; priority:1; threshold:type limit, track by_src, count 1, seconds 300; reference:url,cisa.gov/news-events/cybersecurity-advisories/aa26-097a; classtype:trojan-activity; sid:2000496; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_17, updated_at 2026_04_17;)
 
 # CyberAv3ngers Staging Server — 135.136.1.133
-# Provisioned Feb 2026, activated for a 4-day window mid-Mar 2026, then
-# abandoned. Priority:2 because the IP may have been reassigned after the
-# short activity window. Still valuable for historical incident correlation
-# and detecting lingering compromise from the March 2026 campaign.
-alert ip 135.136.1.133 any -> $HOME_NET any (msg:"Bark&Bite - Iranian CyberAv3ngers Staging Server IOC AA26-097A 2026"; priority:2; threshold:type limit, track by_src, count 1, seconds 300; reference:url,cisa.gov/news-events/cybersecurity-advisories/aa26-097a; classtype:trojan-activity; sid:2000497; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_17, updated_at 2026_04_17;)
+# DISABLED (2026-04-24): See above.
+#alert ip 135.136.1.133 any -> $HOME_NET any (msg:"Bark&Bite - Iranian CyberAv3ngers Staging Server IOC AA26-097A 2026"; priority:2; threshold:type limit, track by_src, count 1, seconds 300; reference:url,cisa.gov/news-events/cybersecurity-advisories/aa26-097a; classtype:trojan-activity; sid:2000497; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_17, updated_at 2026_04_17;)
