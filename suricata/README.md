@@ -6,10 +6,10 @@ This directory contains Suricata IDS signatures for detecting Iranian APT networ
 ## Current Ruleset
 
 ### Canonical File: `iranian-apt-detection.rules`
-- **Version**: 4.0 (consolidated from v3.1, v3.2, v3.3)
-- **Last Updated**: 2026-03-30
-- **SID Range**: 1000039–2000461
-- **Total Rules**: 338 signatures
+- **Version**: 4.0.10 (consolidated from v3.1, v3.2, v3.3 + ongoing updates)
+- **Last Updated**: 2026-04-19
+- **SID Range**: 1000039–2000501
+- **Total Rules**: 378 signatures
 - **Zero duplicate SIDs**
 - **Requires**: Suricata 7.0+
 
@@ -26,20 +26,24 @@ This directory contains Suricata IDS signatures for detecting Iranian APT networ
 | 2000231–2000359 | 129 | March 2026 expansion: Cisco SD-WAN, MDM wiper, Olalampo, healthcare, correlation |
 | 2000360–2000456 | 97 | ICS/PCOM, TAMECAT, Infy blockchain DGA, FortiOS/Ivanti chains (renumbered from v3.3) |
 | 2000457–2000461 | 5 | CRESCENTHARVEST RAT (APT35/Charming Kitten, Feb 2026) |
+| 2000462–2000477 | 16 | Boggy Serpens/BlackBeard, Nuso, Infy Tonnerre, Dust Specter TwinTalk/SPLITDROP |
+| 2000478–2000501 | 24 | CyberAv3ngers ICS/PLC (AA26-097A), Infy IOC update, MuddyWater ChainShell/CastleRAT/Fooder C2 |
 
 ### Threat Group Coverage
 
 | Group | Malware/Tools | SIDs |
 |-------|---------------|------|
-| MuddyWater | Dindoor, RustyWater, MuddyViper/Fooder, TWINTASK, PowGoop, CHAR | ~40 |
-| CyberAv3ngers | IOCONTROL, PCOM PLC exploitation, RabbitMQ, DoH | ~25 |
+| MuddyWater | Dindoor, RustyWater, MuddyViper/Fooder, TWINTASK, PowGoop, CHAR, ChainShell/CastleRAT | ~45 |
+| CyberAv3ngers | IOCONTROL, PCOM PLC, RabbitMQ, DoH, Rockwell CIP/EtherNet-IP, Modbus, S7comm | ~33 |
 | APT34 (OilRig) | Spearal DNS, Veaty, STEALHOOK, Dark Scepter | ~10 |
 | APT35 (Charming Kitten) | BellaCPP, PowerLess v3, CRESCENTHARVEST RAT | ~12 |
 | APT42 (RedKitten) | TAMECAT, WezRat, SloppyMIO, GitHub dead-drop | ~10 |
 | Handala/Void Manticore | Stryker MDM wiper, Telegram C2, Intune mass wipe | ~15 |
 | UNC1549 (Nimbus Manticore) | LIGHTRAIL, POLLBLEND, TWOSTROKE, DEEPROOT, MINIBIKE | ~10 |
 | Pioneer Kitten | CVE-2024-24919, CVE-2024-3400, Backblaze exfil | ~8 |
-| Infy (Prince of Persia) | Tornado, Tonnerre, blockchain DGA, Telegram bot | ~6 |
+| Dust Specter | TwinTalk, SPLITDROP C2, domain IOCs | ~10 |
+| Boggy Serpens/BlackBeard | Nuso backdoor | ~5 |
+| Infy (Prince of Persia) | Tornado, Tonnerre, blockchain DGA, Telegram bot, IOC update | ~11 |
 | CottonSandstorm | WezRat, credential theft | ~5 |
 | Sicarii RaaS | Connectivity burst, file.io exfil | ~4 |
 | Crafty Camel (Sosano) | PDF+HTA polyglot, C2 domains | ~4 |

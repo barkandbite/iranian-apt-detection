@@ -23,8 +23,7 @@ iranian-apt-detection/
 │   └── README.md                                     # Configuration guide
 │
 ├── suricata/
-│   ├── iranian-apt-detection.rules                  # Consolidated Suricata IDS signatures (v4.0)
-│   ├── cyberav3ngers-ioc-aa26-097a.rules            # DEPRECATED �� merged into main file (v4.0.10)
+│   ├── iranian-apt-detection.rules                  # Consolidated Suricata IDS signatures (v4.0.10, 378 rules)
 │   └── README.md                                     # Suricata deployment guide
 │
 ├── documentation/
@@ -51,6 +50,7 @@ iranian-apt-detection/
 │   ├── 0900-iranian-apt-detection-master.xml        # Consolidated Wazuh rules (optional)
 │   ├── iranian-apt.rules                            # Original Suricata rules v1.0
 │   ├── iranian-apt-cloud-ai.rules                   # Cloud rules (merged)
+│   ├── cyberav3ngers-ioc-aa26-097a.rules            # IOC rules merged into main file (v4.0.10)
 │   ├── iranian-apt-2025-06-29                       # June updates archive
 │   └── README.md                                     # Archive documentation
 │
