@@ -1903,3 +1903,45 @@ alert tcp $EXTERNAL_NET any -> $HOME_NET 502 (msg:"Bark&Bite - Iranian CyberAv3n
 
 # External S7comm/ISO-TSAP to internal OT on port 102
 alert tcp $EXTERNAL_NET any -> $HOME_NET 102 (msg:"Bark&Bite - Iranian CyberAv3ngers External S7comm ISO-TSAP to OT Port 102 2026"; flow:to_server; threshold:type limit, track by_src, count 1, seconds 300; reference:url,cisa.gov/news-events/cybersecurity-advisories/aa26-097a; classtype:attempted-admin; sid:2000501; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_04_18, updated_at 2026_04_18;)
+
+# ============================================================================
+# APT34/OilRig "Dark Scepter" C2 Infrastructure (Hunt.io, Apr 2026)
+# 12 Cloudflare-fronted domains + 1 M247 IP mapped to APT34 C2 infrastructure.
+# Domains designed to appear as random legitimate sites. All pre-operational or
+# active C2 staging. Attribution: medium-high confidence Iran/MOIS.
+# MITRE: T1071.001, T1568, T1583.001
+# ============================================================================
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT OilRig Dark Scepter C2 Domain anythingshere.shop DNS 2026"; dns.query; content:"anythingshere.shop"; nocase; fast_pattern; reference:url,hunt.io/blog/track-apt34-like-infrastructure-before-it-strikes; classtype:command-and-control; sid:2000502; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_29, updated_at 2026_04_29;)
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT OilRig Dark Scepter C2 Domain cside.site DNS 2026"; dns.query; content:"cside.site"; nocase; fast_pattern; reference:url,hunt.io/blog/track-apt34-like-infrastructure-before-it-strikes; classtype:command-and-control; sid:2000503; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_29, updated_at 2026_04_29;)
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT OilRig Dark Scepter C2 Domain footballfans.asia DNS 2026"; dns.query; content:"footballfans.asia"; nocase; fast_pattern; reference:url,hunt.io/blog/track-apt34-like-infrastructure-before-it-strikes; classtype:command-and-control; sid:2000504; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_29, updated_at 2026_04_29;)
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT OilRig Dark Scepter C2 Domain menclub.lt DNS 2026"; dns.query; content:"menclub.lt"; nocase; fast_pattern; reference:url,hunt.io/blog/track-apt34-like-infrastructure-before-it-strikes; classtype:command-and-control; sid:2000505; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_29, updated_at 2026_04_29;)
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT OilRig Dark Scepter C2 Domain musiclivetrack.website DNS 2026"; dns.query; content:"musiclivetrack.website"; nocase; fast_pattern; reference:url,hunt.io/blog/track-apt34-like-infrastructure-before-it-strikes; classtype:command-and-control; sid:2000506; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_29, updated_at 2026_04_29;)
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT OilRig Dark Scepter C2 Domain stone110.store DNS 2026"; dns.query; content:"stone110.store"; nocase; fast_pattern; reference:url,hunt.io/blog/track-apt34-like-infrastructure-before-it-strikes; classtype:command-and-control; sid:2000507; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_29, updated_at 2026_04_29;)
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT OilRig Dark Scepter C2 Domain web14.info DNS 2026"; dns.query; content:"web14.info"; nocase; fast_pattern; reference:url,hunt.io/blog/track-apt34-like-infrastructure-before-it-strikes; classtype:command-and-control; sid:2000508; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_29, updated_at 2026_04_29;)
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT OilRig Dark Scepter C2 Domain justweb.click DNS 2026"; dns.query; content:"justweb.click"; nocase; fast_pattern; reference:url,hunt.io/blog/track-apt34-like-infrastructure-before-it-strikes; classtype:command-and-control; sid:2000509; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_29, updated_at 2026_04_29;)
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT OilRig Dark Scepter C2 Domain girlsbags.shop DNS 2026"; dns.query; content:"girlsbags.shop"; nocase; fast_pattern; reference:url,hunt.io/blog/track-apt34-like-infrastructure-before-it-strikes; classtype:command-and-control; sid:2000510; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_29, updated_at 2026_04_29;)
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT OilRig Dark Scepter C2 Domain lecturegenieltd.pro DNS 2026"; dns.query; content:"lecturegenieltd.pro"; nocase; fast_pattern; reference:url,hunt.io/blog/track-apt34-like-infrastructure-before-it-strikes; classtype:command-and-control; sid:2000511; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_29, updated_at 2026_04_29;)
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT OilRig Dark Scepter C2 Domain ntcx.pro DNS 2026"; dns.query; content:"ntcx.pro"; nocase; fast_pattern; reference:url,hunt.io/blog/track-apt34-like-infrastructure-before-it-strikes; classtype:command-and-control; sid:2000512; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_29, updated_at 2026_04_29;)
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT OilRig Dark Scepter C2 Domain retseptik.info DNS 2026"; dns.query; content:"retseptik.info"; nocase; fast_pattern; reference:url,hunt.io/blog/track-apt34-like-infrastructure-before-it-strikes; classtype:command-and-control; sid:2000513; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_29, updated_at 2026_04_29;)
+
+alert ip $HOME_NET any -> [38.180.239.161] any (msg:"Bark&Bite - Iranian APT OilRig Dark Scepter C2 IP 38.180.239.161 (M247) 2026"; threshold:type limit, track by_src, count 1, seconds 300; reference:url,hunt.io/blog/track-apt34-like-infrastructure-before-it-strikes; classtype:command-and-control; sid:2000514; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_29, updated_at 2026_04_29;)
+
+# ============================================================================
+# MuddyWater New C2 Infrastructure (Hunt.io, Apr 2026)
+# New Hosterdaddy AS136557 IP. Complements existing 157.20.182.75 coverage.
+# MITRE: T1071.001, T1573.002
+# ============================================================================
+
+alert ip $HOME_NET any -> [157.20.182.49] any (msg:"Bark&Bite - Iranian APT MuddyWater C2 IP 157.20.182.49 (AS136557 Hosterdaddy) 2026"; threshold:type limit, track by_src, count 1, seconds 300; reference:url,hunt.io; classtype:command-and-control; sid:2000515; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_29, updated_at 2026_04_29;)
