@@ -6,10 +6,10 @@ This directory contains Suricata IDS signatures for detecting Iranian APT networ
 ## Current Ruleset
 
 ### Canonical File: `iranian-apt-detection.rules`
-- **Version**: 4.0.10 (consolidated from v3.1, v3.2, v3.3 + ongoing updates)
-- **Last Updated**: 2026-04-19
-- **SID Range**: 1000039–2000501
-- **Total Rules**: 378 signatures
+- **Version**: 4.0.12 (consolidated from v3.1, v3.2, v3.3 + ongoing updates)
+- **Last Updated**: 2026-04-29
+- **SID Range**: 1000039–2000515
+- **Total Rules**: 392 signatures
 - **Zero duplicate SIDs**
 - **Requires**: Suricata 7.0+
 
@@ -28,6 +28,7 @@ This directory contains Suricata IDS signatures for detecting Iranian APT networ
 | 2000457–2000461 | 5 | CRESCENTHARVEST RAT (APT35/Charming Kitten, Feb 2026) |
 | 2000462–2000477 | 16 | Boggy Serpens/BlackBeard, Nuso, Infy Tonnerre, Dust Specter TwinTalk/SPLITDROP |
 | 2000478–2000501 | 24 | CyberAv3ngers ICS/PLC (AA26-097A), Infy IOC update, MuddyWater ChainShell/CastleRAT/Fooder C2 |
+| 2000502–2000515 | 14 | APT34/OilRig Dark Scepter C2 domains (Hunt.io Apr 2026), MuddyWater AS136557 IP |
 
 ### Threat Group Coverage
 

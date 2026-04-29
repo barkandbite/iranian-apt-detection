@@ -5,6 +5,21 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.12] - 2026-04-29
+
+### Added
+- **12 new APT34/OilRig "Dark Scepter" C2 domain DNS detection rules** (SID 2000502-2000513) — Cloudflare-fronted domains mapped by Hunt.io April 2026 infrastructure tracking: anythingshere.shop, cside.site, footballfans.asia, menclub.lt, musiclivetrack.website, stone110.store, web14.info, justweb.click, girlsbags.shop, lecturegenieltd.pro, ntcx.pro, retseptik.info
+- **1 new APT34/OilRig Dark Scepter C2 IP rule** (SID 2000514): 38.180.239.161 (M247 hosting)
+- **1 new MuddyWater C2 IP rule** (SID 2000515): 157.20.182.49 (AS136557 Hosterdaddy, confirmed active by Oasis Security targeting US/Israeli infrastructure)
+- **Total: 392 Suricata rules** (was 378), SID range: 1000039-2000515
+
+## [4.0.11] - 2026-04-28
+
+### Fixed
+- **Archived deprecated `cyberav3ngers-ioc-aa26-097a.rules`** — Moved to `archive/` to prevent SID collision with SIDs 2000496-2000497 already merged into main file in v4.0.10
+- **Updated suricata/README.md** — Version 4.0→4.0.10, rules 338→378, SID range extended to 2000501
+- **Updated STRUCTURE.md** — Removed deprecated file from suricata/ tree, added to archive/ tree
+
 ## [4.0.10] - 2026-04-19
 
 ### Fixed
