@@ -5,6 +5,11 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.13] - 2026-04-30
+
+### Fixed
+- **4 Suricata rules fixed for Suricata 7.0.3 sticky buffer validation** — SIDs 2000462, 2000463, 2000465, 2000468 had reversed `content:"..."; http.method;` / `http.content_type;` syntax that caused parse errors. Fixed to proper sticky buffer ordering: `http.method; content:"...";`. All 4 rules bumped to rev 2.
+
 ## [4.0.12] - 2026-04-29
 
 ### Added
