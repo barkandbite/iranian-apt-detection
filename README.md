@@ -1,6 +1,6 @@
 # Iranian APT Detection Rules
 
-[![Version](https://img.shields.io/badge/version-4.0.9-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.0.13-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![MITRE ATT&CK](https://img.shields.io/badge/MITRE%20ATT%26CK-v15-orange.svg)](documentation/MITRE-ATT&CK-Mapping.md)
 
@@ -14,10 +14,15 @@ Three concurrent Iranian campaigns targeting U.S. healthcare disclosed March 24:
 
 - **Handala/Void Manticore** wiped 200K+ Stryker devices via **Microsoft Intune MDM** abuse — no malware needed. Maryland EKG transmission went dark statewide. DOJ attributed; $10M reward.
 - **Pay2Key v3** (IRGC) hit unnamed U.S. healthcare org with **ChaCha20 + Curve25519** ransomware. Fake Avast AV bypass. **I2P C2** (not Tor). Purely destructive — no ransom demand.
-- **MuddyWater** exploiting **CVE-2025-59287** (WSUS CVSS 9.8) to pre-position on healthcare networks.
+- **MuddyWater** exploiting **CVE-2025-59287** (Windows WSUS Deserialization RCE, CVSS 9.8) to pre-position on healthcare networks.
 
-## Recent Threats (v4.0.9)
+## Recent Threats (v4.0.13)
 
+- **FIXED (v4.0.13)**: 4 Suricata rules — **sticky buffer ordering** fix for Suricata 7.0.3 validation (SIDs 2000462, 2000463, 2000465, 2000468)
+- **NEW (v4.0.12)**: APT34/OilRig **Dark Scepter C2** — 12 Cloudflare-fronted domains + M247 hosting IP (Hunt.io Apr 2026)
+- **NEW (v4.0.12)**: MuddyWater **AS136557** C2 IP targeting US/Israeli infrastructure (Oasis Security)
+- **FIXED (v4.0.11)**: Archived deprecated CyberAv3ngers IOC file to resolve SID 2000496-2000497 collision
+- **FIXED (v4.0.10)**: Merged CyberAv3ngers IOC rules into main file for daily sync compatibility
 - **NEW (v4.0.9)**: CyberAv3ngers **ICS behavioral detection** — EtherNet/IP (44818), Dropbear SSH (2222), Modbus (502), S7comm (102) from external sources
 - **NEW (v4.0.8)**: CyberAv3ngers **IOC infrastructure** — 7 engineering workstation IPs + staging server per CISA AA26-097A
 - **NEW (v4.0.7)**: MuddyWater **Fooder/MuddyViper** — 2 new C2 IPs from Trellix April 2026 report
@@ -60,7 +65,7 @@ sudo systemctl restart wazuh-manager
 
 ### 2. Deploy Suricata Rules
 ```bash
-# Deploy consolidated rules (v4.0 — single file, 378 signatures)
+# Deploy consolidated rules (v4.0 — single file, 392 signatures)
 sudo cp suricata/iranian-apt-detection.rules /etc/suricata/rules/
 
 # Add to suricata.yaml rule-files section:
@@ -117,10 +122,10 @@ sudo chmod +x /var/ossec/active-response/bin/iranian-apt-active-response.sh
 
 ### Rule Statistics
 - **Wazuh Rules**: 271 detection rules across 10 files
-- **Suricata Signatures**: 370 network signatures (1 consolidated rule file)
+- **Suricata Signatures**: 392 network signatures (1 consolidated rule file)
 - **CVEs Covered**: 40+ including 2025/2026 zero-days
-- **Known C2 IPs**: 35+
-- **Known C2 Domains**: 25+
+- **Known C2 IPs**: 37+
+- **Known C2 Domains**: 37+
 - **Unique Behavioral Patterns**: 100+
 - **Threat Families**: 28+
 
@@ -156,7 +161,7 @@ sudo chmod +x /var/ossec/active-response/bin/iranian-apt-active-response.sh
 - Tehran business hours activity (UTC+3:30), Farsi language artifacts
 - Passive implants (no outbound C2), DNS hijacking
 
-### 🛡️ Active Response
+### Active Response
 - Automated IP blocking
 - Process termination
 - Host isolation
@@ -180,7 +185,7 @@ iranian-apt-detection/
 │   ├── 0919-iranian-apt-march2026-expansion.xml
 │   └── README.md
 ├── suricata/                  # Network IDS signatures
-│   ├── iranian-apt-detection.rules  # Consolidated v4.0 (378 rules)
+│   ├── iranian-apt-detection.rules  # Consolidated v4.0 (392 rules)
 │   └── README.md
 ├── configurations/            # Agent and system configs
 │   ├── sysmon-config-iranian-apt.xml
@@ -249,7 +254,7 @@ index=wazuh rule.groups="iranian_apt" rule.level>=14
 ### Alert Priorities
 
 | Level | Response Time | Action |
-|-------|---------------|---------|
+|-------|---------------|--------|
 | 16 | Immediate | Isolate, investigate, executive brief |
 | 15 | 15 minutes | Block, investigate, incident response |
 | 14 | 1 hour | Investigate, correlate, monitor |
@@ -298,4 +303,4 @@ These rules are provided as-is for defensive purposes. Users are responsible for
 
 ---
 
-**Last Updated**: April 18, 2026 | **Version**: 4.0.9 | **Maintainer**: Bark&Bite Security Intelligence
+**Last Updated**: May 1, 2026 | **Version**: 4.0.13 | **Maintainer**: Bark&Bite Security Intelligence
