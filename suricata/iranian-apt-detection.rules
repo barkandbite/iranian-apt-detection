@@ -1945,3 +1945,17 @@ alert ip $HOME_NET any -> [38.180.239.161] any (msg:"Bark&Bite - Iranian APT Oil
 # ============================================================================
 
 alert ip $HOME_NET any -> [157.20.182.49] any (msg:"Bark&Bite - Iranian APT MuddyWater C2 IP 157.20.182.49 (AS136557 Hosterdaddy) 2026"; threshold:type limit, track by_src, count 1, seconds 300; reference:url,hunt.io; classtype:command-and-control; sid:2000515; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_29, updated_at 2026_04_29;)
+
+# ============================================================================
+# Iranian APT Cloud C2 Infrastructure (Trellix, May 2026)
+# MuddyWater and related actors abusing free-tier cloud platforms for
+# disposable, high-reputation C2. Somee = free ASP.NET hosting, Glitch =
+# Node.js containers, Workers = Cloudflare edge functions.
+# MITRE: T1071.001, T1102.002, T1583.006
+# ============================================================================
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT MuddyWater C2 Domain datadrift.somee.com DNS 2026"; dns.query; content:"datadrift.somee.com"; nocase; fast_pattern; reference:url,trellix.com/blogs/research/the-iranian-cyber-capability-2026; classtype:command-and-control; sid:2000516; rev:1; metadata:policy max-detect-ips drop, created_at 2026_05_04, updated_at 2026_05_04;)
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT C2 Domain prism-west-candy.glitch.me (Glitch Abuse) DNS 2026"; dns.query; content:"prism-west-candy.glitch.me"; nocase; fast_pattern; reference:url,trellix.com/blogs/research/the-iranian-cyber-capability-2026; classtype:command-and-control; sid:2000517; rev:1; metadata:policy max-detect-ips drop, created_at 2026_05_04, updated_at 2026_05_04;)
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT C2 Domain line.completely.workers.dev (Workers Abuse) DNS 2026"; dns.query; content:"line.completely.workers.dev"; nocase; fast_pattern; reference:url,trellix.com/blogs/research/the-iranian-cyber-capability-2026; classtype:command-and-control; sid:2000518; rev:1; metadata:policy max-detect-ips drop, created_at 2026_05_04, updated_at 2026_05_04;)
