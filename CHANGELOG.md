@@ -5,6 +5,23 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.14] - 2026-05-04
+
+### Added
+- **3 new Iranian APT cloud C2 domain DNS detection rules** (SID 2000516-2000518) — C2 domains from the Trellix "Iranian Cyber Capability 2026" report abusing free-tier cloud hosting platforms:
+  - SID 2000516: `datadrift.somee.com` (MuddyWater C2 on free ASP.NET hosting)
+  - SID 2000517: `prism-west-candy.glitch.me` (Iranian APT C2 on Glitch containers)
+  - SID 2000518: `line.completely.workers.dev` (Iranian APT C2 on Cloudflare Workers)
+- **Total: 395 Suricata rules** (was 392), SID range: 1000039-2000518
+
+### MITRE ATT&CK
+- T1071.001 (Web Protocols), T1102.002 (Bidirectional Communication), T1583.006 (Web Services)
+
+### IOC Currency Audit
+- 194.11.246.101 (Hosterdaddy/MuddyWater): **STILL ACTIVE** — confirmed anchor node for 64 Hosterdaddy IPs in 194.11.246.64/26 block, linked to Ethereum smart contract 0x2B77671c for on-chain C2 IP storage
+- 157.20.182.75, 157.20.182.49 (AS136557/Hosterdaddy): No deattribution found, retaining
+- 45.80.148.195: No specific recent intelligence, flagged for deeper verification next session
+
 ## [4.0.13] - 2026-04-30
 
 ### Fixed
