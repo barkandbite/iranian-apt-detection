@@ -1959,3 +1959,15 @@ alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT MuddyWater C2 D
 alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT C2 Domain prism-west-candy.glitch.me (Glitch Abuse) DNS 2026"; dns.query; content:"prism-west-candy.glitch.me"; nocase; fast_pattern; reference:url,trellix.com/blogs/research/the-iranian-cyber-capability-2026; classtype:command-and-control; sid:2000517; rev:1; metadata:policy max-detect-ips drop, created_at 2026_05_04, updated_at 2026_05_04;)
 
 alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT C2 Domain line.completely.workers.dev (Workers Abuse) DNS 2026"; dns.query; content:"line.completely.workers.dev"; nocase; fast_pattern; reference:url,trellix.com/blogs/research/the-iranian-cyber-capability-2026; classtype:command-and-control; sid:2000518; rev:1; metadata:policy max-detect-ips drop, created_at 2026_05_04, updated_at 2026_05_04;)
+
+# ============================================================================
+# Prince of Persia (Infy) Foudre Replacement C2 Infrastructure
+# (SafeBreach, Feb 2026)
+# After abandoning 45.80.148.195 in Dec 2025, actor migrated to new IPs
+# on same HOSTGW SRL (AS204641) network. 12-character DGA .site domains.
+# MITRE: T1071.001, T1568.002
+# ============================================================================
+
+alert ip $HOME_NET any -> [45.80.148.249] any (msg:"Bark&Bite - Iranian APT Prince of Persia Infy Foudre Replacement C2 IP 45.80.148.249 2026"; threshold:type limit, track by_src, count 1, seconds 300; reference:url,safebreach.com/blog/prince-of-persia-part-ii; classtype:command-and-control; sid:2000519; rev:1; metadata:policy max-detect-ips drop, created_at 2026_05_06, updated_at 2026_05_06;)
+
+alert ip $HOME_NET any -> [45.80.149.3] any (msg:"Bark&Bite - Iranian APT Prince of Persia Infy Foudre Replacement C2 IP 45.80.149.3 2026"; threshold:type limit, track by_src, count 1, seconds 300; reference:url,safebreach.com/blog/prince-of-persia-part-ii; classtype:command-and-control; sid:2000520; rev:1; metadata:policy max-detect-ips drop, created_at 2026_05_06, updated_at 2026_05_06;)

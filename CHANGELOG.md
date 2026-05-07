@@ -5,6 +5,21 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.15] - 2026-05-06
+
+### Added
+- **2 new Prince of Persia (Infy) Foudre replacement C2 IP rules** (SID 2000519-2000520) — SafeBreach confirmed 45.80.148.195 abandoned Dec 2025, replaced by 45.80.148.249 and 45.80.149.3 on same HOSTGW SRL (AS204641) network
+- **Total: 397 Suricata rules** (was 395), SID range: 1000039-2000520
+
+### IOC Currency Audit
+- 45.80.148.195 (Prince of Persia Foudre): **ABANDONED** — SafeBreach Feb 2026 confirmed non-active, replaced by 45.80.148.249 and 45.80.149.3. Rule retained but flagged for review.
+- 194.11.246.101 (MuddyWater Hosterdaddy): **STILL ACTIVE** — confirmed anchor node, multiple vendor confirmations through Mar 2026
+- 157.20.182.75 (MuddyWater UDPGangster): **STILL ACTIVE** — Group-IB, Dark Reading confirmations
+- 157.20.182.49 (MuddyWater AS136557): **STILL ACTIVE** — open directory discovered Mar 2026, Sliver C2 on port 31337
+
+### MITRE ATT&CK
+- T1071.001 (Web Protocols), T1568.002 (Domain Generation Algorithms)
+
 ## [4.0.14] - 2026-05-04
 
 ### Added
