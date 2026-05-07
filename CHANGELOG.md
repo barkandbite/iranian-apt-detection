@@ -5,6 +5,18 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.16] - 2026-05-07
+
+### Added
+- **3 new MuddyWater Stagecomp/Darkcomp staging infrastructure rules** (SID 2000521-2000523) — IOCs from Rapid7 false flag ransomware campaign report (THN May 6, 2026):
+  - SID 2000521: `172.86.126.208` — Stagecomp (ms_upd.exe) download server (RouterHosting VPS, UAE)
+  - SID 2000522: `172.86.76.127` — Open directory toolkit hosting server (RouterHosting VPS, UAE)
+  - SID 2000523: Behavioral — HTTP download of `ms_upd.exe` dropper filename (survives IP rotation)
+- **Total: 400 Suricata rules** (was 397), SID range: 1000039-2000523
+
+### MITRE ATT&CK
+- T1105 (Ingress Tool Transfer), T1204.002 (Malicious File), T1036.005 (Match Legitimate Name or Location), T1598 (Phishing for Information)
+
 ## [4.0.15] - 2026-05-06
 
 ### Added
