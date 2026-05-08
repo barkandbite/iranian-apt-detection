@@ -5,6 +5,11 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.17] - 2026-05-08
+
+### Fixed
+- **SID 2000523** (MuddyWater Stagecomp dropper behavioral): Reversed sticky buffer ordering caused Suricata 7.0.3 parse error. `content:"GET"; http.method;` → `http.method; content:"GET";`. Same class of issue fixed in v4.0.13 (SID 2000462-2000468). Bumped to rev 2.
+
 ## [4.0.16] - 2026-05-07
 
 ### Added
