@@ -1971,3 +1971,20 @@ alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT C2 Domain line.
 alert ip $HOME_NET any -> [45.80.148.249] any (msg:"Bark&Bite - Iranian APT Prince of Persia Infy Foudre Replacement C2 IP 45.80.148.249 2026"; threshold:type limit, track by_src, count 1, seconds 300; reference:url,safebreach.com/blog/prince-of-persia-part-ii; classtype:command-and-control; sid:2000519; rev:1; metadata:policy max-detect-ips drop, created_at 2026_05_06, updated_at 2026_05_06;)
 
 alert ip $HOME_NET any -> [45.80.149.3] any (msg:"Bark&Bite - Iranian APT Prince of Persia Infy Foudre Replacement C2 IP 45.80.149.3 2026"; threshold:type limit, track by_src, count 1, seconds 300; reference:url,safebreach.com/blog/prince-of-persia-part-ii; classtype:command-and-control; sid:2000520; rev:1; metadata:policy max-detect-ips drop, created_at 2026_05_06, updated_at 2026_05_06;)
+
+# ============================================================================
+# MuddyWater Stagecomp/Darkcomp Staging Infrastructure (Rapid7, May 2026)
+# False flag ransomware campaign using Microsoft Teams social engineering.
+# Stagecomp (ms_upd.exe) downloads Darkcomp RAT (game.exe + WebView2Loader.dll).
+# RouterHosting VPS infrastructure in UAE. Code-signing cert "Donald Gay".
+# MITRE: T1105, T1204.002, T1036.005, T1598
+# ============================================================================
+
+# MuddyWater Stagecomp download server — delivered ms_upd.exe via curl
+alert ip $HOME_NET any -> [172.86.126.208] any (msg:"Bark&Bite - Iranian APT MuddyWater Stagecomp Staging IP 172.86.126.208 2026"; threshold:type limit, track by_src, count 1, seconds 300; reference:url,thehackernews.com/2026/05/muddywater-uses-microsoft-teams-to.html; classtype:command-and-control; sid:2000521; rev:1; metadata:policy max-detect-ips drop, created_at 2026_05_07, updated_at 2026_05_07;)
+
+# MuddyWater open directory toolkit server — hosts intrusion toolkit
+alert ip $HOME_NET any -> [172.86.76.127] any (msg:"Bark&Bite - Iranian APT MuddyWater Toolkit Server IP 172.86.76.127 2026"; threshold:type limit, track by_src, count 1, seconds 300; reference:url,thehackernews.com/2026/05/muddywater-uses-microsoft-teams-to.html; classtype:command-and-control; sid:2000522; rev:1; metadata:policy max-detect-ips drop, created_at 2026_05_07, updated_at 2026_05_07;)
+
+# Stagecomp dropper download — behavioral, survives IP rotation
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater Stagecomp Dropper Download ms_upd.exe 2026"; flow:to_server,established; content:"GET"; http.method; content:"ms_upd.exe"; http.uri; fast_pattern; reference:url,thehackernews.com/2026/05/muddywater-uses-microsoft-teams-to.html; classtype:trojan-activity; sid:2000523; rev:1; metadata:policy max-detect-ips drop, created_at 2026_05_07, updated_at 2026_05_07;)

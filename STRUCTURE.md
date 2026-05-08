@@ -87,7 +87,7 @@ iranian-apt-detection/
 - **101511-101515**: Dust Specter TwinTalk/SPLITDROP host indicators (0919)
 - **101516-101521**: CyberAv3ngers Rockwell PLC host-side detection (0919)
 
-### Suricata SID Ranges (1000039-2000520)
+### Suricata SID Ranges (1000039-2000523)
 - **1000039-2000014**: CVE exploitation signatures
 - **2000015-2000030**: C2 infrastructure, post-exploitation, exfiltration
 - **2000031-2000050**: Reconnaissance, web shells, ICS/SCADA, correlation
@@ -109,6 +109,7 @@ iranian-apt-detection/
 - **2000502-2000515**: APT34/OilRig Dark Scepter C2 domains (Hunt.io Apr 2026), MuddyWater AS136557 IP
 - **2000516-2000518**: Iranian APT cloud C2 domains (Trellix May 2026: somee.com, glitch.me, workers.dev)
 - **2000519-2000520**: Prince of Persia (Infy) Foudre replacement C2 IPs (SafeBreach Feb 2026)
+- **2000521-2000523**: MuddyWater Stagecomp/Darkcomp staging IPs + dropper behavioral (Rapid7 May 2026)
 
 ## File Naming Conventions
 
