@@ -1,4 +1,4 @@
-# Bark & Bite — Iranian APT Detection Rules (Consolidated)
+ # Bark & Bite — Iranian APT Detection Rules (Consolidated)
 # File: iranian-apt-detection.rules
 # Version: 4.0.10
 # Last Updated: 2026-04-19
@@ -1988,3 +1988,27 @@ alert ip $HOME_NET any -> [172.86.76.127] any (msg:"Bark&Bite - Iranian APT Mudd
 
 # Stagecomp dropper download — behavioral, survives IP rotation
 alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater Stagecomp Dropper Download ms_upd.exe 2026"; flow:to_server,established; http.method; content:"GET"; http.uri; content:"ms_upd.exe"; fast_pattern; reference:url,thehackernews.com/2026/05/muddywater-uses-microsoft-teams-to.html; classtype:trojan-activity; sid:2000523; rev:2; metadata:policy max-detect-ips drop, created_at 2026_05_07, updated_at 2026_05_08;)
+
+# ============================================================================
+# MUDDYWATER MICROSOFT TEAMS FALSE FLAG RANSOMWARE (2026)
+# Source: Rapid7 Threat Research, SecurityWeek, THN — May 2026
+# Context: MuddyWater (MOIS-linked) used Microsoft Teams social engineering
+#   to harvest credentials via screen-sharing, then deployed Chaos ransomware
+#   as a false flag to mask espionage. DWAgent/AnyDesk for persistence.
+#   "Donald Gay" code-signing cert on ms_upd.exe (CastleLoader/Fakeset).
+#   Staging IP 172.86.126.208 already covered by SID 2000521.
+#   ms_upd.exe dropper behavioral already covered by SID 2000523.
+# MITRE: T1566.004, T1598, T1219, T1036.005, T1486
+# ============================================================================
+
+# MuddyWater Stagecomp/Darkcomp C2 domain — downloads next-stage payload
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT MuddyWater Stagecomp C2 Domain moonzonet.com 2026"; dns.query; content:"moonzonet.com"; nocase; fast_pattern; reference:url,rapid7.com/blog/post/tr-muddying-tracks-state-sponsored-shadow-behind-chaos-ransomware/; classtype:command-and-control; sid:2000524; rev:1; metadata:policy max-detect-ips drop, created_at 2026_05_12, updated_at 2026_05_12;)
+
+# MuddyWater encrypted config C2 — resolved from Darkcomp encrypted payload
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT MuddyWater Encrypted Config C2 Domain uploadfiler.com 2026"; dns.query; content:"uploadfiler.com"; nocase; fast_pattern; reference:url,rapid7.com/blog/post/tr-muddying-tracks-state-sponsored-shadow-behind-chaos-ransomware/; classtype:command-and-control; sid:2000525; rev:1; metadata:policy max-detect-ips drop, created_at 2026_05_12, updated_at 2026_05_12;)
+
+# MuddyWater Quick Assist phishing — lure domain for Teams social engineering
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT MuddyWater Quick Assist Phishing Domain adm-pulse.com 2026"; dns.query; content:"adm-pulse.com"; nocase; fast_pattern; reference:url,rapid7.com/blog/post/tr-muddying-tracks-state-sponsored-shadow-behind-chaos-ransomware/; classtype:social-engineering; sid:2000526; rev:1; metadata:policy max-detect-ips drop, created_at 2026_05_12, updated_at 2026_05_12;)
+
+# MuddyWater post-compromise C2 — contacted by renamed pythonw.exe implant
+alert ip $HOME_NET any -> [116.203.208.186] any (msg:"Bark&Bite - Iranian APT MuddyWater Post-Compromise C2 IP 116.203.208.186 2026"; threshold:type limit, track by_src, count 1, seconds 300; reference:url,rapid7.com/blog/post/tr-muddying-tracks-state-sponsored-shadow-behind-chaos-ransomware/; classtype:command-and-control; sid:2000527; rev:1; metadata:policy max-detect-ips drop, created_at 2026_05_12, updated_at 2026_05_12;)
