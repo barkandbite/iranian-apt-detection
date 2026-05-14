@@ -6,10 +6,10 @@ This directory contains Suricata IDS signatures for detecting Iranian APT networ
 ## Current Ruleset
 
 ### Canonical File: `iranian-apt-detection.rules`
-- **Version**: 4.0.13 (consolidated from v3.1, v3.2, v3.3 + ongoing updates)
-- **Last Updated**: 2026-04-30
-- **SID Range**: 1000039–2000515
-- **Total Rules**: 392 signatures
+- **Version**: 4.0.19 (consolidated from v3.1, v3.2, v3.3 + ongoing updates)
+- **Last Updated**: 2026-05-13
+- **SID Range**: 1000039–2000527
+- **Total Rules**: 404 signatures
 - **Zero duplicate SIDs**
 - **Requires**: Suricata 7.0+
 
@@ -29,14 +29,18 @@ This directory contains Suricata IDS signatures for detecting Iranian APT networ
 | 2000462–2000477 | 16 | Boggy Serpens/BlackBeard, Nuso, Infy Tonnerre, Dust Specter TwinTalk/SPLITDROP |
 | 2000478–2000501 | 24 | CyberAv3ngers ICS/PLC (AA26-097A), Infy IOC update, MuddyWater ChainShell/CastleRAT/Fooder C2 |
 | 2000502–2000515 | 14 | APT34/OilRig Dark Scepter C2 domains (Hunt.io Apr 2026), MuddyWater AS136557 IP |
+| 2000516–2000518 | 3 | Iranian APT cloud C2 domains (Trellix May 2026: somee.com, glitch.me, workers.dev) |
+| 2000519–2000520 | 2 | Prince of Persia (Infy) Foudre replacement C2 IPs (SafeBreach Feb 2026) |
+| 2000521–2000523 | 3 | MuddyWater Stagecomp/Darkcomp staging IPs + dropper behavioral (Rapid7 May 2026) |
+| 2000524–2000527 | 4 | MuddyWater Teams false flag C2 domains + IP (Rapid7 May 2026) |
 
 ### Threat Group Coverage
 
 | Group | Malware/Tools | SIDs |
 |-------|---------------|------|
-| MuddyWater | Dindoor, RustyWater, MuddyViper/Fooder, TWINTASK, PowGoop, CHAR, ChainShell/CastleRAT | ~45 |
+| MuddyWater | Dindoor, RustyWater, MuddyViper/Fooder, TWINTASK, PowGoop, CHAR, ChainShell/CastleRAT, Stagecomp/Darkcomp, Teams false flag | ~52 |
 | CyberAv3ngers | IOCONTROL, PCOM PLC, RabbitMQ, DoH, Rockwell CIP/EtherNet-IP, Modbus, S7comm | ~33 |
-| APT34 (OilRig) | Spearal DNS, Veaty, STEALHOOK, Dark Scepter | ~10 |
+| APT34 (OilRig) | Spearal DNS, Veaty, STEALHOOK, Dark Scepter | ~22 |
 | APT35 (Charming Kitten) | BellaCPP, PowerLess v3, CRESCENTHARVEST RAT | ~12 |
 | APT42 (RedKitten) | TAMECAT, WezRat, SloppyMIO, GitHub dead-drop | ~10 |
 | Handala/Void Manticore | Stryker MDM wiper, Telegram C2, Intune mass wipe | ~15 |
@@ -44,7 +48,7 @@ This directory contains Suricata IDS signatures for detecting Iranian APT networ
 | Pioneer Kitten | CVE-2024-24919, CVE-2024-3400, Backblaze exfil | ~8 |
 | Dust Specter | TwinTalk, SPLITDROP C2, domain IOCs | ~10 |
 | Boggy Serpens/BlackBeard | Nuso backdoor | ~5 |
-| Infy (Prince of Persia) | Tornado, Tonnerre, blockchain DGA, Telegram bot, IOC update | ~11 |
+| Infy (Prince of Persia) | Tornado, Tonnerre, blockchain DGA, Telegram bot, IOC update | ~13 |
 | CottonSandstorm | WezRat, credential theft | ~5 |
 | Sicarii RaaS | Connectivity burst, file.io exfil | ~4 |
 | Crafty Camel (Sosano) | PDF+HTA polyglot, C2 domains | ~4 |
