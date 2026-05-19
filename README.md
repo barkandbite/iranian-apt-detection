@@ -1,6 +1,6 @@
 # Iranian APT Detection Rules
 
-[![Version](https://img.shields.io/badge/version-4.0.14-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.0.19-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![MITRE ATT&CK](https://img.shields.io/badge/MITRE%20ATT%26CK-v15-orange.svg)](documentation/MITRE-ATT&CK-Mapping.md)
 
@@ -16,8 +16,14 @@ Three concurrent Iranian campaigns targeting U.S. healthcare disclosed March 24:
 - **Pay2Key v3** (IRGC) hit unnamed U.S. healthcare org with **ChaCha20 + Curve25519** ransomware. Fake Avast AV bypass. **I2P C2** (not Tor). Purely destructive — no ransom demand.
 - **MuddyWater** exploiting **CVE-2025-59287** (Windows WSUS Deserialization RCE, CVSS 9.8) to pre-position on healthcare networks.
 
-## Recent Threats (v4.0.13)
+## Recent Threats (v4.0.19)
 
+- **NEW (v4.0.19)**: MuddyWater **Teams false flag** — 3 C2 domains (moonzonet.com, uploadfiler.com, adm-pulse.com) + post-compromise IP. Espionage disguised as Chaos ransomware (Rapid7 May 2026)
+- **FIXED (v4.0.18)**: SID 2000022/2000026 — mixed legacy/sticky buffer syntax fix
+- **FIXED (v4.0.17)**: SID 2000523 — sticky buffer ordering fix for Suricata 7.0.3
+- **NEW (v4.0.16)**: MuddyWater **Stagecomp/Darkcomp** — staging IPs + ms_upd.exe dropper behavioral (Rapid7 May 2026)
+- **NEW (v4.0.15)**: Infy **Foudre replacement** C2 IPs — 45.80.148.249, 45.80.149.3 (SafeBreach Feb 2026)
+- **NEW (v4.0.14)**: Iranian APT **cloud C2 domains** — free-tier hosting abuse (Trellix May 2026)
 - **FIXED (v4.0.13)**: 4 Suricata rules — **sticky buffer ordering** fix for Suricata 7.0.3 validation (SIDs 2000462, 2000463, 2000465, 2000468)
 - **NEW (v4.0.12)**: APT34/OilRig **Dark Scepter C2** — 12 Cloudflare-fronted domains + M247 hosting IP (Hunt.io Apr 2026)
 - **NEW (v4.0.12)**: MuddyWater **AS136557** C2 IP targeting US/Israeli infrastructure (Oasis Security)
@@ -65,7 +71,7 @@ sudo systemctl restart wazuh-manager
 
 ### 2. Deploy Suricata Rules
 ```bash
-# Deploy consolidated rules (v4.0 — single file, 392 signatures)
+# Deploy consolidated rules (v4.0 — single file, 404 signatures)
 sudo cp suricata/iranian-apt-detection.rules /etc/suricata/rules/
 
 # Add to suricata.yaml rule-files section:
@@ -122,7 +128,7 @@ sudo chmod +x /var/ossec/active-response/bin/iranian-apt-active-response.sh
 
 ### Rule Statistics
 - **Wazuh Rules**: 271 detection rules across 10 files
-- **Suricata Signatures**: 392 network signatures (1 consolidated rule file)
+- **Suricata Signatures**: 404 network signatures (1 consolidated rule file)
 - **CVEs Covered**: 40+ including 2025/2026 zero-days
 - **Known C2 IPs**: 37+
 - **Known C2 Domains**: 37+

@@ -5,6 +5,24 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.19] - 2026-05-13
+
+### Added
+- **4 new MuddyWater Teams false flag C2 rules** (SID 2000524-2000527) — Rapid7 TR-Muddying-Tracks, SecurityWeek, THN (May 2026). MuddyWater used Teams social engineering + Chaos ransomware false flag to mask espionage campaign against US bank, airport, and defense software supplier:
+  - SID 2000524: C2 domain `moonzonet.com` (Stagecomp next-stage download)
+  - SID 2000525: C2 domain `uploadfiler.com` (encrypted config resolution)
+  - SID 2000526: Phishing domain `adm-pulse.com` (Quick Assist lure)
+  - SID 2000527: Post-compromise C2 IP `116.203.208.186` (contacted by renamed pythonw.exe implant)
+- **Total: 404 Suricata rules** (was 400), SID range: 1000039-2000527
+
+### MITRE ATT&CK
+- T1566.004 (Spearphishing Voice), T1598 (Phishing for Information), T1219 (Remote Access Software), T1036.005 (Match Legitimate Name or Location)
+
+## [4.0.18] - 2026-05-12
+
+### Fixed
+- **SID 2000022** and **SID 2000026**: Mixed legacy `http_method` content modifier with sticky buffers (`http.user_agent`, `http.uri`, `http.cookie`). Converted to `http.method; content:"GET";`. Same class of issue as v4.0.13 and v4.0.17 fixes. Bumped revisions.
+
 ## [4.0.17] - 2026-05-08
 
 ### Fixed
