@@ -23,7 +23,7 @@ iranian-apt-detection/
 │   └── README.md                                     # Configuration guide
 │
 ├── suricata/
-│   ├── iranian-apt-detection.rules                  # Consolidated Suricata IDS signatures (v4.0.13, 392 rules)
+│   ├── iranian-apt-detection.rules                  # Consolidated Suricata IDS signatures (v4.0.19, 404 rules)
 │   └── README.md                                     # Suricata deployment guide
 │
 ├── documentation/
@@ -110,6 +110,7 @@ iranian-apt-detection/
 - **2000516-2000518**: Iranian APT cloud C2 domains (Trellix May 2026: somee.com, glitch.me, workers.dev)
 - **2000519-2000520**: Prince of Persia (Infy) Foudre replacement C2 IPs (SafeBreach Feb 2026)
 - **2000521-2000523**: MuddyWater Stagecomp/Darkcomp staging IPs + dropper behavioral (Rapid7 May 2026)
+- **2000524-2000527**: MuddyWater Teams false flag C2 domains + IP (Rapid7 May 2026)
 
 ## File Naming Conventions
 

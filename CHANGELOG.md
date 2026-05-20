@@ -5,6 +5,29 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.19] - 2026-05-12
+
+### Added
+- **4 new MuddyWater Microsoft Teams false flag ransomware campaign rules** (SID 2000524-2000527) — IOCs from Rapid7 Threat Research May 2026:
+  - SID 2000524: `moonzonet.com` — Stagecomp/Darkcomp C2 domain (next-stage payload download)
+  - SID 2000525: `uploadfiler.com` — Encrypted config C2 domain (Darkcomp payload resolution)
+  - SID 2000526: `adm-pulse.com` — Quick Assist phishing lure domain (Teams social engineering)
+  - SID 2000527: `116.203.208.186` — Post-compromise C2 IP (contacted by renamed pythonw.exe implant)
+- **Total: 404 Suricata rules** (was 400), SID range: 1000039-2000527
+
+### Context
+MuddyWater (MOIS-linked) used Microsoft Teams social engineering to harvest credentials via screen-sharing, then deployed Chaos ransomware as a false flag to mask espionage operations. DWAgent/AnyDesk used for persistence. "Donald Gay" code-signing certificate on ms_upd.exe (CastleLoader/Fakeset). Extends existing coverage SID 2000521-2000523 (Stagecomp/Darkcomp staging infrastructure).
+
+### MITRE ATT&CK
+- T1566.004 (Spearphishing Voice), T1598 (Phishing for Information), T1219 (Remote Access Software), T1036.005 (Match Legitimate Name or Location), T1486 (Data Encrypted for Impact)
+
+## [4.0.18] - 2026-05-11
+
+### Fixed
+- **SID 2000022** (Iranian APT Havoc C2 Beacon): Mixed legacy `http_method` content modifier with sticky buffer keywords (`http.user_agent`, `http.uri`, `http.cookie`). Converted to consistent sticky buffer syntax: `http.method; content:"GET";`. Bumped to rev 13.
+- **SID 2000026** (Iranian APT PowerShell Download Cradle): Same mixed legacy/sticky buffer issue. `content:"GET"; http_method;` → `http.method; content:"GET";`. Bumped to rev 10.
+- Same class of issue previously fixed in v4.0.13 (SID 2000462-2000468) and v4.0.17 (SID 2000523).
+
 ## [4.0.17] - 2026-05-08
 
 ### Fixed
