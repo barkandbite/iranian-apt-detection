@@ -5,6 +5,27 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.20] - 2026-05-22
+
+### Added
+- **4 MuddyWater RustyWater Rust RAT rules** (SID 2000528-2000531) — Iranian MOIS-linked spear-phishing campaign deploying Rust-based implant (`reddit.exe`) via macro-laden Word docs against Middle East diplomatic, maritime, financial, and telecom sectors. Sources: The Hacker News (Jan 2026), ProtosLabs, Rescana, CloudSEK.
+  - SID 2000528: DNS query `nomercys.it.com`
+  - SID 2000529: HTTP host header `nomercys.it.com`
+  - SID 2000530: TLS SNI `nomercys.it.com` (reqwest crate defaults to HTTPS)
+  - SID 2000531: Direct contact to C2 IP `159.198.66.153` (Hostinger AS47583)
+- **Total: 408 Suricata rules** (was 404), SID range: 1000039-2000531.
+
+### Changed
+- **False-positive tightening on 5 known-noisy rules:**
+  - SID 2000030 (Bulk Outbound Transfer): dsize threshold 50KB→500KB, count 100→500 per hour to suppress routine cloud uploads. Renamed from "Data Exfiltration to Non-US Host" to reflect actual behavior. Bumped to rev 5.
+  - SID 2000172 (UNC1549 SSH non-22): port exclusion expanded to `![22,443,2222]` to skip GitHub SSH-over-HTTPS and common alt-SSH jump hosts. Threshold 1→5 sessions/hour. Bumped to rev 2.
+  - SID 2000188 (MuddyWater SSH high port): threshold 1→5 sessions/hour. Bumped to rev 2.
+  - SID 2000284 (`.online` TLD): threshold 50→500 per hour. Bumped to rev 3.
+  - SID 2000315 (bit.ly APK delivery): added User-Agent constraint (`Dalvik|okhttp|com.android.`) via legacy `pcre/V` modifier to scope to mobile-app fetches. Threshold 10→50 per hour. Bumped to rev 3.
+
+### Notes
+- v4.0.18 (SID 2000022/2000026 sticky-buffer fix) and v4.0.19 (MuddyWater Teams false-flag SID 2000524-2000527) entries are tracked in pending docs PRs and will be backfilled on merge.
+
 ## [4.0.17] - 2026-05-08
 
 ### Fixed

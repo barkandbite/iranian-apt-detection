@@ -134,11 +134,11 @@ alert rdp $HOME_NET any -> $HOME_NET 3389 (msg:"Bark&Bite - Iranian APT RDP Late
 # DATA EXFILTRATION PATTERNS
 #==============================================================================
 
-# Large data transfer to non-US infrastructure (Iranian preference) - FIXED
-# TUNING NOTE: This rule is intentionally broad. In environments with heavy
-# international traffic, raise the threshold or disable. For tighter detection,
-# pair with flowbits from a preceding compromise indicator.
-alert tcp $HOME_NET any -> ![$HOME_NET,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16] any (msg:"Bark&Bite - Iranian APT Data Exfiltration to Non-US Host"; flow:to_server,established; dsize:>50000; threshold:type both, track by_src, count 100, seconds 3600; classtype:trojan-activity; sid:2000030; rev:4; metadata:policy max-detect-ips drop, created_at 2025_07_06, updated_at 2026_04_07;)
+# Bulk outbound transfer to external infrastructure (FP-tightened 2026-05-22)
+# TUNING NOTE: dsize raised 50KB->500KB and count 100->500/hour to suppress
+# routine cloud uploads. Pair with a preceding-compromise flowbit for higher
+# confidence. Disable if your environment routinely sees GRO/TSO segments.
+alert tcp $HOME_NET any -> ![$HOME_NET,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16] any (msg:"Bark&Bite - Iranian APT Bulk Outbound Transfer Sustained Volume"; flow:to_server,established; dsize:>500000; threshold:type both, track by_src, count 500, seconds 3600; classtype:trojan-activity; sid:2000030; rev:5; metadata:policy max-detect-ips drop, created_at 2025_07_06, updated_at 2026_05_22;)
 
 # DNS tunneling with Iranian encoding patterns
 alert dns $HOME_NET any -> any 53 (msg:"Bark&Bite - Iranian APT DNS Tunnel Exfiltration"; dns.query; pcre:"/^[a-f0-9]{32,}\./"; byte_test:1,>,50,0,relative; threshold:type both, track by_src, count 20, seconds 300; classtype:trojan-activity; sid:2000031; rev:2; metadata:policy max-detect-ips drop, created_at 2025_07_06, updated_at 2026_03_12;)
@@ -412,7 +412,9 @@ alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Infy
 #==============================================================================
 
 # UNC1549 - SSH reverse tunnel on non-standard ports (C2 pattern)
-alert tcp $HOME_NET any -> $EXTERNAL_NET !22 (msg:"Bark&Bite - Iranian APT UNC1549 SSH Reverse Tunnel Non-Standard Port 2025"; flow:to_server,established; content:"SSH-2.0-"; depth:8; threshold:type both, track by_src, count 1, seconds 3600; classtype:command-and-control; sid:2000172; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_12;)
+# FP-tightened 2026-05-22: exclude 22/443/2222 (GitHub SSH-over-HTTPS and
+# common alt-SSH jump hosts). Raise threshold from 1 to 5 sessions/hour.
+alert tcp $HOME_NET any -> $EXTERNAL_NET ![22,443,2222] (msg:"Bark&Bite - Iranian APT UNC1549 SSH Reverse Tunnel Non-Standard Port 2025"; flow:to_server,established; content:"SSH-2.0-"; depth:8; threshold:type both, track by_src, count 5, seconds 3600; classtype:command-and-control; sid:2000172; rev:2; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_05_22;)
 
 # UNC1549 - DCSync attack over DRSUAPI (DCSYNCER.SLICK tool)
 alert tcp $HOME_NET any -> $HOME_NET 135 (msg:"Bark&Bite - Iranian APT UNC1549 DCSYNCER SLICK DCSync Attempt 2025"; flow:to_server,established; content:"|05 00 0b|"; depth:3; content:"e3514235-4b06-11d1-ab04-00c04fc2dcd2"; nocase; distance:0; within:200; classtype:credential-theft; sid:2000173; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_12;)
@@ -494,7 +496,9 @@ alert tcp $EXTERNAL_NET any -> $HOME_NET 20256 (msg:"Bark&Bite - Iranian APT Cyb
 #==============================================================================
 
 # MuddyViper - SSH reverse tunnel establishment
-alert tcp $HOME_NET any -> $EXTERNAL_NET 2222:65535 (msg:"Bark&Bite - Iranian APT MuddyWater SSH Tunnel High Port 2025"; flow:to_server,established; content:"SSH-2.0-"; depth:8; threshold:type both, track by_src, count 1, seconds 3600; classtype:command-and-control; sid:2000188; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_12;)
+# FP-tightened 2026-05-22: threshold from 1 to 5 sessions/hour. The high-port
+# range is intentional (MuddyWater behavior) so port narrowing is not safe.
+alert tcp $HOME_NET any -> $EXTERNAL_NET 2222:65535 (msg:"Bark&Bite - Iranian APT MuddyWater SSH Tunnel High Port 2025"; flow:to_server,established; content:"SSH-2.0-"; depth:8; threshold:type both, track by_src, count 5, seconds 3600; classtype:command-and-control; sid:2000188; rev:2; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_05_22;)
 
 # WezRat - Characteristic Chrome cookie database exfiltration over HTTP
 alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Cotton Sandstorm WezRat Cookie Exfil 2026"; flow:to_server,established; content:"POST"; http_method; content:"Cookies"; http_client_body; content:"chrome"; distance:0; within:100; nocase; classtype:trojan-activity; sid:2000189; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_09, updated_at 2026_03_12;)
@@ -855,8 +859,8 @@ alert tcp $HOME_NET any -> $EXTERNAL_NET 22 (msg:"Bark&Bite - Iranian APT DCHSpy
 # TUNING NOTE: .online is a legitimate gTLD with millions of registrations.
 # This rule fires on ANY .online DNS query. In most environments this will be
 # extremely noisy. Recommended: disable unless correlated with other Iranian
-# APT indicators via flowbits. Threshold raised to 50/hour to reduce noise.
-alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT Suspicious .online TLD Resolution 2026"; dns.query; content:".online"; endswith; threshold:type both, track by_src, count 50, seconds 3600; classtype:bad-unknown; sid:2000284; rev:2; metadata:policy max-detect-ips drop, created_at 2026_03_12, updated_at 2026_04_07;)
+# APT indicators via flowbits. Threshold raised 2026-05-22 from 50 to 500/hour.
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT Suspicious .online TLD Resolution 2026"; dns.query; content:".online"; endswith; threshold:type both, track by_src, count 500, seconds 3600; classtype:bad-unknown; sid:2000284; rev:3; metadata:policy max-detect-ips drop, created_at 2026_03_12, updated_at 2026_05_22;)
 
 # Polyglot file download (PDF/HTA/ZIP combinations used by Crafty Camel/APT42)
 alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Polyglot PDF-HTA Download 2026"; flow:to_server,established; content:"GET"; http_method; content:".pdf"; http_uri; content:".hta"; http_uri; classtype:trojan-activity; sid:2000285; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_12, updated_at 2026_03_12;)
@@ -1026,11 +1030,11 @@ alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT ETW 
 #==============================================================================
 
 # Trojanized APK download via bit.ly shortened URLs (common delivery method)
-# FP reduction (rev 2): added threshold — bare bit.ly matching is too broad
-# for production. Threshold limits to 10 unique bit.ly requests per source
-# per hour, which is still useful for burst delivery campaigns while reducing
-# noise from legitimate bit.ly usage.
-alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Shortened URL APK Delivery 2026"; flow:to_server,established; content:"GET"; http_method; content:"bit.ly"; http_host; threshold:type both, track by_src, count 10, seconds 3600; classtype:social-engineering; sid:2000315; rev:2; metadata:policy max-detect-ips drop, created_at 2026_03_12, updated_at 2026_04_05;)
+# FP reduction (rev 3, 2026-05-22): bare bit.ly matching is too broad. Now
+# requires an Android-flavored User-Agent (com.android.* / Dalvik / okhttp) so
+# it scopes to mobile app fetches via short link, not generic browser clicks.
+# Threshold raised 10->50 short-link fetches per hour per source.
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Shortened URL APK Delivery 2026"; flow:to_server,established; content:"GET"; http_method; content:"bit.ly"; http_host; pcre:"/(Dalvik|okhttp|com\.android\.)/V"; threshold:type both, track by_src, count 50, seconds 3600; classtype:social-engineering; sid:2000315; rev:3; metadata:policy max-detect-ips drop, created_at 2026_03_12, updated_at 2026_05_22;)
 
 #==============================================================================
 # SECTION 40: MUDDYWATER KNOWN C2 IPS (MARCH 2026)
@@ -2012,3 +2016,27 @@ alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT MuddyWater Quic
 
 # MuddyWater post-compromise C2 — contacted by renamed pythonw.exe implant
 alert ip $HOME_NET any -> [116.203.208.186] any (msg:"Bark&Bite - Iranian APT MuddyWater Post-Compromise C2 IP 116.203.208.186 2026"; threshold:type limit, track by_src, count 1, seconds 300; reference:url,rapid7.com/blog/post/tr-muddying-tracks-state-sponsored-shadow-behind-chaos-ransomware/; classtype:command-and-control; sid:2000527; rev:1; metadata:policy max-detect-ips drop, created_at 2026_05_12, updated_at 2026_05_12;)
+
+# ============================================================================
+# MUDDYWATER RUSTYWATER RUST RAT (2026)
+# Source: The Hacker News, ProtosLabs, Rescana, CloudSEK — Jan-May 2026
+# Context: MuddyWater (MOIS) Rust-based implant (reddit.exe) deployed via
+#   macro-laden Word docs in spear-phish targeting Middle East diplomatic,
+#   maritime, financial, and telecom sectors. Uses reqwest/tokio crates;
+#   beacons with GET /favicon.ico then HTTP JSON with Base64+XOR layer.
+#   Persistence: HKCU Run -> CertificationKit.ini. Process injection into
+#   explorer.exe via VEH handler. Also tracked as Archer RAT / RUSTRIC.
+# MITRE: T1566.001, T1059.005, T1547.001, T1055, T1071.001
+# ============================================================================
+
+# RustyWater C2 domain DNS lookup
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT MuddyWater RustyWater RAT C2 Domain nomercys.it.com 2026"; dns.query; content:"nomercys.it.com"; nocase; fast_pattern; reference:url,thehackernews.com/2026/01/muddywater-launches-rustywater-rat-via.html; classtype:command-and-control; sid:2000528; rev:1; metadata:policy max-detect-ips drop, created_at 2026_05_22, updated_at 2026_05_22;)
+
+# RustyWater C2 HTTP host header
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater RustyWater RAT HTTP Host nomercys.it.com 2026"; flow:to_server,established; http.host; content:"nomercys.it.com"; nocase; fast_pattern; reference:url,protoslabs.io/resources/rustywater-rust-rat-campaign; classtype:command-and-control; sid:2000529; rev:1; metadata:policy max-detect-ips drop, created_at 2026_05_22, updated_at 2026_05_22;)
+
+# RustyWater C2 TLS SNI (reqwest crate uses HTTPS by default)
+alert tls $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater RustyWater RAT TLS SNI nomercys.it.com 2026"; flow:to_server,established; tls.sni; content:"nomercys.it.com"; nocase; fast_pattern; reference:url,protoslabs.io/resources/rustywater-rust-rat-campaign; classtype:command-and-control; sid:2000530; rev:1; metadata:policy max-detect-ips drop, created_at 2026_05_22, updated_at 2026_05_22;)
+
+# RustyWater direct C2 IP contact (Hostinger AS47583 resolved IP)
+alert ip $HOME_NET any -> [159.198.66.153] any (msg:"Bark&Bite - Iranian APT MuddyWater RustyWater RAT C2 IP 159.198.66.153 2026"; threshold:type limit, track by_src, count 1, seconds 300; reference:url,protoslabs.io/resources/rustywater-rust-rat-campaign; classtype:command-and-control; sid:2000531; rev:1; metadata:policy max-detect-ips drop, created_at 2026_05_22, updated_at 2026_05_22;)
