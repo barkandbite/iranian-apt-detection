@@ -5,6 +5,27 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.19] - 2026-05-13
+
+### Added
+- **4 new MuddyWater Teams false flag campaign rules** (SID 2000524-2000527) — IOCs from Rapid7 Threat Research May 2026 detailing MuddyWater's use of Microsoft Teams social engineering paired with Chaos ransomware as a false flag to mask espionage:
+  - SID 2000524: `moonzonet.com` — Stagecomp next-stage download C2
+  - SID 2000525: `uploadfiler.com` — Encrypted config resolution C2
+  - SID 2000526: `adm-pulse.com` — Quick Assist phishing lure
+  - SID 2000527: `116.203.208.186` — Post-compromise C2 IP (contacted by renamed `pythonw.exe` implant)
+- **Total: 404 Suricata rules** (was 400), SID range: 1000039-2000527
+- Extends existing MuddyWater Stagecomp coverage (SID 2000521-2000523, v4.0.16).
+
+### MITRE ATT&CK
+- T1566.004 (Phishing via Service), T1598 (Phishing for Information), T1219 (Remote Access Software), T1036.005 (Match Legitimate Name or Location)
+
+## [4.0.18] - 2026-05-11
+
+### Fixed
+- **SID 2000022** (Iranian APT Havoc C2 Beacon): Mixed legacy `http_method` content modifier with sticky buffer keywords `http.user_agent` and `http.uri`. Suricata 7.0+ rejects this combination. Converted to consistent sticky buffer syntax: `http.method; content:"GET";`. Bumped to rev 3.
+- **SID 2000026** (Iranian APT PowerShell Download Cradle): Same mixed legacy/sticky issue with `http_method`, `http.user_agent`, `http.cookie`. Converted to sticky buffer syntax. Bumped to rev 3.
+- Same class of issue previously fixed in v4.0.13 (SID 2000462-2000468) and v4.0.17 (SID 2000523).
+
 ## [4.0.17] - 2026-05-08
 
 ### Fixed
