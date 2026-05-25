@@ -2012,3 +2012,40 @@ alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT MuddyWater Quic
 
 # MuddyWater post-compromise C2 — contacted by renamed pythonw.exe implant
 alert ip $HOME_NET any -> [116.203.208.186] any (msg:"Bark&Bite - Iranian APT MuddyWater Post-Compromise C2 IP 116.203.208.186 2026"; threshold:type limit, track by_src, count 1, seconds 300; reference:url,rapid7.com/blog/post/tr-muddying-tracks-state-sponsored-shadow-behind-chaos-ransomware/; classtype:command-and-control; sid:2000527; rev:1; metadata:policy max-detect-ips drop, created_at 2026_05_12, updated_at 2026_05_12;)
+
+# ============================================================================
+# CVE-2025-34291 — Langflow Origin Validation / Account Takeover + RCE
+# Source: Obsidian Security, CISA KEV (added 2026-05-21, deadline 2026-06-04),
+#         Snyk SNYK-PYTHON-LANGFLOWBASE-14221425, The Hacker News May 2026.
+# Context: Langflow <= 1.6.9 ships an overly permissive CORS policy and a
+#   refresh-token cookie configured with SameSite=None. An authenticated
+#   user who visits an attacker-controlled page has their session token
+#   stolen via cross-origin POST to /api/v1/refresh; the attacker then
+#   POSTs Python to /api/v1/validate/code (RCE-by-design endpoint) and
+#   executes code as the Langflow service account. Public reporting
+#   attributes in-the-wild exploitation to MuddyWater (MOIS-linked) for
+#   initial access into target networks.
+# Deployment note: assumes HOME_NET hosts the Langflow instance and the
+#   service is reachable from EXTERNAL_NET. If Langflow is internal-only,
+#   the cross-origin attack still applies — set rule direction accordingly.
+# MITRE: T1190 (Exploit Public-Facing Application), T1059.006 (Python),
+#        T1199 (Trusted Relationship)
+# ============================================================================
+
+# Langflow refresh-token cross-origin theft attempt. External POST to
+# /api/v1/refresh — the CORS-bypass entry point of the exploit chain.
+# Normal Langflow web traffic from the official UI is same-origin and
+# should not arrive from EXTERNAL_NET against a public Langflow.
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT MuddyWater CVE-2025-34291 Langflow Cross-Origin Refresh Token Theft 2026"; flow:to_server,established; http.method; content:"POST"; http.uri; content:"/api/v1/refresh"; fast_pattern; threshold:type both, track by_src, count 1, seconds 60; reference:cve,2025-34291; reference:url,obsidiansecurity.com/blog/cve-2025-34291-critical-account-takeover-and-rce-vulnerability-in-the-langflow-ai-agent-workflow-platform; classtype:attempted-user; sid:2000534; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_05_25, updated_at 2026_05_25;)
+
+# Langflow code-validation RCE endpoint touched from external. The
+# /api/v1/validate/code endpoint is RCE-by-design — Langflow uses it to
+# validate user-supplied flow node code. External POSTs are the
+# post-token-theft RCE step of the CVE-2025-34291 chain.
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT MuddyWater CVE-2025-34291 Langflow validate/code Endpoint External Access 2026"; flow:to_server,established; http.method; content:"POST"; http.uri; content:"/api/v1/validate/code"; fast_pattern; flowbits:set,iranian.langflow.cve34291; reference:cve,2025-34291; reference:url,thehackernews.com/2026/05/cisa-adds-exploited-langflow-and-trend.html; classtype:attempted-admin; sid:2000535; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_05_25, updated_at 2026_05_25;)
+
+# Langflow validate/code RCE Python payload. High-confidence — request
+# body to /api/v1/validate/code containing exec/eval/__import__/subprocess/
+# os.system/os.popen. These primitives in a "validation" payload indicate
+# active RCE attempt (not a real flow-node validation).
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT MuddyWater CVE-2025-34291 Langflow RCE Python exec Payload 2026"; flow:to_server,established; http.method; content:"POST"; http.uri; content:"/api/v1/validate/code"; fast_pattern; http.request_body; pcre:"/(exec|eval|__import__|subprocess|os\.system|os\.popen)\s*\(/"; reference:cve,2025-34291; reference:url,obsidiansecurity.com/blog/cve-2025-34291-critical-account-takeover-and-rce-vulnerability-in-the-langflow-ai-agent-workflow-platform; classtype:web-application-attack; sid:2000536; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_05_25, updated_at 2026_05_25;)

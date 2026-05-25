@@ -5,6 +5,30 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.21] - 2026-05-25
+
+### Added
+- **3 new Suricata rules for CVE-2025-34291 Langflow Origin Validation / RCE** (SID 2000534-2000536) — CISA KEV added 2026-05-21 with federal remediation deadline 2026-06-04. Public reporting attributes in-the-wild exploitation to MuddyWater (Iranian MOIS-linked) for initial access. The bug combines a permissive CORS policy with a `SameSite=None` refresh-token cookie and an RCE-by-design `/api/v1/validate/code` endpoint:
+  - SID 2000534: Cross-origin POST to `/api/v1/refresh` (CORS bypass entry point), threshold 1/60s per source
+  - SID 2000535: External POST to `/api/v1/validate/code` (sensitive RCE endpoint, sets `iranian.langflow.cve34291` flowbit)
+  - SID 2000536: POST to `/api/v1/validate/code` containing Python `exec`/`eval`/`__import__`/`subprocess`/`os.system`/`os.popen` patterns (high-confidence RCE)
+- **1 new Wazuh rule** (101522): Langflow `python`/`uvicorn` parent process spawning shell or download tool — host-side post-RCE signature.
+- **Total: 407 Suricata rules** (was 404), SID range: 1000039-2000536. **Total Wazuh rules: 272.**
+
+### Sources
+- [Obsidian Security: CVE-2025-34291 Critical Account Takeover and RCE](https://www.obsidiansecurity.com/blog/cve-2025-34291-critical-account-takeover-and-rce-vulnerability-in-the-langflow-ai-agent-workflow-platform)
+- [The Hacker News: CISA Adds Exploited Langflow and Trend Micro Apex One Vulnerabilities](https://thehackernews.com/2026/05/cisa-adds-exploited-langflow-and-trend.html)
+- [Snyk SNYK-PYTHON-LANGFLOWBASE-14221425](https://security.snyk.io/vuln/SNYK-PYTHON-LANGFLOWBASE-14221425)
+
+### MITRE ATT&CK
+- T1190 (Exploit Public-Facing Application)
+- T1059.006 (Command and Scripting Interpreter: Python)
+- T1199 (Trusted Relationship)
+
+### Notes
+- The earlier Langflow CVE (CVE-2026-33017, `/api/v1/build_public_tmp/` RCE) is covered in the by-country crosscountry file (SID 1100111-1100113), not Iran-attributed. CVE-2025-34291 is distinct (CORS bypass + validate/code) and attributed to MuddyWater, so it lives in the Iran ruleset.
+- v4.0.18, v4.0.19, v4.0.20 entries remain pending in older docs PRs (#11/#13/#14/#15/#16) and are not duplicated here. This entry is independent of that resolution.
+
 ## [4.0.17] - 2026-05-08
 
 ### Fixed
