@@ -16,8 +16,14 @@ Three concurrent Iranian campaigns targeting U.S. healthcare disclosed March 24:
 - **Pay2Key v3** (IRGC) hit unnamed U.S. healthcare org with **ChaCha20 + Curve25519** ransomware. Fake Avast AV bypass. **I2P C2** (not Tor). Purely destructive — no ransom demand.
 - **MuddyWater** exploiting **CVE-2025-59287** (Windows WSUS Deserialization RCE, CVSS 9.8) to pre-position on healthcare networks.
 
-## Recent Threats (v4.0.13)
+## Recent Threats (v4.0.19)
 
+- **NEW (v4.0.19)**: MuddyWater **Microsoft Teams false flag** ransomware campaign — 4 rules covering Stagecomp/encrypted-config C2 domains, Quick Assist phishing lure, post-compromise IP `116.203.208.186` (Rapid7 May 2026)
+- **FIXED (v4.0.18)**: SID 2000022 (Havoc C2 Beacon) and SID 2000026 (PowerShell Download Cradle) — converted mixed legacy/sticky-buffer syntax (same class as v4.0.13/v4.0.17)
+- **FIXED (v4.0.17)**: SID 2000523 sticky buffer ordering for Suricata 7.0.3 parser
+- **NEW (v4.0.16)**: MuddyWater **Stagecomp/Darkcomp** staging IPs (`172.86.126.208`, `172.86.76.127`) + `ms_upd.exe` dropper behavioral (Rapid7)
+- **NEW (v4.0.15)**: Prince of Persia **Infy Foudre** replacement C2 IPs after seizure
+- **NEW (v4.0.14)**: Cloud C2 domain IOCs from Trellix report
 - **FIXED (v4.0.13)**: 4 Suricata rules — **sticky buffer ordering** fix for Suricata 7.0.3 validation (SIDs 2000462, 2000463, 2000465, 2000468)
 - **NEW (v4.0.12)**: APT34/OilRig **Dark Scepter C2** — 12 Cloudflare-fronted domains + M247 hosting IP (Hunt.io Apr 2026)
 - **NEW (v4.0.12)**: MuddyWater **AS136557** C2 IP targeting US/Israeli infrastructure (Oasis Security)
@@ -65,7 +71,7 @@ sudo systemctl restart wazuh-manager
 
 ### 2. Deploy Suricata Rules
 ```bash
-# Deploy consolidated rules (v4.0 — single file, 392 signatures)
+# Deploy consolidated rules (v4.0.19 — single file, 404 signatures)
 sudo cp suricata/iranian-apt-detection.rules /etc/suricata/rules/
 
 # Add to suricata.yaml rule-files section:
@@ -185,7 +191,7 @@ iranian-apt-detection/
 │   ├── 0919-iranian-apt-march2026-expansion.xml
 │   └── README.md
 ├── suricata/                  # Network IDS signatures
-│   ├── iranian-apt-detection.rules  # Consolidated v4.0 (392 rules)
+│   ├── iranian-apt-detection.rules  # Consolidated v4.0.19 (404 rules)
 │   └── README.md
 ├── configurations/            # Agent and system configs
 │   ├── sysmon-config-iranian-apt.xml
@@ -303,4 +309,4 @@ These rules are provided as-is for defensive purposes. Users are responsible for
 
 ---
 
-**Last Updated**: May 1, 2026 | **Version**: 4.0.13 | **Maintainer**: Bark&Bite Security Intelligence
+**Last Updated**: May 13, 2026 | **Version**: 4.0.19 | **Maintainer**: Bark&Bite Security Intelligence
