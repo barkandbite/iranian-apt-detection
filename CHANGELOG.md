@@ -5,6 +5,24 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.19] - 2026-05-13
+
+### Added
+- **4 new MuddyWater Microsoft Teams false-flag ransomware C2 rules** (SID 2000524-2000527) — IOCs from Rapid7 Threat Research (May 2026), extending the SID 2000521-2000523 Stagecomp/Darkcomp set:
+  - SID 2000524: `moonzonet.com` — Stagecomp C2 domain (DNS query)
+  - SID 2000525: `uploadfiler.com` — encrypted-config C2 domain (DNS query)
+  - SID 2000526: `adm-pulse.com` — Quick Assist phishing lure domain (DNS query)
+  - SID 2000527: `116.203.208.186` — post-compromise C2 IP
+- **Total: 404 Suricata rules** (was 400), SID range: 1000039-2000527
+
+### MITRE ATT&CK
+- T1566.004 (Phishing: Spearphishing Voice), T1598 (Phishing for Information), T1219 (Remote Access Software), T1036.005 (Match Legitimate Name or Location)
+
+## [4.0.18] - 2026-05-11
+
+### Fixed
+- **SID 2000022** (Havoc C2 Beacon) and **SID 2000026** (PowerShell Download Cradle): mixed the legacy `http_method` content modifier with sticky-buffer keywords (`http.user_agent`/`http.uri`/`http.cookie`), which Suricata 7.x rejects. Converted to consistent sticky-buffer syntax (`http.method; content:"GET";`). Same class of issue fixed in v4.0.13 and v4.0.17. Bumped to rev 13 (2000022) and rev 10 (2000026).
+
 ## [4.0.17] - 2026-05-08
 
 ### Fixed

@@ -1,6 +1,6 @@
 # Iranian APT Detection Rules
 
-[![Version](https://img.shields.io/badge/version-4.0.14-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.0.19-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![MITRE ATT&CK](https://img.shields.io/badge/MITRE%20ATT%26CK-v15-orange.svg)](documentation/MITRE-ATT&CK-Mapping.md)
 
@@ -16,8 +16,13 @@ Three concurrent Iranian campaigns targeting U.S. healthcare disclosed March 24:
 - **Pay2Key v3** (IRGC) hit unnamed U.S. healthcare org with **ChaCha20 + Curve25519** ransomware. Fake Avast AV bypass. **I2P C2** (not Tor). Purely destructive — no ransom demand.
 - **MuddyWater** exploiting **CVE-2025-59287** (Windows WSUS Deserialization RCE, CVSS 9.8) to pre-position on healthcare networks.
 
-## Recent Threats (v4.0.13)
+## Recent Threats (v4.0.19)
 
+- **NEW (v4.0.19)**: MuddyWater **Microsoft Teams false-flag ransomware C2** — `moonzonet.com`, `uploadfiler.com`, `adm-pulse.com`, `116.203.208.186` (SID 2000524-2000527, Rapid7 May 2026). 404 rules total.
+- **FIXED (v4.0.18)**: SID 2000022/2000026 — converted mixed legacy/sticky-buffer syntax to consistent sticky buffers for Suricata 7.x
+- **FIXED (v4.0.17)**: SID 2000523 — sticky buffer ordering fix for Suricata 7.0.3 validation
+- **NEW (v4.0.16)**: MuddyWater **Stagecomp/Darkcomp** staging infrastructure (SID 2000521-2000523, Rapid7 May 2026)
+- **NEW (v4.0.15)**: Prince of Persia (Infy) **Foudre replacement C2 IPs** (SID 2000519-2000520, SafeBreach)
 - **FIXED (v4.0.13)**: 4 Suricata rules — **sticky buffer ordering** fix for Suricata 7.0.3 validation (SIDs 2000462, 2000463, 2000465, 2000468)
 - **NEW (v4.0.12)**: APT34/OilRig **Dark Scepter C2** — 12 Cloudflare-fronted domains + M247 hosting IP (Hunt.io Apr 2026)
 - **NEW (v4.0.12)**: MuddyWater **AS136557** C2 IP targeting US/Israeli infrastructure (Oasis Security)
@@ -65,7 +70,7 @@ sudo systemctl restart wazuh-manager
 
 ### 2. Deploy Suricata Rules
 ```bash
-# Deploy consolidated rules (v4.0 — single file, 392 signatures)
+# Deploy consolidated rules (v4.0 — single file, 404 signatures)
 sudo cp suricata/iranian-apt-detection.rules /etc/suricata/rules/
 
 # Add to suricata.yaml rule-files section:
@@ -185,7 +190,7 @@ iranian-apt-detection/
 │   ├── 0919-iranian-apt-march2026-expansion.xml
 │   └── README.md
 ├── suricata/                  # Network IDS signatures
-│   ├── iranian-apt-detection.rules  # Consolidated v4.0 (392 rules)
+│   ├── iranian-apt-detection.rules  # Consolidated v4.0 (404 rules)
 │   └── README.md
 ├── configurations/            # Agent and system configs
 │   ├── sysmon-config-iranian-apt.xml
@@ -303,4 +308,4 @@ These rules are provided as-is for defensive purposes. Users are responsible for
 
 ---
 
-**Last Updated**: May 1, 2026 | **Version**: 4.0.13 | **Maintainer**: Bark&Bite Security Intelligence
+**Last Updated**: May 13, 2026 | **Version**: 4.0.19 | **Maintainer**: Bark&Bite Security Intelligence
