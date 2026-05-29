@@ -1,7 +1,7 @@
  # Bark & Bite — Iranian APT Detection Rules (Consolidated)
 # File: iranian-apt-detection.rules
-# Version: 4.0.10
-# Last Updated: 2026-04-19
+# Version: 4.0.19
+# Last Updated: 2026-05-12
 # Credit: Bark & Bite Security
 # License: MIT
 # Repository: https://github.com/barkandbite/iranian-apt-detection

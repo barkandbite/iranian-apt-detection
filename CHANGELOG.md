@@ -5,6 +5,24 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.19] - 2026-05-12
+
+### Added
+- **4 new MuddyWater "Teams false flag" C2 detection rules** (SID 2000524-2000527) — IOCs from the Rapid7 "Muddying the Tracks: The State-Sponsored Shadow Behind Chaos Ransomware" report (May 2026). MuddyWater used Microsoft Teams social engineering and Quick Assist abuse while masquerading the intrusion as commodity ransomware:
+  - SID 2000524: `moonzonet.com` — Stagecomp C2 domain (DNS)
+  - SID 2000525: `uploadfiler.com` — encrypted config retrieval C2 domain (DNS)
+  - SID 2000526: `adm-pulse.com` — Quick Assist phishing domain (DNS)
+  - SID 2000527: `116.203.208.186` — post-compromise C2 IP
+- **Total: 404 Suricata rules** (was 400), SID range: 1000039-2000527
+
+### MITRE ATT&CK
+- T1071.001 (Web Protocols), T1656 (Impersonation), T1219 (Remote Access Software), T1583.001 (Domains)
+
+## [4.0.18] - 2026-05-08
+
+### Fixed
+- **SID 2000022 (Havoc C2 Beacon) and SID 2000026 (PowerShell Download Cradle)**: Removed mixed legacy `http_header`/`http_cookie` modifiers used alongside sticky `http.user_agent` buffers, which Suricata 7.0.3 rejects without a `pkt_data` reset. Converted to consistent sticky-buffer syntax (`http.user_agent; ... http.cookie;` and `http.user_agent; ... http.uri;`). Bumped to rev 13 and rev 10 respectively. Same class of issue as v4.0.13/v4.0.17.
+
 ## [4.0.17] - 2026-05-08
 
 ### Fixed
