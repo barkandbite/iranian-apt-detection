@@ -5,6 +5,49 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.20] - 2026-05-30
+
+### Added
+- **12 new Screening Serpens (UNC1549) MiniUpdate and MiniJunk V2 RAT rules** (SID 2000528-2000539) — IOCs from Unit 42 May 27 disclosure tracking 6 RAT variants Iranian-nexus actor Screening Serpens deployed Feb-Apr 2026 against US, Israel, UAE and likely 2 other Middle Eastern entities during the regional conflict:
+  - SID 2000528: MiniUpdate Azure C2 domain pattern `buisness-centeral*.azurewebsites.net` (typo'd "business central")
+  - SID 2000529: MiniUpdate Azure C2 domain pattern `premier*healthadvisory*.azurewebsites.net`
+  - SID 2000530: MiniUpdate Azure C2 domain pattern `ramiltons*finance*.azurewebsites.net`
+  - SID 2000531-2000533: MiniUpdate APEX-style impersonation domains (`.com` variants of the three families above)
+  - SID 2000534: MiniJunk V2 Azure C2 `Manager`-suffix naming cluster (licencemanagers, LicenceSupporting, PeerDistSvcManagers, ThemesManagers, ThemesProviderManagers)
+  - SID 2000535: MiniJunk V2 Azure C2 abstract-noun cluster (NanoMatrix, QuantumWeave, ElementShift)
+  - SID 2000536: MiniUpdate `/agent/poll` beacon endpoint behavioral (Chrome 146 UA + `.azurewebsites.net` host)
+  - SID 2000537: MiniJunk V2 `/api/app/{check,update,comment}` beacon endpoint behavioral (Edg/144 UA + `.azurewebsites.net` host)
+  - SID 2000538: MiniUpdate staging download via filemail.com (long `filekey=` URL parameter)
+  - SID 2000539: MiniUpdate staging download via OnlyOffice docspace (`/storage/files/root/folder_*/file_*/content.zip`)
+- **Total: 416 Suricata rules** (was 404), SID range: 1000039-2000539
+- Targeting: U.S., Israel, UAE + likely 2 additional Middle Eastern entities. Aligns with regional conflict from Feb 28, 2026.
+- Notable evolution: AppDomainManager hijacking (T1574.014) for .NET security bypass. ~12MB junk padding to evade sandbox size limits (MiniJunk V2). Single-byte XOR (key 0x8A) for C2 domain and UA string decryption.
+- Existing UNC1549 coverage preserved: SID 2000434 (POLLBLEND), 2000437 (MINIBIKE), 2000438 (GHOSTLINE) — March 2025 campaign cluster.
+
+### MITRE ATT&CK
+- T1574.002 (DLL sideloading), T1574.014 (AppDomainManager Injection), T1071.001 (Web Protocols), T1102.002 (Bidirectional Comm), T1583.006 (Web Services), T1027 (Obfuscated Files/Info)
+
+## [4.0.19] - 2026-05-12
+
+### Added
+- **4 new MuddyWater Teams false flag campaign rules** (SID 2000524-2000527) — IOCs from Rapid7 TR-Muddying-Tracks report (THN May 12, 2026). MuddyWater (MOIS-affiliated) used Microsoft Teams social engineering plus Chaos ransomware false flag to mask espionage operations:
+  - SID 2000524: C2 domain `moonzonet.com` (Stagecomp next-stage download)
+  - SID 2000525: C2 domain `uploadfiler.com` (encrypted Darkcomp config resolution)
+  - SID 2000526: Phishing domain `adm-pulse.com` (Quick Assist social-engineering lure)
+  - SID 2000527: C2 IP `116.203.208.186` (contacted by renamed pythonw.exe implant)
+- **Total: 404 Suricata rules** (was 400), SID range: 1000039-2000527
+- Extends v4.0.16 staging coverage (SID 2000521-2000523).
+
+### MITRE ATT&CK
+- T1566.004 (Phishing — Spearphishing Voice), T1598 (Phishing for Information), T1219 (Remote Access Software), T1036.005 (Match Legitimate Name or Location)
+
+## [4.0.18] - 2026-05-11
+
+### Fixed
+- **SID 2000022** (Iranian APT Havoc C2 Beacon): Mixed legacy `http_method` modifier with sticky buffer keywords (`http.user_agent`, `http.cookie`) — fails to parse on Suricata 7.0.3. Converted to consistent sticky buffer syntax: `http.method; content:"GET";`. Bumped to rev 13.
+- **SID 2000026** (Iranian APT PowerShell Download Cradle): Same class of mixed legacy/sticky issue (`http_method` mixed with `http.user_agent` and `http.uri`). Converted to sticky. Bumped to rev 10.
+- Same issue class previously fixed in v4.0.13 (SID 2000462-2000468) and v4.0.17 (SID 2000523).
+
 ## [4.0.17] - 2026-05-08
 
 ### Fixed
