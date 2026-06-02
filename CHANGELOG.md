@@ -5,6 +5,28 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.19] - 2026-05-12
+
+### Added
+- **4 new MuddyWater Teams false-flag C2 rules** (SID 2000524-2000527) — IOCs from Rapid7 / SecurityWeek / The Hacker News May 2026 reporting on the MuddyWater Teams-pretexted social-engineering campaign that masqueraded as IT support via Quick Assist to deploy the Stagecomp dropper, then ran Chaos ransomware as a false flag to mask espionage:
+  - SID 2000524: C2 domain `moonzonet.com` — Stagecomp next-stage download
+  - SID 2000525: C2 domain `uploadfiler.com` — encrypted config resolution
+  - SID 2000526: Phishing domain `adm-pulse.com` — Quick Assist lure landing page
+  - SID 2000527: Post-compromise C2 IP `116.203.208.186` — contacted by renamed `pythonw.exe` implant
+- Extends existing MuddyWater Stagecomp coverage:
+  - SID 2000521 (172.86.126.208 download server)
+  - SID 2000522 (172.86.76.127 toolkit hosting open directory)
+  - SID 2000523 (behavioral `ms_upd.exe` dropper filename)
+- **Total: 404 Suricata rules** (was 400), SID range: 1000039-2000527
+
+### MITRE ATT&CK
+- T1566.004 (Spearphishing via Service), T1598 (Phishing for Information), T1219 (Remote Access Software — Quick Assist abuse), T1036.005 (Match Legitimate Name or Location — renamed pythonw.exe)
+
+## [4.0.18] - 2026-05-09
+
+### Fixed
+- **SID 2000022 and SID 2000026** mixed legacy/sticky HTTP buffer syntax — both rules combined the legacy `http_header` modifier with the modern `http.user_agent` sticky buffer without a `pkt_data` reset between them. Suricata 7.0.3 silently dropped both rules during load (no error printed, no alerts produced) — the same failure class documented in CHANGELOG v0.6.1 of the original deployment guide. Resolved by converting both rules to consistent modern sticky-buffer syntax. Bumped both rules to rev 2.
+
 ## [4.0.17] - 2026-05-08
 
 ### Fixed

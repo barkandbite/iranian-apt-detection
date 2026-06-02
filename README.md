@@ -1,6 +1,7 @@
 # Iranian APT Detection Rules
 
-[![Version](https://img.shields.io/badge/version-4.0.14-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.0.19-blue.svg)](CHANGELOG.md)
+[![Rules](https://img.shields.io/badge/rules-404-orange.svg)](suricata/iranian-apt-detection.rules)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![MITRE ATT&CK](https://img.shields.io/badge/MITRE%20ATT%26CK-v15-orange.svg)](documentation/MITRE-ATT&CK-Mapping.md)
 
@@ -16,8 +17,14 @@ Three concurrent Iranian campaigns targeting U.S. healthcare disclosed March 24:
 - **Pay2Key v3** (IRGC) hit unnamed U.S. healthcare org with **ChaCha20 + Curve25519** ransomware. Fake Avast AV bypass. **I2P C2** (not Tor). Purely destructive — no ransom demand.
 - **MuddyWater** exploiting **CVE-2025-59287** (Windows WSUS Deserialization RCE, CVSS 9.8) to pre-position on healthcare networks.
 
-## Recent Threats (v4.0.13)
+## Recent Threats (v4.0.19)
 
+- **NEW (v4.0.19)**: MuddyWater **Teams false-flag C2** — 4 IOCs (`moonzonet.com`, `uploadfiler.com`, `adm-pulse.com`, `116.203.208.186`) from Rapid7/SecurityWeek/THN May 2026 report on Quick Assist pretexting + Chaos ransomware false flag (SID 2000524-2000527)
+- **FIXED (v4.0.18)**: SID 2000022 and SID 2000026 mixed legacy/sticky HTTP buffer syntax — both rules silently dropped at Suricata 7.0.3 load. Same class of issue as v0.6.1 production outage. Converted to consistent sticky-buffer syntax
+- **FIXED (v4.0.17)**: SID 2000523 sticky-buffer ordering parse error (same class as v4.0.13)
+- **NEW (v4.0.16)**: MuddyWater **Stagecomp/Darkcomp staging infrastructure** — 3 rules (172.86.126.208, 172.86.76.127, `ms_upd.exe` behavioral) from Rapid7 false-flag campaign report (SID 2000521-2000523)
+- **NEW (v4.0.15)**: Prince of Persia (Infy) **Foudre replacement C2 IPs** — 2 rules (45.80.148.249, 45.80.149.3) per SafeBreach IOC currency audit confirming 45.80.148.195 abandoned Dec 2025 (SID 2000519-2000520)
+- **NEW (v4.0.14)**: Iranian APT **cloud C2 domain** DNS detection — 3 rules from Trellix "Iranian Cyber Capability 2026" report (`datadrift.somee.com`, `prism-west-candy.glitch.me`, `line.completely.workers.dev` — SID 2000516-2000518)
 - **FIXED (v4.0.13)**: 4 Suricata rules — **sticky buffer ordering** fix for Suricata 7.0.3 validation (SIDs 2000462, 2000463, 2000465, 2000468)
 - **NEW (v4.0.12)**: APT34/OilRig **Dark Scepter C2** — 12 Cloudflare-fronted domains + M247 hosting IP (Hunt.io Apr 2026)
 - **NEW (v4.0.12)**: MuddyWater **AS136557** C2 IP targeting US/Israeli infrastructure (Oasis Security)
