@@ -5,7 +5,26 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [4.0.17] - 2026-05-08
+## [4.0.19] - 2026-05-13
+
+### Added
+- **4 new MuddyWater Teams false flag C2 rules** (SID 2000524-2000527) — IOC infrastructure from the MuddyWater Microsoft Teams impersonation campaign targeting U.S./Israeli organizations. False-flag staging where the actor masquerades as IT support over Teams to lure victims to credential-harvesting payloads:
+  - SID 2000524: `moonzonet.com` (Teams-themed credential portal)
+  - SID 2000525: `uploadfiler.com` (payload staging)
+  - SID 2000526: `adm-pulse.com` (admin-themed C2)
+  - SID 2000527: `116.203.208.186` (Hetzner-hosted Teams false flag C2 IP)
+- **Total: 404 Suricata rules** (was 400), SID range: 1000039-2000527
+
+### MITRE ATT&CK
+- T1566.004 (Spearphishing Voice), T1071.001 (Web Protocols), T1036.005 (Match Legitimate Name or Location), T1657 (Financial Theft)
+
+## [4.0.18] - 2026-05-11
+
+### Fixed
+- **SID 2000022 + SID 2000026** (MuddyWater PowerShell encoded command behavioral; APT34 Karkoff TLS C2 cert): Mixed legacy/sticky buffer syntax — `http.user_agent; content:"..."; http_header;` simultaneously used the modern sticky buffer (`http.user_agent`) alongside the legacy content modifier (`http_header`) without a `pkt_data` reset. Suricata 7.0+ strict parser rejected both rules. Refactored to consistent sticky-buffer style: `http.user_agent; content:"..."; http.header; content:"...";`. Both bumped to rev 2.
+- Same syntax class as the production outage tracked in v0.6.1 CHANGELOG. Audit script (`tools/check_buffer_mixing.py`) added in v4.0.13 should have caught this — root cause was that the audit script's regex didn't match rules with `http_header` (underscore) following `http.X` (dot). Audit script regex updated to catch both orderings.
+
+## [4.0.17] - 2026-05-09
 
 ### Fixed
 - **SID 2000523** (MuddyWater Stagecomp dropper behavioral): Reversed sticky buffer ordering caused Suricata 7.0.3 parse error. `content:"GET"; http.method;` → `http.method; content:"GET";`. Same class of issue fixed in v4.0.13 (SID 2000462-2000468). Bumped to rev 2.

@@ -1,6 +1,6 @@
 # Iranian APT Detection Rules
 
-[![Version](https://img.shields.io/badge/version-4.0.14-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.0.19-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![MITRE ATT&CK](https://img.shields.io/badge/MITRE%20ATT%26CK-v15-orange.svg)](documentation/MITRE-ATT&CK-Mapping.md)
 
@@ -16,8 +16,14 @@ Three concurrent Iranian campaigns targeting U.S. healthcare disclosed March 24:
 - **Pay2Key v3** (IRGC) hit unnamed U.S. healthcare org with **ChaCha20 + Curve25519** ransomware. Fake Avast AV bypass. **I2P C2** (not Tor). Purely destructive — no ransom demand.
 - **MuddyWater** exploiting **CVE-2025-59287** (Windows WSUS Deserialization RCE, CVSS 9.8) to pre-position on healthcare networks.
 
-## Recent Threats (v4.0.13)
+## Recent Threats (v4.0.19)
 
+- **NEW (v4.0.19)**: MuddyWater **Microsoft Teams false flag** — 3 C2 domains (moonzonet.com, uploadfiler.com, adm-pulse.com) + Hetzner IP 116.203.208.186 targeting U.S./Israeli orgs via Teams-impersonation IT support lure
+- **FIXED (v4.0.18)**: SID 2000022 (MuddyWater PowerShell behavioral) + SID 2000026 (APT34 Karkoff TLS C2) — mixed legacy/sticky buffer syntax fixed for Suricata 7.0+ strict parser
+- **FIXED (v4.0.17)**: SID 2000523 (MuddyWater Stagecomp dropper) — reversed sticky buffer ordering
+- **NEW (v4.0.16)**: MuddyWater **Stagecomp/Darkcomp** staging IPs (172.86.126.208, 172.86.76.127) + ms_upd.exe dropper behavioral — Rapid7 false flag ransomware report (May 6, 2026)
+- **NEW (v4.0.15)**: Prince of Persia/Infy **Foudre replacement C2 IPs** (45.80.148.249, 45.80.149.3) — SafeBreach confirmed 45.80.148.195 abandoned Dec 2025
+- **NEW (v4.0.14)**: Iranian APT **cloud C2 domain IOCs** — datadrift.somee.com (MuddyWater on ASP.NET), prism-west-candy.glitch.me (Glitch containers), line.completely.workers.dev (Cloudflare Workers)
 - **FIXED (v4.0.13)**: 4 Suricata rules — **sticky buffer ordering** fix for Suricata 7.0.3 validation (SIDs 2000462, 2000463, 2000465, 2000468)
 - **NEW (v4.0.12)**: APT34/OilRig **Dark Scepter C2** — 12 Cloudflare-fronted domains + M247 hosting IP (Hunt.io Apr 2026)
 - **NEW (v4.0.12)**: MuddyWater **AS136557** C2 IP targeting US/Israeli infrastructure (Oasis Security)
@@ -65,7 +71,7 @@ sudo systemctl restart wazuh-manager
 
 ### 2. Deploy Suricata Rules
 ```bash
-# Deploy consolidated rules (v4.0 — single file, 392 signatures)
+# Deploy consolidated rules (v4.0 — single file, 404 signatures)
 sudo cp suricata/iranian-apt-detection.rules /etc/suricata/rules/
 
 # Add to suricata.yaml rule-files section:
@@ -122,7 +128,7 @@ sudo chmod +x /var/ossec/active-response/bin/iranian-apt-active-response.sh
 
 ### Rule Statistics
 - **Wazuh Rules**: 271 detection rules across 10 files
-- **Suricata Signatures**: 392 network signatures (1 consolidated rule file)
+- **Suricata Signatures**: 404 network signatures (1 consolidated rule file)
 - **CVEs Covered**: 40+ including 2025/2026 zero-days
 - **Known C2 IPs**: 37+
 - **Known C2 Domains**: 37+
@@ -185,7 +191,7 @@ iranian-apt-detection/
 │   ├── 0919-iranian-apt-march2026-expansion.xml
 │   └── README.md
 ├── suricata/                  # Network IDS signatures
-│   ├── iranian-apt-detection.rules  # Consolidated v4.0 (392 rules)
+│   ├── iranian-apt-detection.rules  # Consolidated v4.0 (404 rules)
 │   └── README.md
 ├── configurations/            # Agent and system configs
 │   ├── sysmon-config-iranian-apt.xml
