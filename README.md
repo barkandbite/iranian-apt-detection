@@ -1,6 +1,6 @@
 # Iranian APT Detection Rules
 
-[![Version](https://img.shields.io/badge/version-4.0.14-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.0.19-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![MITRE ATT&CK](https://img.shields.io/badge/MITRE%20ATT%26CK-v15-orange.svg)](documentation/MITRE-ATT&CK-Mapping.md)
 
@@ -16,8 +16,12 @@ Three concurrent Iranian campaigns targeting U.S. healthcare disclosed March 24:
 - **Pay2Key v3** (IRGC) hit unnamed U.S. healthcare org with **ChaCha20 + Curve25519** ransomware. Fake Avast AV bypass. **I2P C2** (not Tor). Purely destructive — no ransom demand.
 - **MuddyWater** exploiting **CVE-2025-59287** (Windows WSUS Deserialization RCE, CVSS 9.8) to pre-position on healthcare networks.
 
-## Recent Threats (v4.0.13)
+## Recent Threats (v4.0.19)
 
+- **NEW (v4.0.19)**: MuddyWater **Microsoft Teams false flag** C2 — Quick Assist phishing pretext, 3 C2 domains (moonzonet.com, uploadfiler.com, adm-pulse.com) + Hetzner post-compromise IP (SID 2000524-2000527, Rapid7 May 2026)
+- **FIXED (v4.0.18)**: 2 Suricata rules — mixed legacy/sticky buffer migration for SID 2000022 Havoc C2 + SID 2000026 PowerShell Download Cradle (Suricata 7.0.3 strict validation)
+- **NEW (v4.0.17/16)**: MuddyWater **Stagecomp/Darkcomp** false flag ransomware — 2 staging IPs + ms_upd.exe dropper behavioral (SID 2000521-2000523, Rapid7 May 2026)
+- **NEW (v4.0.15)**: Prince of Persia (Infy) **Foudre replacement C2** — SafeBreach confirmed 45.80.148.195 abandoned, replaced by 45.80.148.249 + 45.80.149.3 (SID 2000519-2000520)
 - **FIXED (v4.0.13)**: 4 Suricata rules — **sticky buffer ordering** fix for Suricata 7.0.3 validation (SIDs 2000462, 2000463, 2000465, 2000468)
 - **NEW (v4.0.12)**: APT34/OilRig **Dark Scepter C2** — 12 Cloudflare-fronted domains + M247 hosting IP (Hunt.io Apr 2026)
 - **NEW (v4.0.12)**: MuddyWater **AS136557** C2 IP targeting US/Israeli infrastructure (Oasis Security)
