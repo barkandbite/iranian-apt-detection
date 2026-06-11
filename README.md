@@ -312,4 +312,4 @@ These rules are provided as-is for defensive purposes. Users are responsible for
 
 ---
 
-**Last Updated**: May 1, 2026 | **Version**: 4.0.13 | **Maintainer**: Bark&Bite Security Intelligence
+**Last Updated**: June 11, 2026 | **Version**: 4.0.21 | **Maintainer**: Bark&Bite Security Intelligence
