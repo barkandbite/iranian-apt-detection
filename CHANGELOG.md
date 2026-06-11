@@ -5,6 +5,21 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.20] - 2026-05-18
+
+### Added
+- **6 new CyberAv3ngers Rockwell/Allen-Bradley PLC targeting rules** (SID 2000528-2000533) — CISA AA26-097A (April 7, 2026). IRGC-CEC actors exploiting internet-exposed CompactLogix and Micro850 PLCs using legitimate Studio 5000 Logix Designer:
+  - SID 2000528: Known operator IPs `185.82.73.160/.161/.163/.166` (AS214036 multi-homed workstation)
+  - SID 2000529: Staging host `135.136.1.133`
+  - SID 2000530: Suspect range `185.82.73.160/28` to EtherNet/IP port 44818
+  - SID 2000531: Behavioral — external EtherNet/IP RegisterSession (encap cmd 0x0065)
+  - SID 2000532: Behavioral — external CIP Unconnected Send (service 0x52 via SendRRData) for PLC program manipulation
+  - SID 2000533: External VNC to OT HMI workstations (771 exposed instances per Censys)
+- **Total: 410 Suricata rules** (was 404), SID range: 1000039-2000533
+
+### MITRE ATT&CK (ICS)
+- T0831 (Manipulation of Control), T0843 (Program Download), T0842 (Project File Infection), T0855 (Unauthorized Command Message)
+
 ## [4.0.17] - 2026-05-08
 
 ### Fixed

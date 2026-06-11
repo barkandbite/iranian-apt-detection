@@ -2012,3 +2012,38 @@ alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT MuddyWater Quic
 
 # MuddyWater post-compromise C2 — contacted by renamed pythonw.exe implant
 alert ip $HOME_NET any -> [116.203.208.186] any (msg:"Bark&Bite - Iranian APT MuddyWater Post-Compromise C2 IP 116.203.208.186 2026"; threshold:type limit, track by_src, count 1, seconds 300; reference:url,rapid7.com/blog/post/tr-muddying-tracks-state-sponsored-shadow-behind-chaos-ransomware/; classtype:command-and-control; sid:2000527; rev:1; metadata:policy max-detect-ips drop, created_at 2026_05_12, updated_at 2026_05_12;)
+
+# ============================================================================
+# SECTION: CyberAv3ngers Rockwell/Allen-Bradley PLC Targeting (CISA AA26-097A)
+# Source: FBI/CISA/NSA/EPA/DOE/CNMF Joint Advisory AA26-097A (April 7, 2026)
+# IRGC-CEC (CyberAv3ngers/Storm-0784/Bauxite/UNC5691) targeting internet-
+# exposed Rockwell Automation CompactLogix and Micro850 PLCs using legitimate
+# Studio 5000 Logix Designer. 5,219 exposed hosts globally (Censys).
+# MITRE ICS: T0831 (Manipulation of Control), T0843 (Program Download),
+#            T0842 (Project File Infection), T0855 (Unauthorized Command)
+# ============================================================================
+
+# CyberAv3ngers known operator subnet — multi-homed Windows engineering
+# workstation on AS214036 used for Rockwell Studio 5000 access
+alert ip [185.82.73.160,185.82.73.161,185.82.73.163,185.82.73.166] any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT CyberAv3ngers Rockwell Operator IP 185.82.73.x AA26-097A 2026"; threshold:type limit, track by_src, count 1, seconds 300; reference:url,cisa.gov/news-events/cybersecurity-advisories/aa26-097a; classtype:attempted-admin; sid:2000528; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_05_18, updated_at 2026_05_18;)
+
+# CyberAv3ngers staging host — single-use staging box
+alert ip 135.136.1.133 any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT CyberAv3ngers Staging IP 135.136.1.133 AA26-097A 2026"; threshold:type limit, track by_src, count 1, seconds 300; reference:url,cisa.gov/news-events/cybersecurity-advisories/aa26-097a; classtype:attempted-admin; sid:2000529; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_05_18, updated_at 2026_05_18;)
+
+# CyberAv3ngers suspect IP range — treat 185.82.73.160/28 as hostile
+alert tcp [185.82.73.160/28] any -> $HOME_NET 44818 (msg:"Bark&Bite - Iranian APT CyberAv3ngers Suspect Range 185.82.73.160/28 to EtherNet-IP 2026"; flow:to_server; reference:url,cisa.gov/news-events/cybersecurity-advisories/aa26-097a; classtype:attempted-admin; sid:2000530; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_05_18, updated_at 2026_05_18;)
+
+# Behavioral: External EtherNet/IP RegisterSession (encap cmd 0x0065) — any
+# external host opening an EtherNet/IP session to a PLC is suspicious.
+# Session handle field is 0x00000000 for new session requests.
+alert tcp $EXTERNAL_NET any -> $HOME_NET 44818 (msg:"Bark&Bite - Iranian APT CyberAv3ngers External EtherNet-IP RegisterSession to PLC 2026"; flow:to_server,established; content:"|65 00|"; depth:2; content:"|00 00 00 00|"; offset:4; depth:4; threshold:type both, track by_src, count 2, seconds 300; reference:url,cisa.gov/news-events/cybersecurity-advisories/aa26-097a; classtype:attempted-admin; sid:2000531; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_05_18, updated_at 2026_05_18;)
+
+# Behavioral: External CIP SendRRData (encap cmd 0x006f) with Unconnected
+# Send (CIP service 0x52) — routes CIP commands to backplane slots.
+# This is the primary vector for Studio 5000 PLC program manipulation.
+alert tcp $EXTERNAL_NET any -> $HOME_NET 44818 (msg:"Bark&Bite - Iranian APT CyberAv3ngers External CIP Unconnected Send to PLC 2026"; flow:to_server,established; content:"|6f 00|"; depth:2; content:"|00 b2|"; distance:22; within:20; content:"|52|"; distance:2; within:4; fast_pattern; reference:url,cisa.gov/news-events/cybersecurity-advisories/aa26-097a; classtype:attempted-admin; sid:2000532; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_05_18, updated_at 2026_05_18;)
+
+# CyberAv3ngers — external VNC to HMI workstations (port 5900-5910)
+# AA26-097A notes 771 VNC service instances on exposed PLC-adjacent hosts.
+# External VNC to OT segments is almost never legitimate.
+alert tcp $EXTERNAL_NET any -> $HOME_NET [5900:5910] (msg:"Bark&Bite - Iranian APT CyberAv3ngers External VNC to OT HMI Workstation 2026"; flow:to_server,established; content:"RFB "; depth:4; threshold:type both, track by_src, count 3, seconds 300; reference:url,cisa.gov/news-events/cybersecurity-advisories/aa26-097a; classtype:attempted-admin; sid:2000533; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_05_18, updated_at 2026_05_18;)
