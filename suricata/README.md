@@ -6,10 +6,10 @@ This directory contains Suricata IDS signatures for detecting Iranian APT networ
 ## Current Ruleset
 
 ### Canonical File: `iranian-apt-detection.rules`
-- **Version**: 4.0.13 (consolidated from v3.1, v3.2, v3.3 + ongoing updates)
-- **Last Updated**: 2026-04-30
-- **SID Range**: 1000039–2000515
-- **Total Rules**: 392 signatures
+- **Version**: 4.0.21 (consolidated from v3.1, v3.2, v3.3 + ongoing updates)
+- **Last Updated**: 2026-06-11
+- **SID Range**: 1000039–2000552
+- **Total Rules**: 429 signatures
 - **Zero duplicate SIDs**
 - **Requires**: Suricata 7.0+
 
@@ -29,6 +29,14 @@ This directory contains Suricata IDS signatures for detecting Iranian APT networ
 | 2000462–2000477 | 16 | Boggy Serpens/BlackBeard, Nuso, Infy Tonnerre, Dust Specter TwinTalk/SPLITDROP |
 | 2000478–2000501 | 24 | CyberAv3ngers ICS/PLC (AA26-097A), Infy IOC update, MuddyWater ChainShell/CastleRAT/Fooder C2 |
 | 2000502–2000515 | 14 | APT34/OilRig Dark Scepter C2 domains (Hunt.io Apr 2026), MuddyWater AS136557 IP |
+| 2000516–2000518 | 3 | Cloud C2 domains: datadrift.somee.com, prism-west-candy.glitch.me, line.completely.workers.dev |
+| 2000519–2000520 | 2 | Prince of Persia (Infy) Foudre replacement C2 IPs (SafeBreach) |
+| 2000521–2000523 | 3 | MuddyWater Stagecomp/Darkcomp staging IPs + ms_upd.exe behavioral (Rapid7) |
+| 2000524–2000527 | 4 | MuddyWater Teams false flag C2: moonzonet.com, uploadfiler.com, adm-pulse.com, 116.203.208.186 |
+| 2000528–2000533 | 6 | CyberAv3ngers Rockwell/Allen-Bradley PLC targeting (CISA AA26-097A) |
+| 2000534–2000537 | 4 | MuddyWater RustyWater Rust RAT: nomercys.it.com C2 + 159.198.66.153 (THN/ProtosLabs) |
+| 2000538–2000549 | 12 | Screening Serpens (UNC1549) MiniUpdate + MiniJunk V2 Azure C2 (Unit 42 May 2026) |
+| 2000550–2000552 | 3 | CVE-2025-34291 Langflow CORS bypass + RCE, MuddyWater initial access (CISA KEV) |
 
 ### Threat Group Coverage
 

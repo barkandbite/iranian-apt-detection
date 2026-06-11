@@ -14,6 +14,7 @@ iranian-apt-detection/
 │   ├── 0917-iranian-apt-june2025-updates.xml        # June 2025 threat updates
 │   ├── 0918-iranian-apt-march2026-updates.xml       # March 2026 threat updates
 │   ├── 0919-iranian-apt-march2026-expansion.xml     # March 2026 expansion
+│   ├── 0920-iranian-apt-june2026-host-indicators.xml # June 2026 host indicators
 │   └── README.md                                     # Wazuh rules documentation
 │
 ├── configurations/
@@ -23,7 +24,7 @@ iranian-apt-detection/
 │   └── README.md                                     # Configuration guide
 │
 ├── suricata/
-│   ├── iranian-apt-detection.rules                  # Consolidated Suricata IDS signatures (v4.0.13, 392 rules)
+│   ├── iranian-apt-detection.rules                  # Consolidated Suricata IDS signatures (v4.0.21, 429 rules)
 │   └── README.md                                     # Suricata deployment guide
 │
 ├── documentation/
@@ -86,8 +87,10 @@ iranian-apt-detection/
 - **101480-101510**: Healthcare emergency (0919)
 - **101511-101515**: Dust Specter TwinTalk/SPLITDROP host indicators (0919)
 - **101516-101521**: CyberAv3ngers Rockwell PLC host-side detection (0919)
+- **101522**: CVE-2025-34291 Langflow post-RCE process spawn (0919)
+- **101523-101527**: Dindoor/Fakeset June 2026 host indicators — Deno exec, Rclone exfil, Quick Assist, signer subjects (0920)
 
-### Suricata SID Ranges (1000039-2000523)
+### Suricata SID Ranges (1000039-2000552)
 - **1000039-2000014**: CVE exploitation signatures
 - **2000015-2000030**: C2 infrastructure, post-exploitation, exfiltration
 - **2000031-2000050**: Reconnaissance, web shells, ICS/SCADA, correlation
@@ -110,6 +113,11 @@ iranian-apt-detection/
 - **2000516-2000518**: Iranian APT cloud C2 domains (Trellix May 2026: somee.com, glitch.me, workers.dev)
 - **2000519-2000520**: Prince of Persia (Infy) Foudre replacement C2 IPs (SafeBreach Feb 2026)
 - **2000521-2000523**: MuddyWater Stagecomp/Darkcomp staging IPs + dropper behavioral (Rapid7 May 2026)
+- **2000524-2000527**: MuddyWater Teams false flag C2 (moonzonet.com, uploadfiler.com, adm-pulse.com, 116.203.208.186)
+- **2000528-2000533**: CyberAv3ngers Rockwell/Allen-Bradley PLC targeting (CISA AA26-097A)
+- **2000534-2000537**: MuddyWater RustyWater Rust RAT (nomercys.it.com, 159.198.66.153)
+- **2000538-2000549**: Screening Serpens (UNC1549) MiniUpdate + MiniJunk V2 Azure C2 (Unit 42)
+- **2000550-2000552**: CVE-2025-34291 Langflow CORS bypass + RCE (CISA KEV, MuddyWater)
 
 ## File Naming Conventions
 
