@@ -1085,4 +1085,24 @@
     <group>attack,persistence,cyberav3ngers,iranian_apt,ics,pci_dss_10.6.1,</group>
   </rule>
 
+  <!-- ========== CVE-2025-34291 LANGFLOW (MUDDYWATER) — 101522 ========== -->
+  <!-- Source: Obsidian Security, CISA KEV 2026-05-21, Snyk SNYK-PYTHON-LANGFLOWBASE-14221425
+       Public reporting attributes in-the-wild exploitation to MuddyWater (Iranian MOIS).
+       Network-side coverage: Suricata SID 2000534-2000536.
+       Host-side: Langflow validate/code RCE drops Python child processes that spawn
+       shells or curl/wget — the post-RCE signature on the Langflow host. -->
+
+  <!-- Langflow uvicorn/python parent spawning shell or download tool — RCE indicator -->
+  <rule id="101522" level="15">
+    <if_group>sysmon_event_1,audit_command</if_group>
+    <field name="win.eventdata.parentImage" type="pcre2">(?i)(python|uvicorn|langflow)</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)(\\cmd\.exe|\\powershell\.exe|\\bash|\\sh|\\wget|\\curl)</field>
+    <description>Iranian APT: CVE-2025-34291 Langflow validate/code RCE — Python/uvicorn parent spawning shell or download tool</description>
+    <mitre>
+      <id>T1190</id>
+      <id>T1059.006</id>
+    </mitre>
+    <group>attack,execution,muddywater,langflow,iranian_apt,cve_2025_34291,pci_dss_10.6.1,</group>
+  </rule>
+
 </group>

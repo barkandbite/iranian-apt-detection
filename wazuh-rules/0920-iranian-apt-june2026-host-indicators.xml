@@ -1,0 +1,101 @@
+<!--
+  Wazuh Rules for Iranian APT Detection - June 2026 Host Indicators
+  Version: 1.0
+  Last Updated: 2026-06-03
+
+  Host-side detections complementing the Suricata network signatures for the
+  MuddyWater Dindoor (Deno-based) and Fakeset (Python-based) campaign, plus
+  related TTPs from the MuddyWater Teams false-flag espionage operation
+  (Rapid7 May 2026 reporting).
+
+  Network detections for Dindoor/Fakeset already exist in Suricata
+  iranian-apt-detection.rules and via Wazuh 0918 (101213/101214 for the
+  Wasabi and Backblaze hostnames). These rules cover the host-process side:
+  the Deno runtime binary execution itself, Rclone exfil with the specific
+  flags MuddyWater is using, Quick Assist pretexting payload execution, and
+  code-signing certificate subjects associated with the campaign signing key.
+
+  Rule ID Range: 101523-101527 (next available after 0919 expansion 101510)
+
+  References:
+  - Rapid7 TR-Muddying-Tracks (May 2026): MuddyWater Quick Assist + Chaos
+    ransomware false-flag campaign IOCs
+  - SOCRadar "Iranian APT MuddyWater Dindoor Malware US Networks" (Mar 2026)
+  - The Hacker News "Iran-Linked MuddyWater Hackers Target U.S. Networks
+    With New Dindoor Backdoor" (Mar 2026)
+  - Krypt3ia "MANGO SANDSTORM Dindoor / Fakeset Campaign" (Mar 2026)
+-->
+
+<group name="iranian_apt,june2026_host,muddywater,">
+
+  <!-- ========== DINDOOR DENO RUNTIME EXECUTION (101523-101524) ========== -->
+
+  <!-- Deno runtime process create on Windows (T1059.007 JavaScript) -->
+  <rule id="101523" level="13">
+    <if_group>sysmon_event_1</if_group>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\deno(\.exe)?$|\\deno[-_]\w+\.exe$</field>
+    <description>Iranian APT: MuddyWater Dindoor - Deno JavaScript runtime execution detected (Windows)</description>
+    <mitre>
+      <id>T1059.007</id>
+      <id>T1218</id>
+    </mitre>
+    <group>attack,execution,muddywater,dindoor,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- Deno runtime process create on Linux/macOS (T1059.007) -->
+  <rule id="101524" level="13">
+    <if_group>auditd_execve</if_group>
+    <field name="audit.execve.command" type="pcre2">(?i)(^|/)deno\s+(run|task|exec)</field>
+    <description>Iranian APT: MuddyWater Dindoor - Deno JavaScript runtime execution detected (Linux/macOS)</description>
+    <mitre>
+      <id>T1059.007</id>
+    </mitre>
+    <group>attack,execution,muddywater,dindoor,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- ========== RCLONE WASABI EXFIL CMD-LINE (101525) ========== -->
+
+  <!-- Rclone command line with copy/sync to non-corporate cloud (Dindoor exfil pattern) -->
+  <rule id="101525" level="14">
+    <if_group>sysmon_event_1</if_group>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\rclone(\.exe)?$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(copy|sync|copyto|moveto)\s.+(wasabi|backblaze|b2:|s3:)</field>
+    <description>Iranian APT: MuddyWater Dindoor - Rclone exfiltration to Wasabi/Backblaze cloud storage detected</description>
+    <mitre>
+      <id>T1567.002</id>
+      <id>T1048</id>
+    </mitre>
+    <group>attack,exfiltration,muddywater,dindoor,pci_dss_11.4,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- ========== QUICK ASSIST PRETEXTING (101526) — MuddyWater Teams False-Flag ========== -->
+
+  <!-- Quick Assist launched via Outlook/Teams click-through (Rapid7 May 2026 IOC) -->
+  <rule id="101526" level="13">
+    <if_group>sysmon_event_1</if_group>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\quickassist\.exe$</field>
+    <field name="win.eventdata.parentImage" type="pcre2">(?i)\\(outlook|teams|ms-teams|msedge|chrome)\.exe$</field>
+    <description>Iranian APT: MuddyWater Quick Assist remote support launched from Outlook/Teams/browser - possible Chaos ransomware false-flag pretext</description>
+    <mitre>
+      <id>T1219</id>
+      <id>T1566.001</id>
+      <id>T1036.005</id>
+    </mitre>
+    <group>attack,initial_access,muddywater,teams_false_flag,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- ========== CODE-SIGNING CERTIFICATE SUBJECT (101527) ========== -->
+
+  <!-- Signed binary with known MuddyWater-associated code-signing subject (Dindoor signer "Amy Cherne") -->
+  <rule id="101527" level="14">
+    <if_group>sysmon_event_1</if_group>
+    <field name="win.eventdata.signature" type="pcre2">(?i)Amy\s+Cherne|Donald\s+Gay</field>
+    <description>Iranian APT: MuddyWater Dindoor - binary signed by known campaign code-signing subject (Amy Cherne or Donald Gay)</description>
+    <mitre>
+      <id>T1553.002</id>
+      <id>T1036.001</id>
+    </mitre>
+    <group>attack,defense_evasion,muddywater,dindoor,pci_dss_10.6.1,</group>
+  </rule>
+
+</group>

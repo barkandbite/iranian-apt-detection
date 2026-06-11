@@ -5,6 +5,37 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.21] - 2026-06-11
+
+### Added (consolidated backlog merge — PRs #16, #18, #22, #24 with SID renumbering)
+- **4 MuddyWater RustyWater Rust RAT rules** (SID 2000534-2000537, renumbered from PR #16's 2000528-2000531 to resolve collision with v4.0.20 Rockwell rules):
+  - SID 2000534: DNS query `nomercys.it.com`
+  - SID 2000535: HTTP Host header `nomercys.it.com`
+  - SID 2000536: TLS SNI `nomercys.it.com`
+  - SID 2000537: C2 IP `159.198.66.153` (Hostinger AS47583)
+- **12 Screening Serpens (UNC1549) MiniUpdate + MiniJunk V2 rules** (SID 2000538-2000549, renumbered from PR #22's 2000528-2000539) — Unit 42 May 27 2026 disclosure. Azure-hosted C2 domain clusters (`buisness-centeral*`/`premier*healthadvisory*`/`ramiltons*finance*` + Manager-suffix and abstract-noun clusters), `/agent/poll` and `/api/app/*` beacon behavioral, filemail.com + OnlyOffice staging
+- **3 CVE-2025-34291 Langflow rules** (SID 2000550-2000552, renumbered from PR #18's 2000534-2000536) — CORS bypass POST `/api/v1/refresh`, RCE-by-design `/api/v1/validate/code` endpoint, Python exec/eval body match. CISA KEV 2026-05-21, MuddyWater attribution
+- **6 Wazuh host-side rules**:
+  - 101522 (from PR #18): Langflow python/uvicorn parent spawning shell or curl/wget
+  - 101523-101527 (renumbered from PR #24's 101511-101515, which collided with existing 0919 IDs): Dindoor Deno runtime exec (Windows/Linux), Rclone-to-Wasabi/Backblaze exfil, quickassist.exe spawned by mail/browser, Amy Cherne / Donald Gay signed binaries — new file `wazuh-rules/0920-iranian-apt-june2026-host-indicators.xml`
+
+### Changed (FP tightening from PR #16)
+- SID 2000030 (rev 5): dsize 50KB→500KB, threshold 100→500/hr; renamed "Bulk Outbound Transfer Sustained Volume"
+- SID 2000172 (rev 2): port exclusion [22,443,2222], threshold 1→5/hr
+- SID 2000188 (rev 2): threshold 1→5/hr
+- SID 2000284 (rev 3): threshold 50→500/hr (.online TLD)
+- SID 2000315 (rev 3): Android UA constraint (Dalvik|okhttp|com.android.) via pcre /V, threshold 10→50/hr
+
+### Notes
+- **Total: 429 Suricata rules** (was 410), SID range: 1000039-2000552; 277 Wazuh rules, max ID 101527
+- Consolidates four PRs that each claimed overlapping SID ranges against a stale main. Renumbering follows merge order: Rockwell (v4.0.20) kept its SIDs as first claimer.
+
+### MITRE ATT&CK
+- T1566.001, T1059.005, T1547.001, T1055, T1071.001 (RustyWater)
+- T1574.002, T1574.014, T1102.002, T1583.006, T1027 (Screening Serpens)
+- T1190, T1059.006, T1199 (Langflow)
+- T1059.007, T1567.002, T1219, T1553.002, T1036.001/005 (Wazuh host indicators)
+
 ## [4.0.20] - 2026-05-18
 
 ### Added
@@ -19,6 +50,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### MITRE ATT&CK (ICS)
 - T0831 (Manipulation of Control), T0843 (Program Download), T0842 (Project File Infection), T0855 (Unauthorized Command Message)
+
+## [4.0.19] - 2026-05-13
+
+### Added
+- **4 new MuddyWater Microsoft Teams false flag C2 rules** (SID 2000524-2000527) — Rapid7 TR-Muddying-Tracks (May 2026). IT-support pretexting over Teams leading to Quick Assist session and Chaos ransomware false-flag deployment:
+  - SID 2000524: DNS query `moonzonet.com`
+  - SID 2000525: DNS query `uploadfiler.com` (encrypted config C2)
+  - SID 2000526: DNS query `adm-pulse.com` (Quick Assist phishing lure)
+  - SID 2000527: Post-compromise C2 IP `116.203.208.186` (Hetzner)
+- **Total: 404 Suricata rules** (was 400), SID range: 1000039-2000527
+
+### MITRE ATT&CK
+- T1566.004 (Spearphishing Voice/Chat), T1598 (Phishing for Information), T1219 (Remote Access Software), T1036.005 (Masquerading)
+
+## [4.0.18] - 2026-05-11
+
+### Fixed
+- **SID 2000022** (Havoc C2 Beacon) and **SID 2000026** (PowerShell Download Cradle): mixed legacy `http_header` modifier alongside sticky buffers (`http.user_agent`, `http.uri`, `http.cookie`) — Suricata 7.0+ rejects this combination at load. Converted to consistent sticky-buffer syntax. Same failure class as the v0.6.1 production outage and the v4.0.13/v4.0.17 fixes. Both bumped to rev 2.
 
 ## [4.0.17] - 2026-05-08
 

@@ -6,10 +6,10 @@ This directory contains Suricata IDS signatures for detecting Iranian APT networ
 ## Current Ruleset
 
 ### Canonical File: `iranian-apt-detection.rules`
-- **Version**: 4.0.20 (consolidated from v3.1, v3.2, v3.3 + ongoing updates)
-- **Last Updated**: 2026-05-18
-- **SID Range**: 1000039–2000533
-- **Total Rules**: 410 signatures
+- **Version**: 4.0.21 (consolidated from v3.1, v3.2, v3.3 + ongoing updates)
+- **Last Updated**: 2026-06-11
+- **SID Range**: 1000039–2000552
+- **Total Rules**: 429 signatures
 - **Zero duplicate SIDs**
 - **Requires**: Suricata 7.0+
 
@@ -34,6 +34,9 @@ This directory contains Suricata IDS signatures for detecting Iranian APT networ
 | 2000521–2000523 | 3 | MuddyWater Stagecomp/Darkcomp staging IPs + ms_upd.exe behavioral (Rapid7) |
 | 2000524–2000527 | 4 | MuddyWater Teams false flag C2: moonzonet.com, uploadfiler.com, adm-pulse.com, 116.203.208.186 |
 | 2000528–2000533 | 6 | CyberAv3ngers Rockwell/Allen-Bradley PLC targeting (CISA AA26-097A) |
+| 2000534–2000537 | 4 | MuddyWater RustyWater Rust RAT: nomercys.it.com C2 + 159.198.66.153 (THN/ProtosLabs) |
+| 2000538–2000549 | 12 | Screening Serpens (UNC1549) MiniUpdate + MiniJunk V2 Azure C2 (Unit 42 May 2026) |
+| 2000550–2000552 | 3 | CVE-2025-34291 Langflow CORS bypass + RCE, MuddyWater initial access (CISA KEV) |
 
 ### Threat Group Coverage
 
