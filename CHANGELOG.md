@@ -5,6 +5,23 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.22] - 2026-06-17
+
+### Fixed (P0 — ruleset failed to load in Suricata 7.0.3)
+
+The v4.0.21 release shipped two rules whose syntax errors caused the entire `iranian-apt-detection.rules` file to be rejected at load time. Any deployer running Suricata 7.x has had **zero Iranian APT network coverage** since v4.0.21 went out. These fixes restore loading; behavior is equivalent.
+
+- **SID 2000030 (rev 6) — Bulk Outbound Transfer Sustained Volume.** `dsize:>500000` was outside the valid uint16 packet-size range and caused `E: detect-dsize: Parsing '>500000' failed`. Replaced with `dsize:>1400` so the keyword targets near-MTU data-carrying packets, which is the correct behavioral marker for bulk transfer. The 500-per-hour threshold (`count 500, seconds 3600`) was already doing the volumetric work and is unchanged.
+- **SID 2000535 (rev 2) — MuddyWater RustyWater RAT HTTP Host nomercys.it.com.** Suricata 7.0.3 rejects `nocase` against the `http.host` sticky buffer because the buffer is already normalized to lowercase. Removed redundant `nocase` modifier. The match string is already lowercase so detection is identical.
+
+### Notes
+
+- Combined `suricata -T -S suricata/iranian-apt-detection.rules` exits 0 with the fixes applied.
+- Rule count, SID range, and Wazuh inventory unchanged from v4.0.21: **429 Suricata rules** (SID range 1000039-2000552), **277 Wazuh rules** (max ID 101527).
+- These same fixes were also backported to `bb-iran-suricata.rules` in the private barkbite-suricata-by-country repo, where the cross-country file had four additional broken rules with the same root cause (PCRE patterns containing literal `;` and an http.host+nocase rule and a flow direction conflict). See the by-country repo for those.
+
+---
+
 ## [4.0.21] - 2026-06-11
 
 ### Added (consolidated backlog merge — PRs #16, #18, #22, #24 with SID renumbering)
