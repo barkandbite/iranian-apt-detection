@@ -5,6 +5,37 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.22] - 2026-06-19
+
+### Fixed (P0 — production ruleset failed to load on Suricata 7.0.3)
+- **SID 2000030** (rev 6): `dsize:>500000` violated Suricata's uint16 cap (65535).
+  The v4.0.21 FP-tightening attempt (50KB→500KB) made the rule invalid, which
+  caused `suricata -T` to reject the entire ruleset. Replaced with
+  `stream_size:client,>,500000` which is the supported way to measure bulk
+  flow-level transfer. Preserves the original FP-tightening intent.
+- **SID 2000535** (rev 2): removed redundant `nocase` modifier on `http.host`
+  content match. The http.host buffer is auto-lowercased; in Suricata 7.0.3 the
+  redundancy is promoted from a warning to a hard parse error. RustyWater
+  domain match (`nomercys.it.com`) now loads.
+
+### Notes
+- Validated end-to-end on Suricata 7.0.3: `suricata -T` reports
+  "Configuration provided was successfully loaded".
+- These two rules were syntactically broken since v4.0.21 was merged
+  (2026-06-11). For 8 days, any deployer pulling the latest tag would have
+  seen `Loading signatures failed` and reverted, or worse, run with no
+  Iranian coverage at all.
+- The companion `barkbite-suricata-by-country` distribution has the same two
+  rules (synced via the daily Iran sync workflow) plus seven additional
+  cross-country rules that were broken by the same syntax patterns
+  (semicolons inside pcre character classes, flow-direction mismatch on
+  CVE-2026-35273 MeshCentral rule, redundant nocase on http.host).
+  Companion fix shipping in by-country PR.
+
+### MITRE ATT&CK
+- T1071.001 (RustyWater HTTP C2)
+- T1041 (Bulk Outbound Transfer)
+
 ## [4.0.21] - 2026-06-11
 
 ### Added (consolidated backlog merge — PRs #16, #18, #22, #24 with SID renumbering)

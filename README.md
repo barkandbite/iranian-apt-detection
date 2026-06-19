@@ -1,6 +1,6 @@
 # Iranian APT Detection Rules
 
-[![Version](https://img.shields.io/badge/version-4.0.21-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.0.22-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![MITRE ATT&CK](https://img.shields.io/badge/MITRE%20ATT%26CK-v15-orange.svg)](documentation/MITRE-ATT&CK-Mapping.md)
 
@@ -312,4 +312,4 @@ These rules are provided as-is for defensive purposes. Users are responsible for
 
 ---
 
-**Last Updated**: June 11, 2026 | **Version**: 4.0.21 | **Maintainer**: Bark&Bite Security Intelligence
+**Last Updated**: June 19, 2026 | **Version**: 4.0.22 | **Maintainer**: Bark&Bite Security Intelligence
