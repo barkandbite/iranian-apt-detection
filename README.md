@@ -1,6 +1,6 @@
 # Iranian APT Detection Rules
 
-[![Version](https://img.shields.io/badge/version-4.0.21-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.0.22-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![MITRE ATT&CK](https://img.shields.io/badge/MITRE%20ATT%26CK-v15-orange.svg)](documentation/MITRE-ATT&CK-Mapping.md)
 
@@ -16,8 +16,9 @@ Three concurrent Iranian campaigns targeting U.S. healthcare disclosed March 24:
 - **Pay2Key v3** (IRGC) hit unnamed U.S. healthcare org with **ChaCha20 + Curve25519** ransomware. Fake Avast AV bypass. **I2P C2** (not Tor). Purely destructive — no ransom demand.
 - **MuddyWater** exploiting **CVE-2025-59287** (Windows WSUS Deserialization RCE, CVSS 9.8) to pre-position on healthcare networks.
 
-## Recent Threats (v4.0.21)
+## Recent Threats (v4.0.22)
 
+- **P0 FIX (v4.0.22)**: `iranian-apt-detection.rules` was rejected at load by Suricata 7.0.3 since v4.0.21 shipped (June 11). SID 2000030 carried `dsize:>500000` (out of uint16 packet-size range) and SID 2000535 carried a stale `nocase` on a now-normalized `http.host` buffer. Both fixed; rev bumped. Every deployer running the public ruleset had **zero Iranian APT network coverage** during that window — please update.
 - **NEW (v4.0.21)**: Consolidated backlog merge — MuddyWater **RustyWater Rust RAT** (SID 2000534-2000537), Screening Serpens/UNC1549 **MiniUpdate + MiniJunk V2** Azure C2 (SID 2000538-2000549, Unit 42 May 2026), **CVE-2025-34291 Langflow** CORS bypass + RCE (SID 2000550-2000552, CISA KEV), 6 new Wazuh host-side rules (101522-101527) incl. new `0920` file; FP tightening for 5 noisy rules
 - **NEW (v4.0.20)**: CyberAv3ngers **Rockwell/Allen-Bradley PLC** targeting — operator/staging IOCs + EtherNet/IP & CIP behavioral (SID 2000528-2000533, CISA AA26-097A)
 - **NEW (v4.0.19)**: MuddyWater **Microsoft Teams false flag** C2 — moonzonet.com, uploadfiler.com, adm-pulse.com, 116.203.208.186 (SID 2000524-2000527, Rapid7)
