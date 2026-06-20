@@ -5,6 +5,21 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.22] - 2026-06-20
+
+### Fixed (P0 — `suricata -T` load failure since v4.0.21)
+Two rules introduced in the v4.0.21 backlog merge contained syntax that Suricata 7.0.3 rejects at load. While the file failed to load, every Iranian APT signature in the public ruleset was inactive. Behavior preserved across both fixes; rev bumped.
+
+- **SID 2000030 rev 6** — `dsize:>500000` was outside the uint16 packet-size range (max 65535). Lowered to `dsize:>1400` (near-MTU full data packet, the actual behavioral marker for bulk transfer). The `count 500, seconds 3600` threshold is unchanged and continues to do the volumetric work.
+- **SID 2000535 rev 2** — Removed redundant `nocase` modifier after the `http.host` sticky buffer. Suricata 7 normalizes the host buffer to lowercase and rejects the combination as a hard error. Match string is already lowercase so detection is identical.
+
+### Validation
+- `suricata -T -S suricata/iranian-apt-detection.rules` not runnable in this maintenance environment (no binary); static checks pass (uint16 dsize, no http.host+nocase, all flowbits paired, SIDs unique).
+- Rule count, SID range, and Wazuh inventory unchanged from v4.0.21: **429 Suricata rules** (SID 1000039–2000552), **277 Wazuh rules** (max ID 101527).
+
+### Cross-repo sync
+- Same two fixes applied to `bb-iran-suricata.rules` in `barkandbite/barkbite-suricata-by-country` (private, branch `claude/clever-gauss-ss279u`), where the cross-country file required additional companion fixes for the same root cause (PCRE patterns with literal `;`, an http.host+nocase rule, and a flow-direction conflict).
+
 ## [4.0.21] - 2026-06-11
 
 ### Added (consolidated backlog merge — PRs #16, #18, #22, #24 with SID renumbering)
