@@ -5,6 +5,42 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.22] - 2026-06-23
+
+### Fixed (P0 — full ruleset was failing to load on Suricata 7.0.3)
+
+`suricata -T` against the v4.0.21 `suricata/iranian-apt-detection.rules`
+exited with `Loading signatures failed`. Two rules carried syntax that
+Suricata 7.0.3 rejects as fatal parse errors, which means the *entire*
+rule file does not load — every deployment that pulled v4.0.21 lost
+Iranian APT detection coverage entirely until this release.
+
+- **SID 2000030 (rev:6)** — `dsize:>500000` was invalid (`dsize` is
+  uint16, max 65535). The v4.0.21 FP-tightening edit pushed the bound
+  past the integer limit, which the parser surfaces as
+  `E: detect-dsize: Parsing '>500000' failed`. Replaced with
+  `dsize:>1400` (large-segment filter); the per-hour threshold of 500
+  packets remains the volume-detection signal, and the rule comment
+  was updated to call out the uint16 ceiling so the next tuning pass
+  doesn't repeat the mistake.
+- **SID 2000535 (rev:2)** — `http.host; content:"nomercys.it.com";
+  nocase; fast_pattern;` was rejected as a parse error in 7.0.3
+  (warns-then-fails, rather than the warn-only behaviour in 7.0.x
+  earlier patches). `http.host` is already normalized to lowercase, so
+  `nocase` is redundant; dropping it restores parser acceptance with
+  no behaviour change.
+
+After both fixes, `suricata -T` reports zero errors. The companion
+fixes have been applied to the by-country distribution's
+`rules/bb-iran-suricata.rules` so the daily sync won't reintroduce
+the bugs.
+
+### Notes
+- **Total: 429 Suricata rules** (unchanged), SID range: 1000039-2000552;
+  277 Wazuh rules (unchanged), max ID 101527.
+- This is a syntax-only release — no IOC, detection-logic, or coverage
+  changes. Strongly recommended for any operator currently on v4.0.21.
+
 ## [4.0.21] - 2026-06-11
 
 ### Added (consolidated backlog merge — PRs #16, #18, #22, #24 with SID renumbering)
