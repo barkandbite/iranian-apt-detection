@@ -84,6 +84,36 @@
     <group>attack,initial_access,muddywater,teams_false_flag,pci_dss_10.6.1,</group>
   </rule>
 
+  <!-- ========== MS_UPD.EXE → GAME.EXE CHAOS FALSE-FLAG (101528-101529) ========== -->
+
+  <!-- ms_upd.exe stager process create (Rapid7 June 2026 Chaos false-flag IOC) -->
+  <!-- Legitimate Microsoft updates use Update.exe / mussetup.exe / WaaSMedicAgent.exe;
+       ms_upd.exe with this exact name is MuddyWater's chosen masquerade. -->
+  <rule id="101528" level="14">
+    <if_group>sysmon_event_1</if_group>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\ms_upd\.exe$</field>
+    <description>Iranian APT: MuddyWater Chaos false flag - ms_upd.exe stager execution (drops Game.exe trojanized WebView2 RAT)</description>
+    <mitre>
+      <id>T1036.005</id>
+      <id>T1204.002</id>
+      <id>T1105</id>
+    </mitre>
+    <group>attack,execution,muddywater,teams_false_flag,chaos_false_flag,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- Game.exe (trojanized WebView2) outbound to MuddyWater C2 hostnames -->
+  <rule id="101529" level="14">
+    <if_group>sysmon_event_3</if_group>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\Game\.exe$</field>
+    <field name="win.eventdata.destinationHostname" type="pcre2">(?i)(moonzonet\.com|uploadfiler\.com)</field>
+    <description>Iranian APT: MuddyWater Chaos false flag - Game.exe RAT outbound to known C2 (moonzonet.com or uploadfiler.com)</description>
+    <mitre>
+      <id>T1071.001</id>
+      <id>T1219</id>
+    </mitre>
+    <group>attack,command_and_control,muddywater,chaos_false_flag,pci_dss_10.6.1,</group>
+  </rule>
+
   <!-- ========== CODE-SIGNING CERTIFICATE SUBJECT (101527) ========== -->
 
   <!-- Signed binary with known MuddyWater-associated code-signing subject (Dindoor signer "Amy Cherne") -->

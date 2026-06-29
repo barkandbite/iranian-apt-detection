@@ -1,0 +1,55 @@
+name: Validate Suricata + Wazuh Rules
+
+on:
+  pull_request:
+    paths:
+      - 'suricata/**'
+      - 'wazuh-rules/**'
+      - '.github/workflows/validate.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'suricata/**'
+      - 'wazuh-rules/**'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Suricata and xmllint
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y suricata libxml2-utils
+          suricata --build-info | head -3
+
+      - name: Validate Suricata rules
+        run: |
+          set -e
+          mkdir -p /tmp/suri-log
+          fail=0
+          for f in suricata/*.rules; do
+            name=$(basename "$f")
+            result=$(suricata -T -S "$f" -l /tmp/suri-log 2>&1)
+            if echo "$result" | grep -E '^E:|Loading signatures failed' >/dev/null; then
+              echo "::error file=$f::FAIL: $name"
+              echo "$result" | grep -E '^E:|Loading signatures failed' | head -5
+              fail=1
+            else
+              echo "PASS: $name"
+            fi
+          done
+          exit $fail
+
+      - name: Validate Wazuh XML
+        run: |
+          set -e
+          for f in wazuh-rules/*.xml; do
+            xmllint --noout "$f" && echo "OK: $f"
+          done

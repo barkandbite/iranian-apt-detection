@@ -5,6 +5,68 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.22] - 2026-06-29
+
+### Fixed — P0 unblock (file rejected by Suricata 7.0.3 since v4.0.21)
+
+`suricata/iranian-apt-detection.rules` has been failing to load on
+Suricata 7.0.3 since v4.0.21 shipped on 2026-06-11. 18 days of zero
+Iranian APT network coverage for every community deployer running the
+public ruleset. Two rules contained syntax Suricata 7 hard-errors on;
+behavior preserved across both fixes.
+
+- **SID 2000030 rev:6** — `dsize:>500000` was outside the uint16
+  packet-size range (max 65535). Lowered to `dsize:>1400` (near-MTU
+  full data packet — the actual behavioral marker for bulk transfer).
+  The `count 500, seconds 3600` threshold remains the volume signal.
+- **SID 2000535 rev:2** — Removed redundant `nocase` after the `http.host`
+  sticky buffer. Suricata 7 normalizes host buffer to lowercase and
+  rejects the combo as a hard parse error; match string is already
+  lowercase, detection identical.
+
+### Added
+
+- **2 Wazuh host-side rules for MuddyWater Chaos false flag**
+  (`0920-iranian-apt-june2026-host-indicators.xml`, IDs 101528–101529).
+  Closes a host-process detection gap left by the v4.0.19 network-layer
+  rules: SID 2000523 catches the `ms_upd.exe` URL on the wire, but no
+  Sysmon-side rule existed for the executing process or the subsequent
+  `Game.exe` (trojanized WebView2) beacon. Catches the chain when
+  initial download was over an encrypted channel the IDS can't decrypt.
+  - 101528: Sysmon Event 1 — `ms_upd.exe` stager process execution
+  - 101529: Sysmon Event 3 — `Game.exe` outbound to moonzonet.com /
+    uploadfiler.com C2
+
+### Notes on intel survey deferrals
+
+The Rapid7 "MuddyWater Chaos ransomware false flag" article that
+surfaced in this session's intel pull is news coverage of the same
+investigation already integrated as v4.0.19 in May 2026. All network
+IOCs (`moonzonet.com`, `uploadfiler.com`, `ms_upd.exe`,
+`116.203.208.186`, `adm-pulse.com`, "Donald Gay" code-signing cert)
+are covered by SIDs 2000521–2000527 and Wazuh 101527. No new Suricata
+rules added for this campaign — only the two host-process Wazuh
+additions above. (5 candidate rules were drafted and dropped pre-commit
+once existing coverage was confirmed.)
+
+### Added (infrastructure)
+
+- **`.github/workflows/validate.yml`** — new CI workflow that runs
+  `suricata -T -S` on each `suricata/*.rules` file and
+  `xmllint --noout` on each `wazuh-rules/*.xml` file on every PR.
+  This closes the recurring infra gap that let v4.0.21 ship dead-on-load
+  to production — the prior maintenance environment had no Suricata
+  binary, so static checks couldn't catch parse errors.
+
+### Notes
+
+- **Total: 429 Suricata rules** (unchanged), SID range: 1000039–2000552;
+  **279 Wazuh rules** (was 277), max ID 101529.
+- The same P0 fixes were applied to `bb-iran-suricata.rules` in the
+  private `barkandbite/barkbite-suricata-by-country` repo (v3.1.5
+  consolidated merge). Both repos now have CI gates so this class of
+  regression cannot ship silently again.
+
 ## [4.0.21] - 2026-06-11
 
 ### Added (consolidated backlog merge — PRs #16, #18, #22, #24 with SID renumbering)
