@@ -5,6 +5,30 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.22] - 2026-07-01
+
+### Fixed (P0 — rules failed to load under Suricata 7.0.3)
+- **SID 2000030** (rev 6, Bulk Outbound Transfer Sustained Volume): `dsize:>500000`
+  exceeded the u16 max (65535) and prevented the entire ruleset from loading
+  ("detect-dsize: Parsing '>500000' failed → Loading signatures failed"). Rewritten
+  to `dsize:>1400` (near-MTU per-packet) with the existing `count 500, seconds 3600`
+  threshold — that yields ~700KB+ sustained bulk outbound from a single source to
+  non-RFC1918 destinations in one hour, preserving the intent of the previous
+  50KB→500KB tightening. Tuning note updated to explain the semantics (dsize is a
+  per-packet u16 keyword, not a session/flow accumulator).
+- **SID 2000535** (rev 2, MuddyWater RustyWater C2 HTTP Host): removed `nocase`
+  from `http.host` sticky buffer. The hostname buffer is already lowercase-
+  normalized, and the redundant `nocase` promoted from warning to hard parse
+  error under Suricata 7.0.3 when combined with `fast_pattern`, taking down the
+  whole file. Detection semantics unchanged.
+
+### Impact
+- Before this release, deployers on Suricata 7.0.3+ pulling `suricata/iranian-apt-detection.rules`
+  got zero coverage from this ruleset — the entire file failed to load with two
+  errors. Both errors are now fixed and the file loads cleanly (all 429 rules).
+- The by-country distribution repo (`bb-iran-suricata.rules`) had the same two
+  errors; a companion fix lands there simultaneously.
+
 ## [4.0.21] - 2026-06-11
 
 ### Added (consolidated backlog merge — PRs #16, #18, #22, #24 with SID renumbering)

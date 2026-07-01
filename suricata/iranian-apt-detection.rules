@@ -135,10 +135,12 @@ alert rdp $HOME_NET any -> $HOME_NET 3389 (msg:"Bark&Bite - Iranian APT RDP Late
 #==============================================================================
 
 # Bulk outbound transfer to external infrastructure (FP-tightened 2026-05-22)
-# TUNING NOTE: dsize raised 50KB->500KB and count 100->500/hour to suppress
-# routine cloud uploads. Pair with a preceding-compromise flowbit for higher
-# confidence. Disable if your environment routinely sees GRO/TSO segments.
-alert tcp $HOME_NET any -> ![$HOME_NET,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16] any (msg:"Bark&Bite - Iranian APT Bulk Outbound Transfer Sustained Volume"; flow:to_server,established; dsize:>500000; threshold:type both, track by_src, count 500, seconds 3600; classtype:trojan-activity; sid:2000030; rev:5; metadata:policy max-detect-ips drop, created_at 2025_07_06, updated_at 2026_05_22;)
+# TUNING NOTE: dsize is a per-packet u16 (max 65535). We match near-MTU packets
+# (>1400 bytes) and require 500 in an hour, i.e. ~700KB+ of sustained bulk
+# outbound from a single src to non-RFC1918. Pair with a preceding-compromise
+# flowbit for higher confidence. Disable if your environment routinely sees
+# GRO/TSO reassembled segments carrying >MTU dsize values.
+alert tcp $HOME_NET any -> ![$HOME_NET,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16] any (msg:"Bark&Bite - Iranian APT Bulk Outbound Transfer Sustained Volume"; flow:to_server,established; dsize:>1400; threshold:type both, track by_src, count 500, seconds 3600; classtype:trojan-activity; sid:2000030; rev:6; metadata:policy max-detect-ips drop, created_at 2025_07_06, updated_at 2026_07_01;)
 
 # DNS tunneling with Iranian encoding patterns
 alert dns $HOME_NET any -> any 53 (msg:"Bark&Bite - Iranian APT DNS Tunnel Exfiltration"; dns.query; pcre:"/^[a-f0-9]{32,}\./"; byte_test:1,>,50,0,relative; threshold:type both, track by_src, count 20, seconds 300; classtype:trojan-activity; sid:2000031; rev:2; metadata:policy max-detect-ips drop, created_at 2025_07_06, updated_at 2026_03_12;)
@@ -2068,7 +2070,7 @@ alert tcp $EXTERNAL_NET any -> $HOME_NET [5900:5910] (msg:"Bark&Bite - Iranian A
 alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT MuddyWater RustyWater RAT C2 Domain nomercys.it.com 2026"; dns.query; content:"nomercys.it.com"; nocase; fast_pattern; reference:url,thehackernews.com/2026/01/muddywater-launches-rustywater-rat-via.html; classtype:command-and-control; sid:2000534; rev:1; metadata:policy max-detect-ips drop, created_at 2026_05_22, updated_at 2026_05_22;)
 
 # RustyWater C2 HTTP host header
-alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater RustyWater RAT HTTP Host nomercys.it.com 2026"; flow:to_server,established; http.host; content:"nomercys.it.com"; nocase; fast_pattern; reference:url,protoslabs.io/resources/rustywater-rust-rat-campaign; classtype:command-and-control; sid:2000535; rev:1; metadata:policy max-detect-ips drop, created_at 2026_05_22, updated_at 2026_05_22;)
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater RustyWater RAT HTTP Host nomercys.it.com 2026"; flow:to_server,established; http.host; content:"nomercys.it.com"; fast_pattern; reference:url,protoslabs.io/resources/rustywater-rust-rat-campaign; classtype:command-and-control; sid:2000535; rev:2; metadata:policy max-detect-ips drop, created_at 2026_05_22, updated_at 2026_07_01;)
 
 # RustyWater C2 TLS SNI (reqwest crate uses HTTPS by default)
 alert tls $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater RustyWater RAT TLS SNI nomercys.it.com 2026"; flow:to_server,established; tls.sni; content:"nomercys.it.com"; nocase; fast_pattern; reference:url,protoslabs.io/resources/rustywater-rust-rat-campaign; classtype:command-and-control; sid:2000536; rev:1; metadata:policy max-detect-ips drop, created_at 2026_05_22, updated_at 2026_05_22;)
