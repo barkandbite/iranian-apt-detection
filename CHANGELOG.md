@@ -5,6 +5,42 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.22] - 2026-07-03
+
+### Fixed (P0 — signature loading failure in Suricata 7.x)
+
+`suricata/iranian-apt-detection.rules` failed to load entirely under
+Suricata 7.0.3 due to two unparseable signatures introduced in the
+v4.0.21 backlog merge. Every rule in the file was silently unavailable
+for detection until this patch. Deployers running Suricata 7 who
+verified the file loaded with an older engine, or who skipped `-T`
+validation, would not have seen an error at deploy time — the file
+simply never armed.
+
+- **SID 2000030 rev 5→6** — `dsize:>500000` is unparseable. `dsize` is
+  a per-packet size and Suricata's parser caps the value at u16 (65535).
+  The v4.0.21 tightening bumped the threshold from 50KB to "500KB"
+  presumably in KB, but the value is in bytes. Corrected to `dsize:>60000`,
+  which preserves the tightening intent (near-max-size packets only, still
+  gated by the 500/hr threshold to suppress routine cloud uploads) while
+  staying inside the parser's range.
+- **SID 2000535 rev 1→2** — Removed `nocase` from `http.host`. The host
+  buffer is already normalized to lowercase; Suricata 7 emits a warning
+  when `nocase` is combined with the sticky `http.host` buffer + a
+  content match + `fast_pattern`, and the combination fails parsing.
+
+### Notes
+
+The same two rules exist byte-identical in the private by-country
+distribution's `bb-iran-suricata.rules` and were fixed there in the same
+session, so the daily sync-iran-rules action stays a no-op. The
+by-country repo's `bb-crosscountry-suricata.rules` had a further seven
+pcre semicolon-escape / flow-direction bugs fixed in the same session;
+none of those rules live in this repo.
+
+Rule count unchanged: **429 Suricata rules** (SID 1000039-2000552),
+**277 Wazuh rules** (max ID 101527).
+
 ## [4.0.21] - 2026-06-11
 
 ### Added (consolidated backlog merge — PRs #16, #18, #22, #24 with SID renumbering)
