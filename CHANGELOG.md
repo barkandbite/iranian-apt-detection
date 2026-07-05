@@ -5,6 +5,66 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.22] - 2026-07-05
+
+### Fixed (P0 — production outage: v4.0.21 ruleset failed to load on Suricata 7.0.3)
+
+The file has been unloadable since v4.0.21 shipped on 2026-06-11 — **24 days of zero
+community coverage** for every deployer on Suricata 7. Two rules from the v4.0.21
+consolidated backlog merge contained syntax that Suricata 7.0.3 hard-errors on,
+which aborts loading of the entire `.rules` file (not just the offending rules).
+Reproduced today with `suricata -T -S suricata/iranian-apt-detection.rules`:
+
+```
+E: detect-dsize: Parsing '>500000' failed
+E: detect: error parsing signature "... sid:2000030 ..." at line 141
+E: detect: error parsing signature "... sid:2000535 ..." at line 2071
+E: suricata: Loading signatures failed.
+```
+
+- **SID 2000030 rev 6** (Bulk Outbound Transfer Sustained Volume): `dsize:>500000`
+  is outside Suricata's uint16 packet-size range (max 65535). The v4.0.21
+  FP-tightening pass appears to have treated `dsize` as a session-wide byte
+  counter, but it is per-packet u16. Rewritten to `dsize:>1400` (near-MTU full
+  data packet — the actual behavioral marker for bulk transfer). The
+  `count 500, seconds 3600` threshold was already doing the volumetric work
+  and is unchanged; behavioral intent (sustained bulk outbound to non-RFC1918)
+  is preserved.
+- **SID 2000535 rev 2** (MuddyWater RustyWater C2 HTTP Host `nomercys.it.com`):
+  removed the redundant `nocase` after the `http.host` sticky buffer.
+  Suricata 7 normalizes `http.host` to lowercase and now rejects the
+  `http.host + content + nocase + fast_pattern` combination as a hard parse
+  error (was a warning in earlier 7.0.x). Match string is already lowercase
+  so detection semantics are identical.
+
+Post-fix validation: `suricata -T -S suricata/iranian-apt-detection.rules` returns
+"Configuration provided was successfully loaded" and all 429 rules arm.
+
+### Cross-repo sync
+
+Identical fixes applied to `bb-iran-suricata.rules` in the private
+`barkbite-suricata-by-country` repo in the same maintenance window. That repo's
+`bb-crosscountry-suricata.rules` had seven additional broken rules with the same
+root cause (unescaped `;` in PCRE bracketed alternations, one flow-direction
+conflict, one http.host+nocase), also fixed today. The daily sync-iran-rules
+workflow will stay a no-op after both PRs land.
+
+### Backlog note
+
+Seven prior draft PRs (#30, #32, #33, #34, #35, #36, #37) filed since 2026-06-17
+identified this same root cause and stalled unmerged. Recommend closing all seven
+as superseded once this PR merges.
+
+### Notes
+
+- **Total: 429 Suricata rules** (unchanged), SID range: 1000039-2000552;
+  277 Wazuh rules, max ID 101527.
+- **Standing follow-up**: the maintenance environment now has Suricata 7.0.3
+  installable via `apt-get install suricata` — the v4.0.21 regression went
+  undetected because prior sessions couldn't run `suricata -T`. A CI workflow
+  running `suricata -T` on every PR against `suricata/**` should land next
+  session so this class of regression cannot ship silently again.
+
 ## [4.0.21] - 2026-06-11
 
 ### Added (consolidated backlog merge — PRs #16, #18, #22, #24 with SID renumbering)
