@@ -5,6 +5,55 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.23] - 2026-07-07
+
+### Added — Cavern Manticore modular C2 framework (Check Point Research, July 2026)
+
+Cavern Manticore is an Iran MOIS-linked actor (OilRig/Lyceum nexus) targeting
+Israeli government and IT-sector organizations with the Cavern (ex-Cav3rn)
+modular .NET C2 framework. Deploys via DLL sideloading (legitimate
+WinDirStat.exe loading trojanized uxtheme.dll from `C:\ProgramData\WinDir\`);
+HTTP C2 polls `GET /profile` and submits via `POST /gallery` with the agent ID
+in an `X-User-token` header; SQL browser module passes database credentials in
+`x-db-user`/`x-db-password` pseudo-headers; WebSocket alternative channel on
+`/socket`; operator-deployed `cac.aspx` webshell on IIS.
+
+**9 Suricata rules (SID 2000553–2000561):**
+- 2000553: DNS `hospitalinstallation.com` (parent — also catches `auth.` and
+  the `google.com.hospitalinstallation.com` visual-obfuscation subdomain)
+- 2000554: TLS SNI `hospitalinstallation.com`
+- 2000555: DNS `adserviceupdate.com` (older Cav3rn HTTP module)
+- 2000556: DNS `hygienehistory.com` (older Cav3rn HTTP module)
+- 2000557: Behavioral — C2 beacon poll `GET /profile` + `X-User-token` header
+- 2000558: Behavioral — result submit `POST /gallery` + `X-User-token` +
+  `text/plain`
+- 2000559: High-confidence — `x-db-user` + `x-db-password` credential
+  pseudo-headers in one request (unique to the Cavern SQL module), priority 1
+- 2000560: `cac.aspx` IIS webshell access (inbound), priority 1
+- 2000561: WebSocket upgrade to exact `/socket` path (exact-match URI to
+  exclude socket.io's `/socket.io/`)
+
+**2 Wazuh rules (101528–101529, new file
+`wazuh-rules/0921-iranian-apt-july2026-host-indicators.xml`):**
+- 101528: Sysmon Event 7 — `WinDirStat.exe` loading `uxtheme.dll` from a
+  non-System32/SysWOW64 path (the Cavern sideload chain)
+- 101529: Sysmon Event 1 — any process executing from
+  `C:\ProgramData\WinDir\` (masquerade directory, absent on clean systems)
+
+### Notes
+- **Total: 438 Suricata rules** (SID 1000039–2000561); **279 Wazuh rules**
+  (max ID 101529)
+- Same rules added to `bb-iran-suricata.rules` in the by-country repo in the
+  same maintenance window — daily sync stays a no-op.
+- Same-day survey also confirmed the Unit 42 "Tracking Screening Serpens"
+  publication is the May 27 2026 disclosure already integrated in v4.0.21
+  (SID 2000538–2000549) — no new IOCs.
+
+### MITRE ATT&CK
+- T1574.002 (DLL Side-Loading), T1071.001 (Web Protocols/WebSocket),
+  T1021.003, T1087.002 (LDAP enumeration), T1090 (SOCKS5 tunnel),
+  T1036.005 (Masquerading), T1505.003 (Web Shell)
+
 ## [4.0.22] - 2026-07-07
 
 ### Fixed (P0 — 26-day production outage; behavior preserved, revs bumped)
