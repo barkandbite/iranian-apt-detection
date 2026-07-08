@@ -138,7 +138,7 @@ alert rdp $HOME_NET any -> $HOME_NET 3389 (msg:"Bark&Bite - Iranian APT RDP Late
 # TUNING NOTE: dsize raised 50KB->500KB and count 100->500/hour to suppress
 # routine cloud uploads. Pair with a preceding-compromise flowbit for higher
 # confidence. Disable if your environment routinely sees GRO/TSO segments.
-alert tcp $HOME_NET any -> ![$HOME_NET,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16] any (msg:"Bark&Bite - Iranian APT Bulk Outbound Transfer Sustained Volume"; flow:to_server,established; dsize:>500000; threshold:type both, track by_src, count 500, seconds 3600; classtype:trojan-activity; sid:2000030; rev:5; metadata:policy max-detect-ips drop, created_at 2025_07_06, updated_at 2026_05_22;)
+alert tcp $HOME_NET any -> ![$HOME_NET,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16] any (msg:"Bark&Bite - Iranian APT Bulk Outbound Transfer Sustained Volume"; flow:to_server,established; dsize:>1400; threshold:type both, track by_src, count 500, seconds 3600; classtype:trojan-activity; sid:2000030; rev:6; metadata:policy max-detect-ips drop, created_at 2025_07_06, updated_at 2026_07_07;)
 
 # DNS tunneling with Iranian encoding patterns
 alert dns $HOME_NET any -> any 53 (msg:"Bark&Bite - Iranian APT DNS Tunnel Exfiltration"; dns.query; pcre:"/^[a-f0-9]{32,}\./"; byte_test:1,>,50,0,relative; threshold:type both, track by_src, count 20, seconds 300; classtype:trojan-activity; sid:2000031; rev:2; metadata:policy max-detect-ips drop, created_at 2025_07_06, updated_at 2026_03_12;)
@@ -2068,7 +2068,7 @@ alert tcp $EXTERNAL_NET any -> $HOME_NET [5900:5910] (msg:"Bark&Bite - Iranian A
 alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT MuddyWater RustyWater RAT C2 Domain nomercys.it.com 2026"; dns.query; content:"nomercys.it.com"; nocase; fast_pattern; reference:url,thehackernews.com/2026/01/muddywater-launches-rustywater-rat-via.html; classtype:command-and-control; sid:2000534; rev:1; metadata:policy max-detect-ips drop, created_at 2026_05_22, updated_at 2026_05_22;)
 
 # RustyWater C2 HTTP host header
-alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater RustyWater RAT HTTP Host nomercys.it.com 2026"; flow:to_server,established; http.host; content:"nomercys.it.com"; nocase; fast_pattern; reference:url,protoslabs.io/resources/rustywater-rust-rat-campaign; classtype:command-and-control; sid:2000535; rev:1; metadata:policy max-detect-ips drop, created_at 2026_05_22, updated_at 2026_05_22;)
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater RustyWater RAT HTTP Host nomercys.it.com 2026"; flow:to_server,established; http.host; content:"nomercys.it.com"; fast_pattern; reference:url,protoslabs.io/resources/rustywater-rust-rat-campaign; classtype:command-and-control; sid:2000535; rev:2; metadata:policy max-detect-ips drop, created_at 2026_05_22, updated_at 2026_07_07;)
 
 # RustyWater C2 TLS SNI (reqwest crate uses HTTPS by default)
 alert tls $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater RustyWater RAT TLS SNI nomercys.it.com 2026"; flow:to_server,established; tls.sni; content:"nomercys.it.com"; nocase; fast_pattern; reference:url,protoslabs.io/resources/rustywater-rust-rat-campaign; classtype:command-and-control; sid:2000536; rev:1; metadata:policy max-detect-ips drop, created_at 2026_05_22, updated_at 2026_05_22;)
@@ -2173,3 +2173,54 @@ alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT Mudd
 # os.system/os.popen. These primitives in a "validation" payload indicate
 # active RCE attempt (not a real flow-node validation).
 alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT MuddyWater CVE-2025-34291 Langflow RCE Python exec Payload 2026"; flow:to_server,established; http.method; content:"POST"; http.uri; content:"/api/v1/validate/code"; fast_pattern; http.request_body; pcre:"/(exec|eval|__import__|subprocess|os\.system|os\.popen)\s*\(/"; reference:cve,2025-34291; reference:url,obsidiansecurity.com/blog/cve-2025-34291-critical-account-takeover-and-rce-vulnerability-in-the-langflow-ai-agent-workflow-platform; classtype:web-application-attack; sid:2000552; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_05_25, updated_at 2026_05_25;)
+
+# ============================================================================
+# SECTION: CAVERN MANTICORE MODULAR C2 FRAMEWORK (JULY 2026)
+# Source: Check Point Research 2026-07 — "Cavern Manticore: Exposing
+#         Iran-Linked Modular C2 Framework"
+# Actor:  Cavern Manticore (Iran MOIS-linked, OilRig/Lyceum nexus)
+# Target: Israeli government and IT-sector organizations
+# TTPs:   Cavern (ex-Cav3rn) modular .NET C2. DLL sideload via legitimate
+#         WinDirStat.exe loading trojanized uxtheme.dll from
+#         C:\ProgramData\WinDir\. HTTP C2 polls GET /profile, submits via
+#         POST /gallery, agent ID travels in X-User-token header with a
+#         literal "00" suffix. SQL browser module passes DB credentials in
+#         x-db-user/x-db-password/x-db-host pseudo-headers. WebSocket
+#         alternative channel on /socket. Operator-deployed cac.aspx
+#         webshell on IIS. Transport is XOR(0x48)+Base64.
+# MITRE:  T1574.002, T1071.001, T1021.003, T1087.002, T1090 (SOCKS5)
+# ============================================================================
+
+# Parent C2 domain — also catches auth.hospitalinstallation.com and the
+# google.com.hospitalinstallation.com visual-obfuscation subdomain used by
+# newer agents.
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT Cavern Manticore C2 Domain hospitalinstallation.com 2026"; dns.query; content:"hospitalinstallation.com"; nocase; fast_pattern; reference:url,research.checkpoint.com/2026/cavern-manticore-exposing-iran-linked-modular-c2-framework/; classtype:command-and-control; sid:2000553; rev:1; metadata:policy max-detect-ips drop, created_at 2026_07_07, updated_at 2026_07_07;)
+
+alert tls $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Cavern Manticore C2 TLS SNI hospitalinstallation.com 2026"; flow:to_server,established; tls.sni; content:"hospitalinstallation.com"; fast_pattern; reference:url,research.checkpoint.com/2026/cavern-manticore-exposing-iran-linked-modular-c2-framework/; classtype:command-and-control; sid:2000554; rev:1; metadata:policy max-detect-ips drop, created_at 2026_07_07, updated_at 2026_07_07;)
+
+# Older Cav3rn HTTP module endpoints
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT Cavern Manticore Cav3rn C2 Domain adserviceupdate.com 2026"; dns.query; content:"adserviceupdate.com"; nocase; fast_pattern; reference:url,research.checkpoint.com/2026/cavern-manticore-exposing-iran-linked-modular-c2-framework/; classtype:command-and-control; sid:2000555; rev:1; metadata:policy max-detect-ips drop, created_at 2026_07_07, updated_at 2026_07_07;)
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT Cavern Manticore Cav3rn C2 Domain hygienehistory.com 2026"; dns.query; content:"hygienehistory.com"; nocase; fast_pattern; reference:url,research.checkpoint.com/2026/cavern-manticore-exposing-iran-linked-modular-c2-framework/; classtype:command-and-control; sid:2000556; rev:1; metadata:policy max-detect-ips drop, created_at 2026_07_07, updated_at 2026_07_07;)
+
+# Behavioral: C2 beacon poll. GET /profile carrying the custom X-User-token
+# header (agent ID + literal "00" suffix). The header name is the invariant;
+# survives domain rotation.
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Cavern Manticore C2 Beacon Poll GET /profile X-User-token Header 2026"; flow:to_server,established; http.method; content:"GET"; http.uri; content:"/profile"; http.header_names; content:"X-User-token"; nocase; fast_pattern; threshold:type limit, track by_src, count 1, seconds 600; reference:url,research.checkpoint.com/2026/cavern-manticore-exposing-iran-linked-modular-c2-framework/; classtype:command-and-control; sid:2000557; rev:1; metadata:policy max-detect-ips drop, created_at 2026_07_07, updated_at 2026_07_07;)
+
+# Behavioral: C2 result submission. POST /gallery with X-User-token and
+# Content-Type text/plain (XOR+Base64 blob travels as plain text).
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Cavern Manticore C2 Result Submit POST /gallery X-User-token Header 2026"; flow:to_server,established; http.method; content:"POST"; http.uri; content:"/gallery"; http.header_names; content:"X-User-token"; nocase; fast_pattern; http.content_type; content:"text/plain"; threshold:type limit, track by_src, count 1, seconds 600; reference:url,research.checkpoint.com/2026/cavern-manticore-exposing-iran-linked-modular-c2-framework/; classtype:command-and-control; sid:2000558; rev:1; metadata:policy max-detect-ips drop, created_at 2026_07_07, updated_at 2026_07_07;)
+
+# High-confidence: SQL browser module passing database credentials as
+# pseudo-HTTP headers. x-db-user + x-db-password together in one request
+# is unique to the Cavern SQL module — no legitimate software does this.
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Cavern Manticore SQL Module DB Credentials in x-db-user x-db-password Headers 2026"; flow:to_server,established; http.header_names; content:"x-db-user"; nocase; fast_pattern; content:"x-db-password"; nocase; reference:url,research.checkpoint.com/2026/cavern-manticore-exposing-iran-linked-modular-c2-framework/; classtype:command-and-control; sid:2000559; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_07_07, updated_at 2026_07_07;)
+
+# Operator-deployed ASP.NET webshell handler on compromised IIS.
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT Cavern Manticore cac.aspx IIS Webshell Access 2026"; flow:to_server,established; http.uri; content:"/cac.aspx"; nocase; fast_pattern; threshold:type limit, track by_src, count 1, seconds 300; reference:url,research.checkpoint.com/2026/cavern-manticore-exposing-iran-linked-modular-c2-framework/; classtype:trojan-activity; sid:2000560; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_07_07, updated_at 2026_07_07;)
+
+# WebSocket alternative C2 channel: upgrade handshake to the exact /socket
+# path (first WSS frame carries XOR-encrypted agent ID + "00"). Exact-match
+# URI to keep FPs down (socket.io and friends use /socket.io/).
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Cavern Manticore WebSocket C2 Upgrade /socket Endpoint 2026"; flow:to_server,established; http.method; content:"GET"; http.uri; content:"/socket"; startswith; endswith; http.header; content:"Upgrade|3a 20|websocket"; nocase; fast_pattern; threshold:type limit, track by_src, count 1, seconds 600; reference:url,research.checkpoint.com/2026/cavern-manticore-exposing-iran-linked-modular-c2-framework/; classtype:command-and-control; sid:2000561; rev:1; metadata:policy max-detect-ips drop, created_at 2026_07_07, updated_at 2026_07_07;)

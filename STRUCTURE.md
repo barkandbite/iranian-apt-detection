@@ -15,6 +15,7 @@ iranian-apt-detection/
 │   ├── 0918-iranian-apt-march2026-updates.xml       # March 2026 threat updates
 │   ├── 0919-iranian-apt-march2026-expansion.xml     # March 2026 expansion
 │   ├── 0920-iranian-apt-june2026-host-indicators.xml # June 2026 host indicators
+│   ├── 0921-iranian-apt-july2026-host-indicators.xml # July 2026 host indicators (Cavern Manticore)
 │   └── README.md                                     # Wazuh rules documentation
 │
 ├── configurations/
@@ -89,8 +90,9 @@ iranian-apt-detection/
 - **101516-101521**: CyberAv3ngers Rockwell PLC host-side detection (0919)
 - **101522**: CVE-2025-34291 Langflow post-RCE process spawn (0919)
 - **101523-101527**: Dindoor/Fakeset June 2026 host indicators — Deno exec, Rclone exfil, Quick Assist, signer subjects (0920)
+- **101528-101529**: Cavern Manticore host indicators — WinDirStat/uxtheme.dll sideload, ProgramData\WinDir masquerade (0921)
 
-### Suricata SID Ranges (1000039-2000552)
+### Suricata SID Ranges (1000039-2000561)
 - **1000039-2000014**: CVE exploitation signatures
 - **2000015-2000030**: C2 infrastructure, post-exploitation, exfiltration
 - **2000031-2000050**: Reconnaissance, web shells, ICS/SCADA, correlation
@@ -118,6 +120,7 @@ iranian-apt-detection/
 - **2000534-2000537**: MuddyWater RustyWater Rust RAT (nomercys.it.com, 159.198.66.153)
 - **2000538-2000549**: Screening Serpens (UNC1549) MiniUpdate + MiniJunk V2 Azure C2 (Unit 42)
 - **2000550-2000552**: CVE-2025-34291 Langflow CORS bypass + RCE (CISA KEV, MuddyWater)
+- **2000553-2000561**: Cavern Manticore modular C2 framework — domains, X-User-token beacon, x-db-* SQL module headers, cac.aspx webshell, /socket WebSocket (Check Point July 2026)
 
 ## File Naming Conventions
 

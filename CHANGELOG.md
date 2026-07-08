@@ -5,6 +5,118 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.23] - 2026-07-07
+
+### Added — Cavern Manticore modular C2 framework (Check Point Research, July 2026)
+
+Cavern Manticore is an Iran MOIS-linked actor (OilRig/Lyceum nexus) targeting
+Israeli government and IT-sector organizations with the Cavern (ex-Cav3rn)
+modular .NET C2 framework. Deploys via DLL sideloading (legitimate
+WinDirStat.exe loading trojanized uxtheme.dll from `C:\ProgramData\WinDir\`);
+HTTP C2 polls `GET /profile` and submits via `POST /gallery` with the agent ID
+in an `X-User-token` header; SQL browser module passes database credentials in
+`x-db-user`/`x-db-password` pseudo-headers; WebSocket alternative channel on
+`/socket`; operator-deployed `cac.aspx` webshell on IIS.
+
+**9 Suricata rules (SID 2000553–2000561):**
+- 2000553: DNS `hospitalinstallation.com` (parent — also catches `auth.` and
+  the `google.com.hospitalinstallation.com` visual-obfuscation subdomain)
+- 2000554: TLS SNI `hospitalinstallation.com`
+- 2000555: DNS `adserviceupdate.com` (older Cav3rn HTTP module)
+- 2000556: DNS `hygienehistory.com` (older Cav3rn HTTP module)
+- 2000557: Behavioral — C2 beacon poll `GET /profile` + `X-User-token` header
+- 2000558: Behavioral — result submit `POST /gallery` + `X-User-token` +
+  `text/plain`
+- 2000559: High-confidence — `x-db-user` + `x-db-password` credential
+  pseudo-headers in one request (unique to the Cavern SQL module), priority 1
+- 2000560: `cac.aspx` IIS webshell access (inbound), priority 1
+- 2000561: WebSocket upgrade to exact `/socket` path (exact-match URI to
+  exclude socket.io's `/socket.io/`)
+
+**2 Wazuh rules (101528–101529, new file
+`wazuh-rules/0921-iranian-apt-july2026-host-indicators.xml`):**
+- 101528: Sysmon Event 7 — `WinDirStat.exe` loading `uxtheme.dll` from a
+  non-System32/SysWOW64 path (the Cavern sideload chain)
+- 101529: Sysmon Event 1 — any process executing from
+  `C:\ProgramData\WinDir\` (masquerade directory, absent on clean systems)
+
+### Notes
+- **Total: 438 Suricata rules** (SID 1000039–2000561); **279 Wazuh rules**
+  (max ID 101529)
+- Same rules added to `bb-iran-suricata.rules` in the by-country repo in the
+  same maintenance window — daily sync stays a no-op.
+- Same-day survey also confirmed the Unit 42 "Tracking Screening Serpens"
+  publication is the May 27 2026 disclosure already integrated in v4.0.21
+  (SID 2000538–2000549) — no new IOCs.
+
+### MITRE ATT&CK
+- T1574.002 (DLL Side-Loading), T1071.001 (Web Protocols/WebSocket),
+  T1021.003, T1087.002 (LDAP enumeration), T1090 (SOCKS5 tunnel),
+  T1036.005 (Masquerading), T1505.003 (Web Shell)
+
+## [4.0.22] - 2026-07-07
+
+### Fixed (P0 — 26-day production outage; behavior preserved, revs bumped)
+
+Since v4.0.21 shipped 2026-06-11, `suricata -T -S suricata/iranian-apt-detection.rules`
+has been rejected under Suricata 7.0.3 with `Loading signatures failed`. Every
+community deployer of the public ruleset has had **zero Iranian APT network
+coverage for 26 days**. Two rules introduced in the v4.0.21 backlog merge
+contained syntax Suricata 7 hard-errors on, aborting load of the entire file
+(not just the offending rules).
+
+Seven prior draft PRs (#30, #32, #33, #34, #35, #36, #37, #38) identified this
+same root cause across seven separate sessions and stalled unmerged. This
+release lands the fix.
+
+- **SID 2000030 rev 5→6** — `dsize:>500000` was outside Suricata's uint16
+  packet-size range (max 65535). The v4.0.21 FP-tightening pass treated `dsize`
+  as a session-wide byte counter, but it is per-packet u16. Rewritten to
+  `dsize:>1400` (near-MTU full data packet — the actual behavioral marker for
+  bulk transfer). The existing `count 500, seconds 3600` threshold was already
+  doing the volumetric work and is unchanged, so behavioral intent (sustained
+  bulk outbound to non-RFC1918) is preserved.
+- **SID 2000535 rev 1→2** — Removed redundant `nocase` after the sticky
+  `http.host` buffer. Suricata 7 normalizes the host buffer to lowercase and
+  rejects the `http.host + content + nocase + fast_pattern` combination as a
+  hard parse error (was a warning in earlier 7.0.x). Match string is already
+  lowercase so detection semantics are identical.
+
+### Validation
+
+```
+$ suricata -T -S suricata/iranian-apt-detection.rules -l /tmp/suri
+i: suricata: This is Suricata version 7.0.3 RELEASE running in SYSTEM mode
+i: suricata: Configuration provided was successfully loaded. Exiting.
+```
+
+All 429 rules arm. `xmllint --noout wazuh-rules/*.xml` exits 0. Rule count,
+SID range, and Wazuh inventory unchanged from v4.0.21:
+
+- **429 Suricata rules** (SID 1000039–2000552)
+- **277 Wazuh rules** (max ID 101527)
+
+### Cross-repo sync
+
+Identical fixes applied to `bb-iran-suricata.rules` in the private
+`barkbite-suricata-by-country` repo (v3.1.5). That repo's
+`bb-crosscountry-suricata.rules` had **seven additional** broken rules with
+the same syntax-error root cause (unescaped `;` in PCRE bracketed alternations,
+one flow-direction / http.uri conflict, one `http.host + nocase`); all fixed
+there too. The daily `sync-iran-rules.yml` workflow stays a no-op after both
+land.
+
+### Root cause of the 26-day miss
+
+Prior maintenance sessions could not run `suricata -T` — the environment had
+no Suricata binary — so static-check-only validation missed both defects and
+none of the seven follow-up sessions merged their fix PRs. Suricata 7.0.3 is
+now installed via `apt-get install suricata` at session start (~30s cost).
+Standing follow-up for the next maintenance cycle: add a GitHub Actions
+workflow that runs `suricata -T` on every PR touching `suricata/**`, plus
+`xmllint` on `wazuh-rules/**`, so this class of regression cannot ship silently
+again.
+
 ## [4.0.21] - 2026-06-11
 
 ### Added (consolidated backlog merge — PRs #16, #18, #22, #24 with SID renumbering)
