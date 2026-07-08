@@ -91,6 +91,7 @@ iranian-apt-detection/
 - **101522**: CVE-2025-34291 Langflow post-RCE process spawn (0919)
 - **101523-101527**: Dindoor/Fakeset June 2026 host indicators — Deno exec, Rclone exfil, Quick Assist, signer subjects (0920)
 - **101528-101529**: Cavern Manticore host indicators — WinDirStat/uxtheme.dll sideload, ProgramData\WinDir masquerade (0921)
+- **101530-101531**: MuddyWater Chaos false-flag host parity — ms_upd.exe stager, Game.exe C2 outbound (0920)
 
 ### Suricata SID Ranges (1000039-2000561)
 - **1000039-2000014**: CVE exploitation signatures

@@ -5,6 +5,29 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.24] - 2026-07-08
+
+### Added — MuddyWater Chaos false-flag host-process parity (Wazuh)
+
+Host-side parity for the MuddyWater Teams/Chaos false-flag network signatures
+(Suricata SID 2000521–2000527, integrated v4.0.19). The network rules catch the
+C2 hostnames and download URLs on the wire; these two Wazuh rules close the
+host-process gap when the initial download rides an encrypted channel the IDS
+cannot inspect. Backported from the private by-country maintenance session
+(private→public direction, manual).
+
+**2 Wazuh rules (101530–101531, appended to `0920-iranian-apt-june2026-host-indicators.xml`):**
+- 101530: Sysmon Event 1 — `ms_upd.exe` stager execution (the actor's masquerade
+  for a Windows updater; legit updates use Update.exe / mussetup.exe /
+  WaaSMedicAgent.exe). Drops the trojanized WebView2 `Game.exe` RAT.
+- 101531: Sysmon Event 3 — `Game.exe` outbound to `moonzonet.com` or
+  `uploadfiler.com` (known MuddyWater C2).
+
+**Totals: 438 Suricata rules (unchanged), 281 Wazuh rules** (max ID 101531).
+
+MITRE: T1036.005, T1204.002, T1105, T1071.001, T1219
+Ref: Rapid7 *Muddying the Tracks* (May–June 2026)
+
 ## [4.0.23] - 2026-07-07
 
 ### Added — Cavern Manticore modular C2 framework (Check Point Research, July 2026)
