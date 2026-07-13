@@ -5,6 +5,51 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.24] - 2026-07-13
+
+### Added — Seedworm/MuddyWater nine-country DLL sideloading campaign (WatchGuard, July 1 2026)
+
+WatchGuard's Q1 2026 threat report (Huntress corroboration) documents a
+Seedworm/MuddyWater espionage campaign against at least nine organizations in
+nine countries on four continents — industrial/electronics manufacturing,
+education, public sector, financial and professional services — including a
+week-long undetected dwell at a major South Korean electronics maker in
+February. Signed legitimate binaries sideload malicious DLLs: Fortemedia
+`fmapp.exe` loads `fmapp.dll`, SentinelOne `sentinelmemoryscanner.exe` loads
+`sentinelagentcore.dll`; both DLLs embed the open-source ChromElevator tool
+to defeat Chrome App-Bound Encryption and steal browser credentials, cookies
+and payment-card data. A Node.js implant chain runs PowerShell recon,
+screenshot capture, SAM hive theft and SOCKS5 reverse proxying. Stolen data
+stages at the legitimate sendit.sh file-transfer service; fmapp.dll beacons
+to 157.20.182.49 (AS136557 — already covered since v3.x by SID
+2000156/2000316/2000326/2000515).
+
+**2 Suricata rules (SID 2000562–2000563):**
+- 2000562: DNS query for sendit.sh (anchored to the registered domain;
+  thresholded; classtype policy-violation — the service is legitimate, tune
+  or disable where sanctioned)
+- 2000563: TLS SNI sendit.sh (same anchoring/threshold — fires on the
+  actual upload connection)
+
+**2 Wazuh rules (101530–101531, appended to
+`wazuh-rules/0921-iranian-apt-july2026-host-indicators.xml`):**
+- 101530: Sysmon Event 7 — sentinelmemoryscanner.exe loading
+  sentinelagentcore.dll (attacker-invented DLL name, any path)
+- 101531: Sysmon Event 7 — fmapp.exe loading fmapp.dll from outside
+  Program Files / Windows driver paths
+
+### Notes
+- **Total: 440 Suricata rules** (SID 1000039–2000563); **281 Wazuh rules**
+  (max ID 101531)
+- Same Suricata rules added to `bb-iran-suricata.rules` in the by-country
+  repo in the same maintenance window — daily sync stays a no-op.
+- Documentation updated: MITRE mapping (new July 2026 Seedworm section),
+  SOC Quick Reference (campaign indicator block), README counts.
+
+### MITRE ATT&CK
+- T1574.002 (DLL Side-Loading), T1555.003 (Credentials from Web Browsers),
+  T1567 (Exfiltration Over Web Service), T1071.001, T1090
+
 ## [4.0.23] - 2026-07-07
 
 ### Added — Cavern Manticore modular C2 framework (Check Point Research, July 2026)

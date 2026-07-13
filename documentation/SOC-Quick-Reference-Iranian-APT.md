@@ -38,6 +38,13 @@ web14[.]info
 web27[.]info
 ```
 
+### Seedworm Nine-Country Sideloading Campaign (July 2026) — Key Indicators
+- **DLL sideloads**: signed `fmapp.exe` loading `fmapp.dll` outside Program Files; signed `sentinelmemoryscanner.exe` loading `sentinelagentcore.dll` (any path)
+- **Credential theft**: both DLLs embed ChromElevator (Chrome App-Bound Encryption bypass) — check Chromium profile access after a sideload alert
+- **Exfil staging**: uploads to `sendit.sh` (legitimate file-transfer service; SID 2000562-2000563 fire at policy grade — correlate, don't auto-block)
+- **C2**: `157.20.182[.]49` (AS136557 Hosterdaddy — covered by SID 2000156/2000316/2000326/2000515)
+- **Implant chain**: Node.js orchestrating PowerShell recon/screenshots/SAM hive theft, SOCKS5 reverse proxy
+
 ### Dust Specter (April 2026) — Key Indicators
 - **TwinTalk C2**: HTTPS GET with `Authorization: Bearer eyJ...` to randomized hex URI paths
 - **File artifacts**: `C:\ProgramData\PolGuid\in.txt` and `out.txt` (TwinTask polling)

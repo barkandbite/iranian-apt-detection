@@ -2224,3 +2224,33 @@ alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT Cave
 # path (first WSS frame carries XOR-encrypted agent ID + "00"). Exact-match
 # URI to keep FPs down (socket.io and friends use /socket.io/).
 alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Cavern Manticore WebSocket C2 Upgrade /socket Endpoint 2026"; flow:to_server,established; http.method; content:"GET"; http.uri; content:"/socket"; startswith; endswith; http.header; content:"Upgrade|3a 20|websocket"; nocase; fast_pattern; threshold:type limit, track by_src, count 1, seconds 600; reference:url,research.checkpoint.com/2026/cavern-manticore-exposing-iran-linked-modular-c2-framework/; classtype:command-and-control; sid:2000561; rev:1; metadata:policy max-detect-ips drop, created_at 2026_07_07, updated_at 2026_07_07;)
+
+# ============================================================================
+# SECTION: SEEDWORM/MUDDYWATER NINE-COUNTRY DLL SIDELOADING CAMPAIGN (Q1 2026)
+# Source: WatchGuard threat report (2026-07-01), Symantec/Security.com,
+#         Huntress corroboration
+# TTPs:   DLL sideloading via signed Fortemedia fmapp.exe -> fmapp.dll and
+#         SentinelOne sentinelmemoryscanner.exe -> sentinelagentcore.dll;
+#         both DLLs embed ChromElevator (Chrome App-Bound Encryption bypass)
+#         for browser credential/cookie/card theft. Node.js implant chain
+#         runs PowerShell recon, screenshots, SAM hive theft, SOCKS5 reverse
+#         proxy. Victims across 9 countries / 4 continents incl. a South
+#         Korean electronics maker (week-long dwell, Feb 2026).
+# Network: fmapp.dll beacons to 157.20.182.49 (already covered by SID
+#         2000156/2000316/2000326/2000515 — same AS136557 infra from earlier
+#         MuddyWater reporting). Stolen data stages at sendit.sh, a
+#         legitimate public file-transfer service, to blend with normal
+#         outbound traffic.
+# MITRE: T1574.002, T1555.003, T1567 (exfil to web service), T1090
+# ============================================================================
+
+# Exfil staging via sendit.sh. The service is legitimate — this is a
+# policy-violation-grade indicator, not proof of compromise. In managed
+# corporate environments sendit.sh usage is rare; alongside any MuddyWater
+# host indicator it is a strong exfil signal. Thresholded; tune or disable
+# on networks where sendit.sh is sanctioned. Anchored to the registered
+# domain (endswith + boundary pcre) so lookalike domains don't match.
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT Seedworm Exfil Staging Service sendit.sh DNS Query 2026"; dns.query; content:"sendit.sh"; fast_pattern; endswith; pcre:"/(^|\.)sendit\.sh$/"; threshold:type limit, track by_src, count 1, seconds 600; reference:url,itsecurityguru.org/2026/07/01/iran-linked-muddywater-espionage-campaign-targets-organisations-across-four-continents/; reference:url,attack.mitre.org/techniques/T1567/; classtype:policy-violation; sid:2000562; rev:1; metadata:policy max-detect-ips drop, created_at 2026_07_13, updated_at 2026_07_13;)
+
+# Same indicator at the TLS layer — fires on the actual upload connection.
+alert tls $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Seedworm Exfil Staging Service sendit.sh TLS SNI 2026"; flow:to_server,established; tls.sni; content:"sendit.sh"; fast_pattern; endswith; pcre:"/(^|\.)sendit\.sh$/"; threshold:type limit, track by_src, count 1, seconds 600; reference:url,itsecurityguru.org/2026/07/01/iran-linked-muddywater-espionage-campaign-targets-organisations-across-four-continents/; reference:url,attack.mitre.org/techniques/T1567/; classtype:policy-violation; sid:2000563; rev:1; metadata:policy max-detect-ips drop, created_at 2026_07_13, updated_at 2026_07_13;)

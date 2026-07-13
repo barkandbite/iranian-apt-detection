@@ -1,7 +1,7 @@
 <!--
   Wazuh Rules for Iranian APT Detection - July 2026 Host Indicators
-  Version: 1.0
-  Last Updated: 2026-07-07
+  Version: 1.1
+  Last Updated: 2026-07-13
 
   Host-side detections complementing the Suricata network signatures
   (SID 2000553-2000561) for the Cavern Manticore modular C2 framework
@@ -15,11 +15,19 @@
   EnableThemeDialogTexture). Config lives in config.txt (JSON keys
   i/xd/int) in the working directory.
 
-  Rule ID Range: 101528-101529 (next available after 0920's 101527)
+  Also contains host indicators for the Seedworm/MuddyWater nine-country
+  DLL sideloading campaign (WatchGuard, 2026-07-01): signed Fortemedia
+  fmapp.exe -> fmapp.dll and SentinelOne sentinelmemoryscanner.exe ->
+  sentinelagentcore.dll sideloads embedding ChromElevator. Network-side
+  companions: Suricata SID 2000562-2000563 (sendit.sh exfil staging).
+
+  Rule ID Range: 101528-101531 (next available after 0920's 101527)
 
   References:
   - Check Point Research "Cavern Manticore: Exposing Iran-Linked Modular
     C2 Framework" (July 2026)
+  - WatchGuard threat report on Seedworm Q1 2026 espionage campaign
+    (2026-07-01); Huntress corroboration
 -->
 
 <group name="iranian_apt,july2026_host,cavern_manticore,">
@@ -56,6 +64,45 @@
       <id>T1574.002</id>
     </mitre>
     <group>attack,defense_evasion,cavern_manticore,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- ========== SEEDWORM NINE-COUNTRY SIDELOAD CHAIN (101530-101531) ========== -->
+
+  <!-- Seedworm/MuddyWater nine-country DLL sideloading campaign (WatchGuard
+       2026-07-01, Huntress corroboration). Signed SentinelOne memory
+       scanner binary sideloads the malicious sentinelagentcore.dll
+       (embeds ChromElevator browser credential theft). The DLL name is
+       attacker-invented — the legitimate scanner never loads it, so any
+       path matches. (T1574.002, T1555.003) -->
+  <rule id="101530" level="14">
+    <if_group>sysmon_event7</if_group>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\sentinelmemoryscanner\.exe$</field>
+    <field name="win.eventdata.imageLoaded" type="pcre2">(?i)\\sentinelagentcore\.dll$</field>
+    <description>Iranian APT: Seedworm - sentinelmemoryscanner.exe sideloading sentinelagentcore.dll (ChromElevator credential theft chain)</description>
+    <mitre>
+      <id>T1574.002</id>
+      <id>T1555.003</id>
+    </mitre>
+    <group>attack,defense_evasion,credential_access,seedworm,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- Same campaign: signed Fortemedia audio binary fmapp.exe sideloading
+       fmapp.dll from outside the legitimate driver install paths
+       (Program Files / Windows). The campaign drops both files into
+       user-writable directories; the legitimate pairing only ever loads
+       from the driver package location. fmapp.dll beacons to
+       157.20.182.49 (Suricata SID 2000156/2000316/2000326/2000515).
+       (T1574.002) -->
+  <rule id="101531" level="14">
+    <if_group>sysmon_event7</if_group>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\fmapp\.exe$</field>
+    <field name="win.eventdata.imageLoaded" type="pcre2">(?i)^(?!.*\\(Program Files( \(x86\))?|Windows)\\).*\\fmapp\.dll$</field>
+    <description>Iranian APT: Seedworm - fmapp.exe sideloading fmapp.dll from non-standard path (ChromElevator credential theft chain)</description>
+    <mitre>
+      <id>T1574.002</id>
+      <id>T1555.003</id>
+    </mitre>
+    <group>attack,defense_evasion,credential_access,seedworm,pci_dss_10.6.1,</group>
   </rule>
 
 </group>

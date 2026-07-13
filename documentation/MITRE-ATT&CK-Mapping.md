@@ -234,3 +234,19 @@
 ### Defense Evasion
 - **T1574.002 - DLL Side-Loading**: Wazuh 101528 (WinDirStat.exe loading trojanized uxtheme.dll from non-system path)
 - **T1036.005 - Match Legitimate Name or Location**: Wazuh 101529 (execution from C:\ProgramData\WinDir\ masquerade directory), SID 2000553 (google.com.hospitalinstallation.com visual-obfuscation subdomain)
+
+---
+
+## July 2026 Additions — Seedworm Nine-Country DLL Sideloading Campaign (WatchGuard)
+
+### Defense Evasion
+- **T1574.002 - DLL Side-Loading**: Wazuh 101530 (sentinelmemoryscanner.exe loading sentinelagentcore.dll), Wazuh 101531 (fmapp.exe loading fmapp.dll from non-standard path)
+
+### Credential Access
+- **T1555.003 - Credentials from Web Browsers**: Wazuh 101530-101531 (both sideloaded DLLs embed ChromElevator to defeat Chrome App-Bound Encryption)
+
+### Exfiltration
+- **T1567 - Exfiltration Over Web Service**: SIDs 2000562-2000563 (stolen data staged at the legitimate sendit.sh file-transfer service; DNS + TLS SNI, thresholded policy-grade indicators)
+
+### Command and Control
+- **T1071.001 - Web Protocols**: fmapp.dll C2 157.20.182.49 already covered by SIDs 2000156, 2000316, 2000326, 2000515 (same AS136557 infrastructure from earlier MuddyWater reporting)
