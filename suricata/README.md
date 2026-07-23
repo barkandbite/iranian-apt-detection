@@ -6,10 +6,10 @@ This directory contains Suricata IDS signatures for detecting Iranian APT networ
 ## Current Ruleset
 
 ### Canonical File: `iranian-apt-detection.rules`
-- **Version**: 4.0.21 (consolidated from v3.1, v3.2, v3.3 + ongoing updates)
-- **Last Updated**: 2026-06-11
-- **SID Range**: 1000039–2000552
-- **Total Rules**: 429 signatures
+- **Version**: 4.0.24 (consolidated from v3.1, v3.2, v3.3 + ongoing updates)
+- **Last Updated**: 2026-07-23
+- **SID Range**: 1000039–2000563
+- **Total Rules**: 440 signatures
 - **Zero duplicate SIDs**
 - **Requires**: Suricata 7.0+
 
@@ -37,6 +37,8 @@ This directory contains Suricata IDS signatures for detecting Iranian APT networ
 | 2000534–2000537 | 4 | MuddyWater RustyWater Rust RAT: nomercys.it.com C2 + 159.198.66.153 (THN/ProtosLabs) |
 | 2000538–2000549 | 12 | Screening Serpens (UNC1549) MiniUpdate + MiniJunk V2 Azure C2 (Unit 42 May 2026) |
 | 2000550–2000552 | 3 | CVE-2025-34291 Langflow CORS bypass + RCE, MuddyWater initial access (CISA KEV) |
+| 2000553–2000561 | 9 | Cavern Manticore modular C2 (X-User-token beacon, x-db-* SQL headers, /socket WS, cac.aspx webshell) — Check Point, July 2026 |
+| 2000562–2000563 | 2 | Cavern HollowGraph M365-calendar C2: cloudlanecdn.com credential-refresh DNS — Group-IB, 2026-07-20 |
 
 ### Threat Group Coverage
 

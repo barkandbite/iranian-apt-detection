@@ -5,6 +5,36 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.24] - 2026-07-23
+
+### Added — HollowGraph: Cavern-framework Microsoft 365 calendar C2 (Group-IB, 2026-07-20)
+
+HollowGraph is a Cavern-framework module (high-confidence attribution to the
+same Iran MOIS-linked cluster as SID 2000553–2000561; Lyceum/OilRig overlap)
+observed infecting at least 12 Israeli-organization systems, with three in
+active communication between 2026-06-03 and 2026-07-09. The implant
+authenticates to the Microsoft Graph API with hardcoded credentials and uses a
+compromised M365 mailbox calendar as a two-way dead drop: commands and
+exfiltrated data hide in `File{n}.txt` attachments on calendar events dated
+`2050-05-13`. The Graph C2 itself is opaque TLS to `graph.microsoft.com`; the
+durable network tell is the out-of-band credential-refresh domain resolved over
+DNS (AAAA, high-entropy labels).
+
+**2 Suricata rules (SID 2000562–2000563):**
+- 2000562: DNS `cloudlanecdn.com` (credential-refresh / fallback C2 domain)
+- 2000563: Behavioral — high-entropy subdomain of `cloudlanecdn.com`
+  (DNS-tunnel credential refresh), thresholded 3/300s on the beacon cadence
+
+**2 Wazuh rules (101532–101533)** in `wazuh-rules/0921-iranian-apt-july2026-host-indicators.xml`:
+- 101532: FIM/Sysmon 11 — `logAzure.txt` Graph-credential store dropped to disk
+- 101533: Sysmon 22 — host DNS query to `cloudlanecdn.com` (host attribution
+  for the network match, fires even when the Graph C2 is opaque TLS)
+
+MITRE: T1071.001, T1102.002, T1568.002, T1132.001, T1552.001, T1036.005
+
+Ref: Group-IB "HOLLOWGRAPH: Turning Microsoft 365 Calendars into Covert
+Command-and-Control Channels" (2026-07-20).
+
 ## [4.0.23] - 2026-07-07
 
 ### Added — Cavern Manticore modular C2 framework (Check Point Research, July 2026)

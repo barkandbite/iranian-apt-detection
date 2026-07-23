@@ -233,4 +233,15 @@
 
 ### Defense Evasion
 - **T1574.002 - DLL Side-Loading**: Wazuh 101528 (WinDirStat.exe loading trojanized uxtheme.dll from non-system path)
-- **T1036.005 - Match Legitimate Name or Location**: Wazuh 101529 (execution from C:\ProgramData\WinDir\ masquerade directory), SID 2000553 (google.com.hospitalinstallation.com visual-obfuscation subdomain)
+- **T1036.005 - Match Legitimate Name or Location**: Wazuh 101529 (execution from C:\ProgramData\WinDir\ masquerade directory), SID 2000553 (google.com.hospitalinstallation.com visual-obfuscation subdomain), Wazuh 101532 (logAzure.txt Graph-credential store masquerade)
+
+## July 2026 Additions — HollowGraph: Cavern Microsoft 365 Calendar C2 (Group-IB, 2026-07-20)
+
+### Command and Control
+- **T1102.002 - Web Service: Bidirectional Communication**: Cavern module using a compromised M365 mailbox calendar (Graph API) as a two-way dead drop — File{n}.txt attachments on events dated 2050-05-13
+- **T1071.001 - Web Protocols**: SIDs 2000562-2000563, Wazuh 101533 (cloudlanecdn.com credential-refresh / fallback C2)
+- **T1568.002 - Dynamic Resolution: Domain Generation Algorithms**: SID 2000563 (high-entropy DNS-tunnel subdomain of cloudlanecdn.com), Wazuh 101533 (host attribution)
+- **T1132.001 - Data Encoding: Standard Encoding**: SID 2000563 (base32-style encoded DNS labels)
+
+### Credential Access
+- **T1552.001 - Unsecured Credentials: Credentials In Files**: Wazuh 101532 (logAzure.txt hardcoded Graph client credentials on disk)

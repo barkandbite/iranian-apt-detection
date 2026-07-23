@@ -2224,3 +2224,26 @@ alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT Cave
 # path (first WSS frame carries XOR-encrypted agent ID + "00"). Exact-match
 # URI to keep FPs down (socket.io and friends use /socket.io/).
 alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Cavern Manticore WebSocket C2 Upgrade /socket Endpoint 2026"; flow:to_server,established; http.method; content:"GET"; http.uri; content:"/socket"; startswith; endswith; http.header; content:"Upgrade|3a 20|websocket"; nocase; fast_pattern; threshold:type limit, track by_src, count 1, seconds 600; reference:url,research.checkpoint.com/2026/cavern-manticore-exposing-iran-linked-modular-c2-framework/; classtype:command-and-control; sid:2000561; rev:1; metadata:policy max-detect-ips drop, created_at 2026_07_07, updated_at 2026_07_07;)
+# ============================================================================
+# HOLLOWGRAPH - Cavern framework Microsoft 365 calendar C2 (SID 2000562-2000563)
+# Source: Group-IB "HOLLOWGRAPH: Turning Microsoft 365 Calendars into Covert
+#         C2 Channels" (2026-07-20). High-confidence attribution to the Cavern
+#         backdoor framework (Iran MOIS-linked, Lyceum/OilRig overlap; already
+#         covered at SID 2000553-2000561). >=12 Israeli-org infections, active
+#         C2 2026-06-03 .. 2026-07-09.
+# TTP:    Implant authenticates to Microsoft Graph with hardcoded creds and
+#         uses a compromised M365 mailbox calendar (events dated 2050-05-13,
+#         File{n}.txt attachments) as a two-way dead drop. The Graph traffic
+#         itself is TLS to graph.microsoft.com (not tractable); the durable
+#         network tell is the out-of-band credential-refresh domain resolved
+#         over DNS (AAAA, high-entropy labels).
+# MITRE:  T1071.001, T1102.002, T1568.002, T1132.001
+# ============================================================================
+
+# cloudlanecdn.com - HollowGraph credential-refresh / fallback C2 domain.
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT Cavern HollowGraph C2 Domain cloudlanecdn.com 2026"; flow:to_server; dns.query; content:"cloudlanecdn.com"; nocase; fast_pattern; reference:url,group-ib.com/blog/hollowgraph-microsoft-365/; classtype:command-and-control; sid:2000562; rev:1; metadata:policy max-detect-ips drop, created_at 2026_07_23, updated_at 2026_07_23;)
+
+# High-entropy subdomain of cloudlanecdn.com - the DNS-tunnel credential
+# refresh (long base32/hex label carrying encoded data). Thresholded to key on
+# the beacon cadence rather than a single lookup.
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT Cavern HollowGraph DNS-Tunnel Credential Refresh cloudlanecdn.com 2026"; flow:to_server; dns.query; content:"cloudlanecdn.com"; nocase; pcre:"/[a-z2-7]{16,}\.cloudlanecdn\.com/i"; threshold:type both, track by_src, count 3, seconds 300; reference:url,group-ib.com/blog/hollowgraph-microsoft-365/; classtype:command-and-control; sid:2000563; rev:1; metadata:policy max-detect-ips drop, created_at 2026_07_23, updated_at 2026_07_23;)
