@@ -15,11 +15,17 @@
   EnableThemeDialogTexture). Config lives in config.txt (JSON keys
   i/xd/int) in the working directory.
 
-  Rule ID Range: 101528-101529 (next available after 0920's 101527)
+  Rule ID Range: 101528-101529, 101532-101533 (next available after 0920's 101527)
+
+  101532-101533 add host-side coverage for HOLLOWGRAPH, a Cavern-framework
+  module that uses a compromised Microsoft 365 mailbox calendar as C2
+  (Group-IB, 2026-07-20; network side at SID 2000562-2000563).
 
   References:
   - Check Point Research "Cavern Manticore: Exposing Iran-Linked Modular
     C2 Framework" (July 2026)
+  - Group-IB "HOLLOWGRAPH: Turning Microsoft 365 Calendars into Covert
+    Command-and-Control Channels" (2026-07-20)
 -->
 
 <group name="iranian_apt,july2026_host,cavern_manticore,">
@@ -56,6 +62,39 @@
       <id>T1574.002</id>
     </mitre>
     <group>attack,defense_evasion,cavern_manticore,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- ========== HOLLOWGRAPH M365 CALENDAR C2 (101532-101533) ========== -->
+
+  <!-- logAzure.txt written to disk (FIM / Sysmon Event 11). HollowGraph
+       stores its hardcoded Microsoft Graph client credentials in a file
+       masqueraded as a routine Azure log. Legitimate software does not drop
+       a "logAzure.txt"; its creation alongside a running .NET host is the
+       config-staging tell. (T1552.001, T1036.005) -->
+  <rule id="101532" level="13">
+    <if_group>syscheck,sysmon_event_11</if_group>
+    <field name="file" type="pcre2">(?i)\\logAzure\.txt$</field>
+    <description>Iranian APT: Cavern HollowGraph - logAzure.txt Graph credential store dropped to disk</description>
+    <mitre>
+      <id>T1552.001</id>
+      <id>T1036.005</id>
+    </mitre>
+    <group>attack,credential_access,cavern_manticore,hollowgraph,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- Host resolving the HollowGraph credential-refresh domain (Sysmon
+       Event 22 DnsQuery). Provides host attribution for the network match at
+       SID 2000562-2000563 and fires even when the Graph C2 itself is opaque
+       TLS to graph.microsoft.com. (T1071.001, T1568.002) -->
+  <rule id="101533" level="13">
+    <if_group>sysmon_event_22</if_group>
+    <field name="win.eventdata.queryName" type="pcre2">(?i)(^|\.)cloudlanecdn\.com$</field>
+    <description>Iranian APT: Cavern HollowGraph - host DNS query to C2 domain cloudlanecdn.com</description>
+    <mitre>
+      <id>T1071.001</id>
+      <id>T1568.002</id>
+    </mitre>
+    <group>attack,command_and_control,cavern_manticore,hollowgraph,pci_dss_10.6.1,</group>
   </rule>
 
 </group>

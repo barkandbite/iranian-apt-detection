@@ -36,7 +36,23 @@ girlsbags[.]shop
 onlinepettools[.]shop
 web14[.]info
 web27[.]info
+
+# Cavern Manticore C2 domains (July 2026)
+hospitalinstallation[.]com
+adserviceupdate[.]com
+hygienehistory[.]com
+
+# Cavern HollowGraph M365-calendar C2 (Group-IB, 2026-07-20)
+cloudlanecdn[.]com          # credential-refresh via AAAA, high-entropy subdomains
 ```
+
+### Cavern HollowGraph (July 2026) — Key Indicators
+- **Graph C2**: compromised M365 mailbox calendar as two-way dead drop; events
+  dated `2050-05-13` with `File{n}.txt` attachments carrying tasking/exfil
+- **Credential store**: `logAzure.txt` (hardcoded Graph client credentials on disk)
+- **Fallback C2**: DNS AAAA lookups of high-entropy subdomains under `cloudlanecdn[.]com`
+- **Cloud tell**: newly created Entra client secrets; app-driven (not user-driven)
+  calendar-event changes on a mailbox
 
 ### Dust Specter (April 2026) — Key Indicators
 - **TwinTalk C2**: HTTPS GET with `Authorization: Bearer eyJ...` to randomized hex URI paths
