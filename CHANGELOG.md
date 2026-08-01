@@ -5,6 +5,54 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.24] - 2026-08-01
+
+### Added — Schneider/Siemens PLC targeting (CISA AA26-097A, 2026-07-22 update)
+
+CISA/FBI/EPA advisory AA26-097A ("Iranian-Affiliated Cyber Actors Exploit
+Programmable Logic Controllers Across US Critical Infrastructure") was updated
+on 2026-07-22 to widen the observed targeting from Rockwell Automation to
+**Schneider Electric and Siemens** PLCs, and to add guidance on detecting
+malicious changes to reusable PLC code modules. Attribution: IRGC-affiliated
+CyberAv3ngers. The existing ruleset already covered Rockwell EtherNet/IP+CIP
+(SID 2000304) and generic Modbus writes (SID 2000041/2000301); these three
+rules fill the Schneider- and Siemens-specific gaps for internet-exposed PLCs.
+
+**3 Suricata rules (SID 2000562–2000564), all `priority:1`, OT-segment only:**
+- 2000562: Schneider Electric Modicon **UMAS** control channel (Modbus
+  function code 0x5A / 90) from `$EXTERNAL_NET` → PLC port 502. UMAS carries
+  reservation, program upload/download, and start/stop — the Schneider-specific
+  disruptive surface, distinct from the generic FC 0x10 write already covered.
+  Thresholded (3/60s).
+- 2000563: Siemens **S7comm external-origin CPU STOP** (`$EXTERNAL_NET` →
+  port 102). The pre-existing STOP rule (SID 2000161) only matches
+  internal→internal traffic; this covers a directly internet-exposed S7 PLC
+  being halted from outside (TPKT `03 00`, S7 job `32 01`, PLC-control
+  function `0x29`).
+- 2000564: Siemens **S7comm external-origin program download**
+  (request-download function `0x1a`) — overwriting PLC logic from the internet,
+  the mechanism behind the "disrupted the function of PLCs" language in the
+  advisory. Thresholded (1/60s).
+
+### Notes
+- **Total: 441 Suricata rules** (SID 1000039–2000564); Wazuh unchanged at 279
+  rules (max ID 101529). These are network-only ICS behavioral rules; no
+  host-side artifact, so no new Wazuh rule.
+- **ICS/OT deployment caution:** enable SID 2000562–2000564 ONLY on
+  OT-adjacent segments. A false positive on an ICS control rule can disrupt
+  industrial operations.
+- Same three rules added to `bb-iran-suricata.rules` in the by-country repo in
+  the same maintenance window (private↔public Iran files kept byte-identical) —
+  the daily sync stays a no-op.
+
+### MITRE ATT&CK
+- T0855 (Unauthorized Command Message), T0831 (Manipulation of Control),
+  T0813 (Denial of Control), T0836 (Modify Parameter), T0843 (Program
+  Download), T1190 (Exploit Public-Facing Application)
+
+### Ref
+- CISA AA26-097A (updated 2026-07-22); IC3 CSA 260722.
+
 ## [4.0.23] - 2026-07-07
 
 ### Added — Cavern Manticore modular C2 framework (Check Point Research, July 2026)

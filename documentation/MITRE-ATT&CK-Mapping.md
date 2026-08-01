@@ -234,3 +234,22 @@
 ### Defense Evasion
 - **T1574.002 - DLL Side-Loading**: Wazuh 101528 (WinDirStat.exe loading trojanized uxtheme.dll from non-system path)
 - **T1036.005 - Match Legitimate Name or Location**: Wazuh 101529 (execution from C:\ProgramData\WinDir\ masquerade directory), SID 2000553 (google.com.hospitalinstallation.com visual-obfuscation subdomain)
+---
+
+## August 2026 Additions — Schneider/Siemens PLC Targeting (CISA AA26-097A, 2026-07-22 update)
+
+The advisory update widened observed Iranian PLC targeting from Rockwell to
+Schneider Electric and Siemens. These are ICS-domain (MITRE ATT&CK for ICS)
+techniques. Enable SIDs 2000562-2000564 ONLY on OT-adjacent segments.
+
+### Initial Access (ICS)
+- **T0883 - Internet Accessible Device**: SIDs 2000562-2000564 (Schneider UMAS and Siemens S7comm control from $EXTERNAL_NET to internet-exposed PLCs)
+
+### Execution / Impair Process Control (ICS)
+- **T0855 - Unauthorized Command Message**: SIDs 2000562 (Schneider UMAS FC 0x5A control), 2000563 (Siemens S7comm CPU STOP)
+- **T0843 - Program Download**: SID 2000564 (Siemens S7comm request-download function 0x1a — PLC logic overwrite)
+- **T0836 - Modify Parameter**: SID 2000562 (UMAS reservation/write to Modicon controllers)
+
+### Inhibit Response Function / Impact (ICS)
+- **T0813 - Denial of Control**: SID 2000563 (external S7comm CPU STOP halts the PLC)
+- **T0831 - Manipulation of Control**: SIDs 2000562, 2000564 (unauthorized program/parameter changes to Schneider and Siemens PLCs)

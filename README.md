@@ -1,6 +1,6 @@
 # Iranian APT Detection Rules
 
-[![Version](https://img.shields.io/badge/version-4.0.23-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.0.24-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![MITRE ATT&CK](https://img.shields.io/badge/MITRE%20ATT%26CK-v15-orange.svg)](documentation/MITRE-ATT&CK-Mapping.md)
 
@@ -16,8 +16,9 @@ Three concurrent Iranian campaigns targeting U.S. healthcare disclosed March 24:
 - **Pay2Key v3** (IRGC) hit unnamed U.S. healthcare org with **ChaCha20 + Curve25519** ransomware. Fake Avast AV bypass. **I2P C2** (not Tor). Purely destructive — no ransom demand.
 - **MuddyWater** exploiting **CVE-2025-59287** (Windows WSUS Deserialization RCE, CVSS 9.8) to pre-position on healthcare networks.
 
-## Recent Threats (v4.0.23)
+## Recent Threats (v4.0.24)
 
+- **NEW (v4.0.24)**: **Schneider/Siemens PLC targeting** (CISA AA26-097A 2026-07-22 update) — advisory widened from Rockwell to Schneider Electric and Siemens PLCs. 3 Suricata rules (SID 2000562-2000564, all `priority:1`, OT-only): Schneider Modicon **UMAS** (Modbus FC 0x5A) external control, Siemens **S7comm external CPU STOP** (fills the internal-only gap in SID 2000161), Siemens **S7comm external program download** (FC 0x1a). Network-only ICS behavioral — enable on OT-adjacent segments only.
 - **NEW (v4.0.23)**: **Cavern Manticore** modular C2 framework (Check Point July 2026) — Iran MOIS-linked (OilRig/Lyceum nexus) targeting Israeli gov/IT. 9 Suricata rules (SID 2000553-2000561): C2 domains hospitalinstallation.com / adserviceupdate.com / hygienehistory.com, `X-User-token` beacon behavioral (`GET /profile` / `POST /gallery`), `x-db-user`/`x-db-password` SQL-module credential headers, `cac.aspx` IIS webshell, `/socket` WebSocket channel. 2 Wazuh host rules (101528-101529, new `0921` file): WinDirStat.exe→uxtheme.dll sideload, `C:\ProgramData\WinDir\` masquerade execution.
 - **FIXED (v4.0.22 — P0, 26-day production outage)**: `suricata/iranian-apt-detection.rules` failed to load on Suricata 7.0.3 since v4.0.21 shipped 2026-06-11. All 429 rules silently unavailable. Two hard parse errors: SID 2000030 `dsize:>500000` (u16 overflow, corrected to `dsize:>1400` — per-hour threshold of 500 packets stays the volume signal), SID 2000535 `http.host + nocase` (redundant + hard error in 7.0.3, `nocase` removed). Detection intent unchanged for both; revs bumped to 6 and 2.
 - **NEW (v4.0.21)**: Consolidated backlog merge — MuddyWater **RustyWater Rust RAT** (SID 2000534-2000537), Screening Serpens/UNC1549 **MiniUpdate + MiniJunk V2** Azure C2 (SID 2000538-2000549, Unit 42 May 2026), **CVE-2025-34291 Langflow** CORS bypass + RCE (SID 2000550-2000552, CISA KEV), 6 new Wazuh host-side rules (101522-101527) incl. new `0920` file; FP tightening for 5 noisy rules
@@ -75,7 +76,7 @@ sudo systemctl restart wazuh-manager
 
 ### 2. Deploy Suricata Rules
 ```bash
-# Deploy consolidated rules (v4.0 — single file, 438 signatures)
+# Deploy consolidated rules (v4.0 — single file, 441 signatures)
 sudo cp suricata/iranian-apt-detection.rules /etc/suricata/rules/
 
 # Add to suricata.yaml rule-files section:
@@ -132,7 +133,7 @@ sudo chmod +x /var/ossec/active-response/bin/iranian-apt-active-response.sh
 
 ### Rule Statistics
 - **Wazuh Rules**: 277 detection rules across 11 files
-- **Suricata Signatures**: 438 network signatures (1 consolidated rule file)
+- **Suricata Signatures**: 441 network signatures (1 consolidated rule file)
 - **CVEs Covered**: 40+ including 2025/2026 zero-days
 - **Known C2 IPs**: 37+
 - **Known C2 Domains**: 37+
@@ -196,7 +197,7 @@ iranian-apt-detection/
 │   ├── 0920-iranian-apt-june2026-host-indicators.xml
 │   └── README.md
 ├── suricata/                  # Network IDS signatures
-│   ├── iranian-apt-detection.rules  # Consolidated v4.0 (438 rules)
+│   ├── iranian-apt-detection.rules  # Consolidated v4.0 (441 rules)
 │   └── README.md
 ├── configurations/            # Agent and system configs
 │   ├── sysmon-config-iranian-apt.xml
@@ -314,4 +315,4 @@ These rules are provided as-is for defensive purposes. Users are responsible for
 
 ---
 
-**Last Updated**: July 7, 2026 | **Version**: 4.0.23 | **Maintainer**: Bark&Bite Security Intelligence
+**Last Updated**: August 1, 2026 | **Version**: 4.0.24 | **Maintainer**: Bark&Bite Security Intelligence

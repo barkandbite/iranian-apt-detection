@@ -2224,3 +2224,38 @@ alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT Cave
 # path (first WSS frame carries XOR-encrypted agent ID + "00"). Exact-match
 # URI to keep FPs down (socket.io and friends use /socket.io/).
 alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Cavern Manticore WebSocket C2 Upgrade /socket Endpoint 2026"; flow:to_server,established; http.method; content:"GET"; http.uri; content:"/socket"; startswith; endswith; http.header; content:"Upgrade|3a 20|websocket"; nocase; fast_pattern; threshold:type limit, track by_src, count 1, seconds 600; reference:url,research.checkpoint.com/2026/cavern-manticore-exposing-iran-linked-modular-c2-framework/; classtype:command-and-control; sid:2000561; rev:1; metadata:policy max-detect-ips drop, created_at 2026_07_07, updated_at 2026_07_07;)
+
+# ============================================================================
+# AA26-097A update (2026-07-22) — Iranian-affiliated PLC targeting widens to
+# Schneider Electric and Siemens. Attribution: CyberAv3ngers / IRGC-affiliated.
+# The original advisory covered Rockwell (EtherNet/IP+CIP, SID 2000304) and
+# generic Modbus writes (SID 2000041/2000301); the July update adds observed
+# targeting of Schneider Modicon (UMAS control channel) and Siemens S7 PLCs
+# reached directly from the internet. These fill the Schneider/Siemens-specific
+# gap. ICS/OT — enable ONLY on OT-adjacent segments; a false positive here can
+# disrupt industrial operations.
+# Ref: CISA AA26-097A (updated 2026-07-22), IC3 CSA 260722.
+# ============================================================================
+
+# Schneider Electric Modicon UMAS — the proprietary management protocol
+# encapsulated in Modbus function code 0x5A (90). UMAS carries PLC reservation,
+# program upload/download, and start/stop operations — the disruptive control
+# surface on Modicon M340/M580. Generic Modbus write (FC 0x10) is covered by
+# SID 2000041/2000301; this catches the Schneider-specific UMAS channel from an
+# external source. Modbus protocol id (bytes 2-3 = 0x0000) anchors it to real
+# Modbus/TCP; FC at offset 7. OT-only.
+alert tcp $EXTERNAL_NET any -> $HOME_NET 502 (msg:"Bark&Bite - Iranian APT CyberAv3ngers Schneider UMAS External Control AA26-097A 2026"; flow:to_server,established; content:"|00 00|"; offset:2; depth:2; content:"|5a|"; offset:7; depth:1; threshold:type both, track by_src, count 3, seconds 60; reference:url,cisa.gov/news-events/cybersecurity-advisories/aa26-097a; classtype:attempted-admin; sid:2000562; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_08_01, updated_at 2026_08_01;)
+
+# Siemens S7comm external-origin CPU STOP. The existing STOP rule (SID 2000161)
+# only matches internal->internal (HOME->HOME) traffic; the AA26-097A update
+# highlights S7 PLCs reachable directly from the internet being halted. Same S7
+# job/STOP signature (TPKT 0300, ROSCTR job 32 01, PLC-control function 0x29)
+# but from EXTERNAL_NET — a directly internet-exposed Siemens PLC being stopped
+# from outside is a high-confidence disruption event. OT-only.
+alert tcp $EXTERNAL_NET any -> $HOME_NET 102 (msg:"Bark&Bite - Iranian APT CyberAv3ngers Siemens S7comm External CPU STOP AA26-097A 2026"; flow:to_server,established; content:"|03 00|"; depth:2; content:"|32 01|"; distance:0; within:12; content:"|29|"; distance:0; within:15; reference:url,cisa.gov/news-events/cybersecurity-advisories/aa26-097a; classtype:attempted-admin; sid:2000563; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_08_01, updated_at 2026_08_01;)
+
+# Siemens S7comm external-origin program download (request-download, function
+# 0x1a). Overwriting PLC logic from the internet is the mechanism behind the
+# "disrupted the function of PLCs" language in AA26-097A. TPKT + S7 job header +
+# request-download function code, from EXTERNAL_NET to port 102. OT-only.
+alert tcp $EXTERNAL_NET any -> $HOME_NET 102 (msg:"Bark&Bite - Iranian APT CyberAv3ngers Siemens S7comm External Program Download AA26-097A 2026"; flow:to_server,established; content:"|03 00|"; depth:2; content:"|32 01|"; distance:0; within:12; content:"|1a|"; distance:0; within:15; threshold:type both, track by_src, count 1, seconds 60; reference:url,cisa.gov/news-events/cybersecurity-advisories/aa26-097a; classtype:attempted-admin; sid:2000564; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_08_01, updated_at 2026_08_01;)

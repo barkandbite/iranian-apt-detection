@@ -181,6 +181,23 @@ Count alerts by signature:
 grep "Iranian APT" /var/log/suricata/fast.log | cut -d'"' -f2 | sort | uniq -c
 ```
 
+### ICS/OT — Schneider/Siemens PLC Alerts (CISA AA26-097A, priority 1)
+
+**Enable SIDs 2000562-2000564 only on OT-adjacent segments.** Any hit is an
+external host reaching an internet-exposed PLC — treat as a control-system
+compromise, not a routine web alert. Isolate the segment before investigating.
+
+```bash
+# Schneider UMAS / Siemens S7comm external control on OT protocols
+grep -E "\[1:(2000562|2000563|2000564):" /var/log/suricata/fast.log
+```
+
+| SID | Trigger | Action |
+|-----|---------|--------|
+| 2000562 | Schneider Modicon UMAS (Modbus FC 0x5A) from external → port 502 | Verify no external Modbus/UMAS should reach the PLC; block at perimeter |
+| 2000563 | Siemens S7comm CPU STOP from external → port 102 | Potential process-halt attempt; check PLC run state immediately |
+| 2000564 | Siemens S7comm program download from external → port 102 | PLC logic overwrite; capture the S7 payload, engage OT/ICS IR |
+
 ## Quick Wins
 
 1. **Patch these NOW**: Check Point, Palo Alto, Citrix, F5, Ivanti devices, Exchange servers
