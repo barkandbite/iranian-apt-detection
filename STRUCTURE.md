@@ -16,6 +16,7 @@ iranian-apt-detection/
 │   ├── 0919-iranian-apt-march2026-expansion.xml     # March 2026 expansion
 │   ├── 0920-iranian-apt-june2026-host-indicators.xml # June 2026 host indicators
 │   ├── 0921-iranian-apt-july2026-host-indicators.xml # July 2026 host indicators (Cavern Manticore)
+│   ├── 0922-iranian-apt-august2026-ics-indicators.xml # Aug 2026 ICS indicators (CyberAv3ngers Schneider/Siemens)
 │   └── README.md                                     # Wazuh rules documentation
 │
 ├── configurations/
@@ -25,7 +26,7 @@ iranian-apt-detection/
 │   └── README.md                                     # Configuration guide
 │
 ├── suricata/
-│   ├── iranian-apt-detection.rules                  # Consolidated Suricata IDS signatures (v4.0.21, 429 rules)
+│   ├── iranian-apt-detection.rules                  # Consolidated Suricata IDS signatures (v4.0.24, 443 rules)
 │   └── README.md                                     # Suricata deployment guide
 │
 ├── documentation/
@@ -91,8 +92,9 @@ iranian-apt-detection/
 - **101522**: CVE-2025-34291 Langflow post-RCE process spawn (0919)
 - **101523-101527**: Dindoor/Fakeset June 2026 host indicators — Deno exec, Rclone exfil, Quick Assist, signer subjects (0920)
 - **101528-101529**: Cavern Manticore host indicators — WinDirStat/uxtheme.dll sideload, ProgramData\WinDir masquerade (0921)
+- **101530-101531**: CyberAv3ngers ICS host indicators — Schneider project-file access, Siemens S7 programming binary from non-standard path (0922, CISA AA26-097A)
 
-### Suricata SID Ranges (1000039-2000561)
+### Suricata SID Ranges (1000039-2000566)
 - **1000039-2000014**: CVE exploitation signatures
 - **2000015-2000030**: C2 infrastructure, post-exploitation, exfiltration
 - **2000031-2000050**: Reconnaissance, web shells, ICS/SCADA, correlation
@@ -121,6 +123,8 @@ iranian-apt-detection/
 - **2000538-2000549**: Screening Serpens (UNC1549) MiniUpdate + MiniJunk V2 Azure C2 (Unit 42)
 - **2000550-2000552**: CVE-2025-34291 Langflow CORS bypass + RCE (CISA KEV, MuddyWater)
 - **2000553-2000561**: Cavern Manticore modular C2 framework — domains, X-User-token beacon, x-db-* SQL module headers, cac.aspx webshell, /socket WebSocket (Check Point July 2026)
+- **2000562-2000563**: Cavern Manticore HollowGraph — cloudlanecdn.com DNS-tunnel credential refresh (Group-IB, Aug 2026)
+- **2000564-2000566**: CyberAv3ngers ICS expansion — Schneider UMAS (Modbus 502), Siemens S7comm CPU-STOP + program-download (priority:1, OT-segment only; CISA AA26-097A 2026-07-22)
 
 ## File Naming Conventions
 

@@ -5,6 +5,42 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.24] - 2026-08-02
+
+### Added — Cavern Manticore HollowGraph + CyberAv3ngers ICS expansion
+
+Backported from the private by-country distribution (SID 2000562–2000566) to
+keep the public Iran ruleset in sync.
+
+**Cavern Manticore HollowGraph (Group-IB).** An M365-nexus variant of the
+Cavern Manticore framework that resolves and refreshes stolen credentials
+through a `cloudlanecdn.com` DNS tunnel, complementing the existing
+`hospitalinstallation.com` HTTP/WebSocket C2 (SID 2000553–2000561).
+- 2000562: DNS `cloudlanecdn.com` (C2 domain resolution)
+- 2000563: Behavioral — long-label base32 subdomain of `cloudlanecdn.com`
+  (DNS-tunnel credential refresh), thresholded 3/300s
+
+**CyberAv3ngers / IRGC-CEC ICS targeting — CISA AA26-097A (updated 2026-07-22).**
+The refreshed advisory expands the actor's PLC targeting from Rockwell to
+Schneider Electric (UMAS) and Siemens (S7comm), and reports project-file
+exfiltration via the vendors' own engineering software, with confirmed
+ladder-logic tampering that disabled safety shutdown/alarm logic at a US Water
+& Wastewater victim.
+- 2000564: Schneider UMAS external control on Modbus/TCP 502 (priority:1)
+- 2000565: Siemens S7comm external CPU STOP on TCP 102 (priority:1)
+- 2000566: Siemens S7comm external program download on TCP 102 (priority:1)
+
+> **ICS/OT deployment note:** SID 2000564–2000566 alert on external-origin
+> control traffic to PLC ports. Enable ONLY on OT-adjacent segments where such
+> external access is never legitimate — a false positive here can disrupt
+> industrial operations.
+
+**2 Wazuh host rules (101530–101531, new `0922` file):** Schneider engineering
+software (EcoStruxure Control Expert / Unity Pro) opening `.stu/.sta/.xef`
+project files; Siemens S7/TIA-Portal programming binary executing from a
+non-standard path (host footprint of the AA26-097A project-file exfil and
+program-download activity).
+
 ## [4.0.23] - 2026-07-07
 
 ### Added — Cavern Manticore modular C2 framework (Check Point Research, July 2026)

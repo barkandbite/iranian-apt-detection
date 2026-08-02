@@ -2224,3 +2224,21 @@ alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT Cave
 # path (first WSS frame carries XOR-encrypted agent ID + "00"). Exact-match
 # URI to keep FPs down (socket.io and friends use /socket.io/).
 alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Cavern Manticore WebSocket C2 Upgrade /socket Endpoint 2026"; flow:to_server,established; http.method; content:"GET"; http.uri; content:"/socket"; startswith; endswith; http.header; content:"Upgrade|3a 20|websocket"; nocase; fast_pattern; threshold:type limit, track by_src, count 1, seconds 600; reference:url,research.checkpoint.com/2026/cavern-manticore-exposing-iran-linked-modular-c2-framework/; classtype:command-and-control; sid:2000561; rev:1; metadata:policy max-detect-ips drop, created_at 2026_07_07, updated_at 2026_07_07;)
+
+# =====================================================================
+# 2026-08-02 — Cavern Manticore HollowGraph + CyberAv3ngers ICS expansion
+# HollowGraph: M365-nexus C2 variant of Cavern Manticore using a
+# cloudlanecdn.com DNS tunnel for credential refresh (Group-IB).
+# CyberAv3ngers / IRGC-CEC: per CISA AA26-097A (updated 2026-07-22),
+# ICS targeting expanded from Rockwell to Schneider (UMAS) and Siemens
+# (S7comm) PLCs, with confirmed ladder-logic tampering at a US victim.
+# ICS/OT NOTE: SID 2000564-2000566 alert on external-origin control
+# traffic to PLC ports (Modbus/502, S7comm/102). Enable ONLY on
+# OT-adjacent segments where such external access is never legitimate.
+# Ref: research.checkpoint.com Cavern Manticore; cisa.gov AA26-097A
+# =====================================================================
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT Cavern HollowGraph C2 Domain cloudlanecdn.com 2026"; flow:to_server; dns.query; content:"cloudlanecdn.com"; nocase; fast_pattern; reference:url,group-ib.com/blog/hollowgraph-microsoft-365/; classtype:command-and-control; sid:2000562; rev:1; metadata:policy max-detect-ips drop, created_at 2026_07_23, updated_at 2026_07_23;)
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT Cavern HollowGraph DNS-Tunnel Credential Refresh cloudlanecdn.com 2026"; flow:to_server; dns.query; content:"cloudlanecdn.com"; nocase; pcre:"/[a-z2-7]{16,}\.cloudlanecdn\.com/i"; threshold:type both, track by_src, count 3, seconds 300; reference:url,group-ib.com/blog/hollowgraph-microsoft-365/; classtype:command-and-control; sid:2000563; rev:1; metadata:policy max-detect-ips drop, created_at 2026_07_23, updated_at 2026_07_23;)
+alert tcp $EXTERNAL_NET any -> $HOME_NET 502 (msg:"Bark&Bite - Iranian APT CyberAv3ngers Schneider UMAS External Control AA26-097A 2026"; flow:to_server,established; content:"|00 00|"; offset:2; depth:2; content:"|5a|"; offset:7; depth:1; threshold:type both, track by_src, count 3, seconds 60; reference:url,cisa.gov/news-events/cybersecurity-advisories/aa26-097a; classtype:attempted-admin; sid:2000564; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_08_01, updated_at 2026_08_01;)
+alert tcp $EXTERNAL_NET any -> $HOME_NET 102 (msg:"Bark&Bite - Iranian APT CyberAv3ngers Siemens S7comm External CPU STOP AA26-097A 2026"; flow:to_server,established; content:"|03 00|"; depth:2; content:"|32 01|"; distance:0; within:12; content:"|29|"; distance:0; within:15; reference:url,cisa.gov/news-events/cybersecurity-advisories/aa26-097a; classtype:attempted-admin; sid:2000565; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_08_01, updated_at 2026_08_01;)
+alert tcp $EXTERNAL_NET any -> $HOME_NET 102 (msg:"Bark&Bite - Iranian APT CyberAv3ngers Siemens S7comm External Program Download AA26-097A 2026"; flow:to_server,established; content:"|03 00|"; depth:2; content:"|32 01|"; distance:0; within:12; content:"|1a|"; distance:0; within:15; threshold:type both, track by_src, count 1, seconds 60; reference:url,cisa.gov/news-events/cybersecurity-advisories/aa26-097a; classtype:attempted-admin; sid:2000566; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_08_01, updated_at 2026_08_01;)
