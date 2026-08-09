@@ -6,10 +6,10 @@ This directory contains Suricata IDS signatures for detecting Iranian APT networ
 ## Current Ruleset
 
 ### Canonical File: `iranian-apt-detection.rules`
-- **Version**: 4.0.21 (consolidated from v3.1, v3.2, v3.3 + ongoing updates)
-- **Last Updated**: 2026-06-11
-- **SID Range**: 1000039–2000552
-- **Total Rules**: 429 signatures
+- **Version**: 4.0.24 (consolidated from v3.1, v3.2, v3.3 + ongoing updates)
+- **Last Updated**: 2026-08-09
+- **SID Range**: 1000039–2000567
+- **Total Rules**: 444 signatures
 - **Zero duplicate SIDs**
 - **Requires**: Suricata 7.0+
 

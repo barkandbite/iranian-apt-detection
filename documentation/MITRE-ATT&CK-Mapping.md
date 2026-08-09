@@ -234,3 +234,20 @@
 ### Defense Evasion
 - **T1574.002 - DLL Side-Loading**: Wazuh 101528 (WinDirStat.exe loading trojanized uxtheme.dll from non-system path)
 - **T1036.005 - Match Legitimate Name or Location**: Wazuh 101529 (execution from C:\ProgramData\WinDir\ masquerade directory), SID 2000553 (google.com.hospitalinstallation.com visual-obfuscation subdomain)
+
+## August 2026 Additions — Operation Olalampo Update: PatchAgent / GhostBackDoor (Group-IB)
+
+### Command and Control
+- **T1071.001 - Web Protocols**: SIDs 2000562-2000566 (GhostBackDoor French REST API /api/accueil/actualiser, /api/graphique/obtenir-donnees, /api/authentification/renouveler_token; HTTP_VIP /postinfo registration + /upload-results chunk download)
+- **T1132.001 - Standard Encoding**: SID 2000565 (HTTP_VIP X-Computer-Name/X-Antivirus-Name pseudo-header registration)
+- **T1090 - Proxy (reverse SOCKS5)**: Wazuh 101533 (FMAPP.dll reverse SOCKS5 injector sideload)
+
+### Execution / Defense Evasion
+- **T1055.012 - Process Hollowing**: SID 2000567 (PatchAgent PTCH v2 container → shellcode backdoor hollowing notepad.exe)
+- **T1218.010 - Regsvr32**: SID 2000567 context (regsvr32-executed COM dropper first stage)
+
+### Persistence
+- **T1543.003 - Windows Service**: Wazuh 101532 (MicrosoftVersionUpdater masquerading service)
+- **T1547.001 - Registry Run Keys / Startup Folder**: Wazuh 101531 (GhostFetch burnutill\burn.exe)
+- **T1574.002 - DLL Side-Loading**: Wazuh 101533 (FMAPP.exe loading FMAPP.dll from non-Program Files path)
+- **T1036.005 - Match Legitimate Name or Location**: Wazuh 101530 (CHAR novaservice.exe from Public\Downloads)

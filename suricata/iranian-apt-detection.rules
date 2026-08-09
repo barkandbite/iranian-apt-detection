@@ -2224,3 +2224,43 @@ alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT Cave
 # path (first WSS frame carries XOR-encrypted agent ID + "00"). Exact-match
 # URI to keep FPs down (socket.io and friends use /socket.io/).
 alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Cavern Manticore WebSocket C2 Upgrade /socket Endpoint 2026"; flow:to_server,established; http.method; content:"GET"; http.uri; content:"/socket"; startswith; endswith; http.header; content:"Upgrade|3a 20|websocket"; nocase; fast_pattern; threshold:type limit, track by_src, count 1, seconds 600; reference:url,research.checkpoint.com/2026/cavern-manticore-exposing-iran-linked-modular-c2-framework/; classtype:command-and-control; sid:2000561; rev:1; metadata:policy max-detect-ips drop, created_at 2026_07_07, updated_at 2026_07_07;)
+
+#==============================================================================
+# SECTION 46: OPERATION OLALAMPO JULY 2026 UPDATE - PATCHAGENT / GHOSTBACKDOOR
+# MITRE ATT&CK: T1071.001, T1132.001, T1055.012, T1059.001, T1219
+# Context: Group-IB "MuddyWater: ClickFix to Telegram & PatchAgent Backdoor"
+#          (July 2026) - continuation of Operation Olalampo. ClickFix lure
+#          pastes attacker commands into the Run dialog; three-stage PatchAgent
+#          loader (regsvr32 COM dropper -> AES-256-CBC "PTCH" v2 container ->
+#          HTTP shellcode backdoor hollowing notepad.exe). GhostBackDoor uses
+#          French-language REST endpoints; HTTP_VIP registers victims via
+#          pseudo-HTTP headers. Behavioral endpoints survive domain rotation.
+#==============================================================================
+
+# GhostBackDoor - French-language REST heartbeat endpoint /api/accueil/actualiser.
+# The French API surface (accueil/graphique/authentification) is unique to this
+# MuddyWater C2 and does not appear in legitimate software; behavioral, survives
+# the promoverse/miniquest/jerusalemsolutions domain rotation already in SID 1287-1292.
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater GhostBackDoor French API Heartbeat /api/accueil/actualiser 2026"; flow:to_server,established; http.method; content:"POST"; http.uri; content:"/api/accueil/actualiser"; fast_pattern; threshold:type limit, track by_src, count 1, seconds 300; reference:url,group-ib.com/blog/muddywater-operation-olalampo/; classtype:command-and-control; sid:2000562; rev:1; metadata:policy max-detect-ips drop, created_at 2026_08_09, updated_at 2026_08_09;)
+
+# GhostBackDoor - shell command output exfil to /api/graphique/obtenir-donnees.
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater GhostBackDoor French API Shell Output /api/graphique/obtenir-donnees 2026"; flow:to_server,established; http.method; content:"POST"; http.uri; content:"/api/graphique/obtenir-donnees"; fast_pattern; reference:url,group-ib.com/blog/muddywater-operation-olalampo/; classtype:command-and-control; sid:2000563; rev:1; metadata:policy max-detect-ips drop, created_at 2026_08_09, updated_at 2026_08_09;)
+
+# GhostBackDoor - session token renewal /api/authentification/renouveler_token.
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater GhostBackDoor French API Token Renewal /api/authentification/renouveler_token 2026"; flow:to_server,established; http.uri; content:"/api/authentification/renouveler_token"; fast_pattern; reference:url,group-ib.com/blog/muddywater-operation-olalampo/; classtype:command-and-control; sid:2000564; rev:1; metadata:policy max-detect-ips drop, created_at 2026_08_09, updated_at 2026_08_09;)
+
+# HTTP_VIP - victim registration POST /postinfo carrying the pseudo-HTTP header
+# set (X-Computer-Name + X-Antivirus-Name). The combination of these two custom
+# headers in one registration beacon is unique to the HTTP_VIP native downloader;
+# high-confidence and independent of C2 domain. (Complements /postifo SID 2000243.)
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater HTTP_VIP Victim Registration Pseudo-Headers /postinfo 2026"; flow:to_server,established; http.method; content:"POST"; http.uri; content:"/postinfo"; http.header_names; content:"X-Computer-Name"; nocase; fast_pattern; content:"X-Antivirus-Name"; nocase; reference:url,group-ib.com/blog/muddywater-operation-olalampo/; classtype:command-and-control; sid:2000565; rev:1; metadata:policy max-detect-ips drop, created_at 2026_08_09, updated_at 2026_08_09;)
+
+# HTTP_VIP - chunked payload download /upload-results carrying the X-ChunkId
+# header (server -> agent staged-download reassembly). Behavioral.
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater HTTP_VIP Chunk Download X-ChunkId /upload-results 2026"; flow:to_server,established; http.uri; content:"/upload-results"; fast_pattern; http.header_names; content:"X-ChunkId"; nocase; reference:url,group-ib.com/blog/muddywater-operation-olalampo/; classtype:command-and-control; sid:2000566; rev:1; metadata:policy max-detect-ips drop, created_at 2026_08_09, updated_at 2026_08_09;)
+
+# PatchAgent - second-stage "PTCH" v2 AES-256-CBC container download over HTTP.
+# The container magic "PTCH" followed by the 0x02 version byte anchors the drop
+# of the encrypted shellcode blob delivered after the regsvr32 COM dropper.
+# Response-side match (server -> victim) on the file body.
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT MuddyWater PatchAgent PTCH v2 Container Download 2026"; flow:to_client,established; file.data; content:"PTCH|02|"; depth:8; reference:url,group-ib.com/blog/muddywater-operation-olalampo/; classtype:trojan-activity; sid:2000567; rev:1; metadata:policy max-detect-ips drop, created_at 2026_08_09, updated_at 2026_08_09;)

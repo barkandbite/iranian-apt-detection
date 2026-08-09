@@ -16,6 +16,7 @@ iranian-apt-detection/
 │   ├── 0919-iranian-apt-march2026-expansion.xml     # March 2026 expansion
 │   ├── 0920-iranian-apt-june2026-host-indicators.xml # June 2026 host indicators
 │   ├── 0921-iranian-apt-july2026-host-indicators.xml # July 2026 host indicators (Cavern Manticore)
+│   ├── 0922-iranian-apt-august2026-host-indicators.xml # August 2026 host indicators (Olalampo PatchAgent)
 │   └── README.md                                     # Wazuh rules documentation
 │
 ├── configurations/
@@ -91,6 +92,7 @@ iranian-apt-detection/
 - **101522**: CVE-2025-34291 Langflow post-RCE process spawn (0919)
 - **101523-101527**: Dindoor/Fakeset June 2026 host indicators — Deno exec, Rclone exfil, Quick Assist, signer subjects (0920)
 - **101528-101529**: Cavern Manticore host indicators — WinDirStat/uxtheme.dll sideload, ProgramData\WinDir masquerade (0921)
+- **101530-101533**: Olalampo PatchAgent host indicators — CHAR novaservice.exe, GhostFetch burnutill\burn.exe, MicrosoftVersionUpdater service, FMAPP.dll reverse-SOCKS sideload (0922)
 
 ### Suricata SID Ranges (1000039-2000561)
 - **1000039-2000014**: CVE exploitation signatures

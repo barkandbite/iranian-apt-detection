@@ -45,6 +45,21 @@ web27[.]info
 - **Registry**: Run keys for `VLC` or `WingetUI` pointing to non-standard paths
 - **Lure**: Fake Webex installer from `meetingapp[.]site/webexdownload`
 
+### Operation Olalampo — PatchAgent/GhostBackDoor (July 2026) — Key Indicators
+- **PatchAgent loader**: `regsvr32` COM dropper → AES-256-CBC `PTCH` v2 container
+  (file magic `PTCH\x02`) → HTTP shellcode backdoor hollowing `notepad.exe`
+- **ClickFix lure**: commands pasted into the Windows Run dialog (Telegram beaconing)
+- **GhostBackDoor French REST API**: `POST /api/accueil/actualiser` (heartbeat),
+  `POST /api/graphique/obtenir-donnees` (shell output),
+  `/api/authentification/renouveler_token` (token renewal)
+- **HTTP_VIP registration**: `POST /postinfo` with `X-Computer-Name` +
+  `X-Antivirus-Name` pseudo-headers; chunked download `/upload-results` + `X-ChunkId`
+- **Host artifacts** (Wazuh 101530-101533): `Public\Downloads\novaservice.exe` (CHAR),
+  `...\microsoft\windows\burnutill\burn.exe` (GhostFetch), `MicrosoftVersionUpdater`
+  service, `FMAPP.dll` reverse-SOCKS sideload from a non-Program Files path
+- **C2 domains**: promoverse[.]org, miniquest[.]org, jerusalemsolutions[.]com,
+  codefusiontech[.]org (Suricata SID 2000562-2000567)
+
 ## Investigation Checklist
 
 ### When Alert Triggers:

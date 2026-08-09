@@ -5,6 +5,43 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.24] - 2026-08-09
+
+### Added — Operation Olalampo July 2026 update: PatchAgent / GhostBackDoor (Group-IB)
+
+Group-IB's July 2026 report ("MuddyWater: ClickFix to Telegram & PatchAgent
+Backdoor") extends Operation Olalampo. MuddyWater now delivers via a ClickFix
+lure (commands pasted into the Windows Run dialog) and a three-stage PatchAgent
+loader: a regsvr32-executed COM dropper decrypts an AES-256-CBC `PTCH` v2
+container and injects an HTTP shellcode backdoor into a hollowed `notepad.exe`.
+GhostBackDoor uses a French-language REST API surface; HTTP_VIP registers
+victims via pseudo-HTTP headers. Behavioral endpoints survive the C2 domain
+rotation already covered by the Feb 2026 Olalampo rules.
+
+**6 Suricata rules (SID 2000562–2000567):**
+- 2000562: GhostBackDoor French API heartbeat `POST /api/accueil/actualiser` (thresholded)
+- 2000563: GhostBackDoor shell-output exfil `POST /api/graphique/obtenir-donnees`
+- 2000564: GhostBackDoor session token renewal `/api/authentification/renouveler_token`
+- 2000565: HTTP_VIP victim registration `POST /postinfo` with the
+  `X-Computer-Name` + `X-Antivirus-Name` pseudo-header pair (high-confidence,
+  domain-independent)
+- 2000566: HTTP_VIP chunked download `/upload-results` with the `X-ChunkId` header
+- 2000567: PatchAgent `PTCH` v2 AES container download (`file.data` magic
+  `PTCH|02|`, server → victim)
+
+**4 Wazuh rules (101530–101533, new file
+`wazuh-rules/0922-iranian-apt-august2026-host-indicators.xml`):**
+- 101530: Sysmon Event 1 — CHAR `novaservice.exe` execution from `Public\Downloads`
+- 101531: Sysmon Event 1 — GhostFetch `burnutill\burn.exe` persistence
+- 101532: Sysmon Event 13 — `MicrosoftVersionUpdater` masquerading service creation
+- 101533: Sysmon Event 7 — `FMAPP.dll` reverse SOCKS5 sideload from a
+  non-Program Files path
+
+All 6 Suricata rules pass `suricata -T` (444 rules, zero duplicate SIDs);
+all Wazuh files pass `xmllint --noout`. Verified firing against crafted PCAPs
+with zero false positives on benign traffic. Ported byte-identical into the
+private by-country repo's `bb-iran-suricata.rules` the same session.
+
 ## [4.0.23] - 2026-07-07
 
 ### Added — Cavern Manticore modular C2 framework (Check Point Research, July 2026)
