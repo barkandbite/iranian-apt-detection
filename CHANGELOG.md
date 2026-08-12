@@ -5,6 +5,50 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.24] - 2026-08-12
+
+### Added — Suricata syntax pitfalls guide for contributors
+
+`CONTRIBUTING.md` now documents the Suricata 7.x footguns that have produced
+real defects in this project, split into hard errors (the file will not load)
+and silent failures (the rule loads but never does what was intended).
+
+Hard errors: `http.host` combined with `nocase` (this shipped unnoticed and
+cost 26 days of production coverage), unescaped `;` inside a `pcre`, `dsize`
+above the u16 ceiling, and request-only buffers paired with `flow:to_client`.
+
+Silent failures, including one newly identified during the 2026-08-12
+maintenance cycle:
+
+- **A second `pcre` on the same sticky buffer is evaluated relative to the
+  previous match offset**, so a negated `pcre:"!/.../"` placed after a positive
+  `pcre` or `content` on that buffer silently fails to suppress anything.
+  Verified across four variants on Suricata 7.0.3. Exclusions must be written
+  as a single pcre with a leading negative lookahead, or as anchored negated
+  content (`content:!"..."; endswith;`). Both documented forms were validated
+  with `suricata -T` before being added to the guide.
+- `flowbits` scoped to a single TCP flow where a multi-connection chain needs
+  `xbits` with `track ip_pair` and `expire`.
+- `flowbits:isset` with no corresponding `set` in any loaded rule.
+- Unanchored domain content matches (`content:"evil.com"` also matches
+  `evil.com.attacker.net`).
+- Multiple `fast_pattern` in one rule; mixed sticky/legacy buffer modifiers.
+
+### Changed — testing requirements
+
+The "verify no false positives" requirement now states explicitly that syntax
+validation cannot catch false positives, and asks contributors to test against
+ordinary traffic *and* near-misses (the legitimate endpoint beside the
+vulnerable one, the real vendor domain a lookalike rule must exclude). Rules
+that pass `suricata -T` and fire correctly on attack traffic can still match
+every HTTPS connection on the network.
+
+### Unchanged
+
+No rule content changed. Suricata rules remain at 438 SIDs and Wazuh at 279
+rules, byte-identical to the Iran file in the by-country distribution repo.
+`suricata -T` and `xmllint --noout wazuh-rules/*.xml` both clean.
+
 ## [4.0.23] - 2026-07-07
 
 ### Added — Cavern Manticore modular C2 framework (Check Point Research, July 2026)
