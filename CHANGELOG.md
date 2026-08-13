@@ -5,6 +5,32 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.24] - 2026-08-13
+
+### Fixed — documentation accuracy (no rule changes)
+
+Post-consolidation documentation had drifted behind the ruleset. Corrected so
+deployers reading the repo see what actually ships:
+
+- `suricata/README.md`: canonical file header said **v4.0.21 / 429 signatures /
+  SID range 1000039–2000552 / last updated 2026-06-11**. Actual shipping state is
+  **v4.0.23 / 438 signatures / SID range 1000039–2000561 / 2026-07-07**.
+- `suricata/README.md`: SID allocation table ended at 2000552, omitting the
+  Cavern Manticore block. Added the `2000553–2000561` row (9 rules).
+- `STRUCTURE.md`: canonical file annotated as *v4.0.21, 429 rules* → **v4.0.23,
+  438 rules**.
+- `STRUCTURE.md`: Wazuh rule ID range stated as `100900-101521` → **`100900-101529`**
+  (279 rules across 12 XML files).
+
+### Verified
+
+- `suricata -T` on `suricata/iranian-apt-detection.rules`: **438 rules, 0 errors**
+  under Suricata 7.0.3. Zero duplicate SIDs.
+- `xmllint --noout wazuh-rules/*.xml`: clean. Zero duplicate Wazuh rule IDs.
+- **Cross-repo Iran sync verified in sync** with the private by-country
+  distribution repo: 438 rules on both sides, identical SID sets, max SID
+  2000561. No backport was outstanding in either direction.
+
 ## [4.0.23] - 2026-07-07
 
 ### Added — Cavern Manticore modular C2 framework (Check Point Research, July 2026)

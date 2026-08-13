@@ -6,10 +6,10 @@ This directory contains Suricata IDS signatures for detecting Iranian APT networ
 ## Current Ruleset
 
 ### Canonical File: `iranian-apt-detection.rules`
-- **Version**: 4.0.21 (consolidated from v3.1, v3.2, v3.3 + ongoing updates)
-- **Last Updated**: 2026-06-11
-- **SID Range**: 1000039–2000552
-- **Total Rules**: 429 signatures
+- **Version**: 4.0.23 (consolidated from v3.1, v3.2, v3.3 + ongoing updates)
+- **Last Updated**: 2026-07-07
+- **SID Range**: 1000039–2000561
+- **Total Rules**: 438 signatures
 - **Zero duplicate SIDs**
 - **Requires**: Suricata 7.0+
 
@@ -37,6 +37,7 @@ This directory contains Suricata IDS signatures for detecting Iranian APT networ
 | 2000534–2000537 | 4 | MuddyWater RustyWater Rust RAT: nomercys.it.com C2 + 159.198.66.153 (THN/ProtosLabs) |
 | 2000538–2000549 | 12 | Screening Serpens (UNC1549) MiniUpdate + MiniJunk V2 Azure C2 (Unit 42 May 2026) |
 | 2000550–2000552 | 3 | CVE-2025-34291 Langflow CORS bypass + RCE, MuddyWater initial access (CISA KEV) |
+| 2000553–2000561 | 9 | Cavern Manticore modular C2 framework (MOIS/OilRig-Lyceum nexus, Check Point July 2026) |
 
 ### Threat Group Coverage
 
