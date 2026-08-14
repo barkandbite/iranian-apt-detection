@@ -5,6 +5,70 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.24] - 2026-08-14
+
+### Added — August 2026 backlog consolidation
+
+Nine draft PRs (#40–#48) had accumulated unmerged since 2026-07-08, each
+opened against an unchanged `main` and each allocating from the same "next
+available" SID/rule-ID. The result was four different rule sets all claiming
+Wazuh IDs from 101530 and three different Suricata rule sets all claiming
+SID 2000562. This release merges every unique rule from that backlog into a
+single collision-free allocation. No detection content was dropped.
+
+**11 Suricata rules (SID 2000562–2000572):**
+
+- **2000562–2000563** — Cavern HollowGraph (from PRs #41/#42). M365 Graph-API
+  C2 over `cloudlanecdn.com`, plus the DNS-tunnel credential-refresh channel.
+- **2000564–2000566** — CyberAv3ngers ICS expansion (from PRs #43/#45), per
+  CISA AA26-097A (updated 2026-07-22): Schneider UMAS external control,
+  Siemens S7comm external CPU STOP, and S7comm program download. These are
+  OT rules — enable **only** on OT-adjacent segments.
+- **2000567–2000572** — MuddyWater Operation Olalampo (from PR #46):
+  GhostBackDoor French-language API C2 (`/api/accueil/actualiser`,
+  `/api/graphique/obtenir-donnees`, `/api/authentification/renouveler_token`),
+  HTTP_VIP victim registration and chunked download, PatchAgent PTCH v2
+  container retrieval.
+
+**10 Wazuh rules (101530–101539):**
+
+- **101530–101531** (`0920`) — MuddyWater Chaos false-flag host indicators:
+  `ms_upd.exe` stager, `Game.exe` RAT C2 egress (from PR #40).
+- **101532–101533** (`0921`) — Cavern HollowGraph: `logAzure.txt` Graph
+  credential store dropped to disk, host DNS query to `cloudlanecdn.com`
+  (from PRs #41/#42).
+- **101534–101535** (new `0922-iranian-apt-august2026-ics-indicators.xml`) —
+  CyberAv3ngers ICS: Schneider PLC project-file access by engineering
+  software, Siemens S7 programming binary from a non-standard path
+  (from PR #45).
+- **101536–101539** (new `0923-iranian-apt-august2026-host-indicators.xml`) —
+  Olalampo host footprint: CHAR `novaservice.exe`, GhostFetch
+  `burnutill\burn.exe`, `MicrosoftVersionUpdater` service masquerade,
+  `FMAPP.dll` reverse-SOCKS5 sideload (from PR #46).
+
+### Added — contributor guidance
+
+`CONTRIBUTING.md` now documents the Suricata 7.x syntax pitfalls that have
+each caused a real defect in this project, split into hard errors (the file
+will not load) and silent failures (the rule loads but never fires). Salvaged
+from PR #47.
+
+### Fixed — documentation drift
+
+`STRUCTURE.md`, `suricata/README.md` and the rule-file header all understated
+the shipping ruleset. The rules file header still claimed 376 rules with a
+ceiling of SID 2000501 and a 2026-04-19 date while the file actually shipped
+438 rules up to SID 2000561. All three are now reconciled against the
+ruleset, and the header's SID-allocation map covers 2000502-2000572.
+Partly salvaged from PR #48.
+
+### Cross-repo
+
+`bb-iran-suricata.rules` in `barkbite-suricata-by-country` and
+`suricata/iranian-apt-detection.rules` here are byte-identical at 449 rules
+(verified). SIDs were assigned once and applied to both repos in the same
+cycle.
+
 ## [4.0.23] - 2026-07-07
 
 ### Added — Cavern Manticore modular C2 framework (Check Point Research, July 2026)
