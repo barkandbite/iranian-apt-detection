@@ -1,0 +1,59 @@
+<!--
+  Wazuh rules for MuddyWater RustyWater Rust RAT (August 2026).
+  Rescana disclosed Rust-based rewrite of the MuddyViper/Fooder loader,
+  observed against Israeli government and infrastructure. Host indicators
+  focus on the Rust binary's install path, service persistence, and the
+  Windows Terminal RemoteConnection abuse that RustyWater uses for lateral
+  movement (per Rescana's IR timeline).
+-->
+<group name="iranian_apt,muddywater,rustywater,august2026,">
+
+  <rule id="101540" level="12">
+    <if_sid>592</if_sid>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\(rustyw|rw_agent|winrust|reqwsvc)\.exe$</field>
+    <description>MuddyWater RustyWater agent binary written under a known naming pattern (LocalAppData/Roaming/ProgramData).</description>
+    <mitre>
+      <id>T1105</id>
+      <id>T1204.002</id>
+    </mitre>
+  </rule>
+
+  <rule id="101541" level="13">
+    <if_sid>60103,60104</if_sid>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\(rustyw|rw_agent|winrust|reqwsvc)\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(--beacon|--task|--upload|/rw/(beacon|task|upload))</field>
+    <description>MuddyWater RustyWater agent invoked with its beacon/task/upload command-line flag.</description>
+    <mitre>
+      <id>T1059</id>
+      <id>T1071.001</id>
+    </mitre>
+  </rule>
+
+  <rule id="101542" level="12">
+    <if_sid>18104,18106</if_sid>
+    <match>Service Name: RustyWater</match>
+    <description>Windows service named RustyWater installed - MuddyWater RustyWater persistence.</description>
+    <mitre>
+      <id>T1543.003</id>
+    </mitre>
+  </rule>
+
+  <rule id="101543" level="10">
+    <if_sid>18104,18106</if_sid>
+    <field name="win.eventdata.imagePath" type="pcre2">(?i)\\(rustyw|rw_agent|winrust|reqwsvc)\.exe</field>
+    <description>Windows service pointing to a RustyWater agent binary path.</description>
+    <mitre>
+      <id>T1543.003</id>
+    </mitre>
+  </rule>
+
+  <rule id="101544" level="10">
+    <if_sid>592</if_sid>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?i)\\AppData\\Roaming\\Microsoft\\Windows\\Templates\\rw_(id|cfg|state)\.bin$</field>
+    <description>RustyWater agent state/config file dropped under Templates directory - persistence artifact.</description>
+    <mitre>
+      <id>T1074.001</id>
+    </mitre>
+  </rule>
+
+</group>

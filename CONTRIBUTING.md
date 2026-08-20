@@ -43,9 +43,63 @@ Thank you for your interest in contributing to this project. This document provi
 alert protocol $SOURCE_NET any -> $DEST_NET any (msg:"Iranian APT: Description"; flow:established; content:"pattern"; reference:cve,xxxx-xxxxx; classtype:attempted-admin; sid:1000xxx; rev:1;)
 ```
 
+#### Suricata Syntax Pitfalls
+
+Every item below has caused a real defect in this project. A single bad rule
+makes Suricata reject the **entire file**, so one mistake means zero coverage
+for every rule in it. Always run `suricata -T -S suricata/iranian-apt-detection.rules`
+before opening a PR.
+
+**Hard errors — the file will not load**
+
+- **`http.host` with `nocase`.** The `http.host` buffer is already
+  lowercase-normalized, and combining it with `nocase` is a parse error in
+  Suricata 7.x. Use `http.host; content:"example.com";` with no `nocase`.
+  This one shipped unnoticed and cost 26 days of production coverage.
+- **Unescaped `;` inside a `pcre`.** The rule parser splits options on `;`,
+  including inside a quoted pcre. Escape it: `pcre:"/[\;|&]/"`, `[^\;]`.
+- **`dsize` above 65535.** `dsize` is a u16; `dsize:>500000` silently
+  overflows. Express large-transfer detection per-packet (near-MTU) plus a
+  `threshold`, not as one giant dsize.
+- **Request-only buffers with `flow:to_client`.** `http.uri`, `http.method`
+  and friends only exist in the to_server direction; pairing them with
+  `flow:to_client,established` is a direction conflict.
+
+**Silent failures — the rule loads but never does what you meant**
+
+- **A second `pcre` on the same sticky buffer is relative.** It is evaluated
+  from the previous match offset, so a negated `pcre:"!/.../"` placed after a
+  positive `pcre` or `content` on the same buffer **will not suppress
+  anything**. Verified on Suricata 7.0.3. Write exclusions as *one* pcre with
+  a leading negative lookahead:
+
+  ```
+  tls.sni; pcre:"/^(?!(?:[\w-]+\.)*(?:google\.com|gstatic\.com)$).*(?:google)/i";
+  ```
+
+  or as anchored negated content: `content:!"google.com"; endswith; nocase;`.
+- **`flowbits` across multiple connections.** `flowbits` are scoped to a
+  single TCP flow. A chain whose stages land on separate connections (token
+  mint on one, payload on the next) needs `xbits` with `track ip_pair`
+  (or `ip_src`/`ip_dst`) and an `expire`.
+- **`flowbits:isset` with no matching `set`.** If no loaded rule ever sets the
+  bit, the rule can never fire. Cross-check every `isset` against a `set`.
+- **Unanchored domain matches.** `dns.query; content:"evil.com";` also matches
+  `evil.com.attacker.net`. Add `endswith` and, where label boundaries matter,
+  a `(?:^|\.)` anchor.
+- **Multiple `fast_pattern`.** Only one content per rule may carry it; put it
+  on the longest, most selective string.
+- **Mixed sticky buffers and legacy modifiers.** Do not combine `http.user_agent`
+  (sticky) with `http_header` (legacy) without a `pkt_data` reset.
+
 ### Testing Requirements
 1. Test against known malicious samples when possible
-2. Verify no false positives in normal operations
+2. **Verify no false positives in normal operations.** Syntax validation
+   cannot catch this. Run the rule against ordinary traffic *and* against
+   near-misses — the legitimate endpoint next to the vulnerable one, the real
+   vendor domain a lookalike rule is meant to exclude. Rules that pass
+   `suricata -T` and fire correctly on attack traffic can still match every
+   HTTPS connection on the network.
 3. Check performance impact
 4. Test across different OS versions if applicable
 

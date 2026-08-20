@@ -16,6 +16,9 @@ iranian-apt-detection/
 │   ├── 0919-iranian-apt-march2026-expansion.xml     # March 2026 expansion
 │   ├── 0920-iranian-apt-june2026-host-indicators.xml # June 2026 host indicators
 │   ├── 0921-iranian-apt-july2026-host-indicators.xml # July 2026 host indicators (Cavern Manticore)
+│   ├── 0922-iranian-apt-august2026-ics-indicators.xml # August 2026 ICS host indicators (CyberAv3ngers)
+│   ├── 0923-iranian-apt-august2026-host-indicators.xml # August 2026 host indicators (Olalampo)
+│   ├── 0924-iranian-apt-august2026-rustywater.xml    # August 2026 RustyWater host indicators
 │   └── README.md                                     # Wazuh rules documentation
 │
 ├── configurations/
@@ -25,7 +28,7 @@ iranian-apt-detection/
 │   └── README.md                                     # Configuration guide
 │
 ├── suricata/
-│   ├── iranian-apt-detection.rules                  # Consolidated Suricata IDS signatures (v4.0.21, 429 rules)
+│   ├── iranian-apt-detection.rules                  # Consolidated Suricata IDS signatures (v4.0.24, 449 rules)
 │   └── README.md                                     # Suricata deployment guide
 │
 ├── documentation/
@@ -74,7 +77,7 @@ iranian-apt-detection/
 
 ## Rule ID Allocation
 
-### Wazuh Rules (100900-101521)
+### Wazuh Rules (100900-101544)
 - **100900-100924**: CVE exploitation detection (0910)
 - **100925-100959**: Behavioral detection (0911)
 - **100940-100959**: Network detection (0912)
@@ -91,6 +94,11 @@ iranian-apt-detection/
 - **101522**: CVE-2025-34291 Langflow post-RCE process spawn (0919)
 - **101523-101527**: Dindoor/Fakeset June 2026 host indicators — Deno exec, Rclone exfil, Quick Assist, signer subjects (0920)
 - **101528-101529**: Cavern Manticore host indicators — WinDirStat/uxtheme.dll sideload, ProgramData\WinDir masquerade (0921)
+- **101530-101531**: MuddyWater Chaos false-flag host indicators — ms_upd.exe stager, Game.exe RAT C2 (0920)
+- **101532-101533**: Cavern HollowGraph host indicators — logAzure.txt credential store, cloudlanecdn.com DNS (0921)
+- **101534-101535**: CyberAv3ngers ICS host indicators — Schneider project-file access, Siemens S7 binary path (0922)
+- **101536-101539**: MuddyWater Olalampo host indicators — CHAR, GhostFetch, service masquerade, FMAPP.dll SOCKS5 (0923)
+- **101540-101544**: MuddyWater RustyWater host indicators — Rust agent binary drop, service persistence, Templates state artifacts (0924)
 
 ### Suricata SID Ranges (1000039-2000561)
 - **1000039-2000014**: CVE exploitation signatures
