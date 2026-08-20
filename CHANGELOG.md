@@ -5,6 +5,53 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.25] - 2026-08-20
+
+### Added — MuddyWater RustyWater behavioral rules (SID 2000573–2000575)
+
+Rescana (Aug 2026) profiled MuddyWater's Rust-based `reqwest`-driven RAT
+targeting Israeli government and infrastructure. v4.0.21 already ships four
+IOC-anchored RustyWater rules against `nomercys.it.com` / `159.198.66.153`
+(SID 2000534–2000537). These new rules complement that with **behavioral
+fingerprints** that survive C2 infrastructure rotation:
+
+- **SID 2000573** — `POST /rw/beacon` with `User-Agent: reqwest/…` and a
+  Base64-shaped body ≥200 bytes. Threshold 2/600s to suppress single-hit
+  scanner probes.
+- **SID 2000574** — `GET /rw/task` with the campaign-unique `X-Rw-Id`
+  16-byte-hex agent-identifier header.
+- **SID 2000575** — `POST /rw/upload` with `Content-Encoding: gzip` and a
+  `reqwest/` UA. High-priority exfil signal.
+
+### Added — Wazuh host-side parity rules (101540–101544)
+
+New file `wazuh-rules/0924-iranian-apt-august2026-rustywater.xml`:
+
+- **101540** — RustyWater agent binary drop under a known naming pattern
+  (`rustyw.exe`, `rw_agent.exe`, `winrust.exe`, `reqwsvc.exe`) in
+  LocalAppData / Roaming / ProgramData.
+- **101541** — Same binaries invoked with `--beacon` / `--task` / `--upload`
+  or `/rw/(beacon|task|upload)` command-line arguments.
+- **101542** — Windows service literally named `RustyWater` installed.
+- **101543** — Windows service whose ImagePath resolves to a known
+  RustyWater binary path.
+- **101544** — RustyWater state file (`rw_id.bin` / `rw_cfg.bin` /
+  `rw_state.bin`) dropped under `AppData\Roaming\Microsoft\Windows\Templates`.
+
+### Backport direction
+
+Originated in the private `barkbite-suricata-by-country` repo in the same
+2026-08-20 maintenance session; backported here per the standing rule that
+both repos must stay in sync on Iran content. SID/rule-ID allocation matches
+the private repo — Iran SID parity verified (both repos at 452 rules,
+SIDs 1000039–2000575).
+
+### Validation
+
+- `suricata -T` on `suricata/iranian-apt-detection.rules`: OK, 452 rules load
+- `xmllint --noout wazuh-rules/*.xml`: all 15 XML files pass
+- Wazuh rule ID `100900–101544`: 289 rules, zero duplicates
+- Suricata SID parity vs `bb-iran-suricata.rules`: **identical**
 ## [4.0.24] - 2026-08-14
 
 ### Added — August 2026 backlog consolidation

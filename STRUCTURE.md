@@ -18,6 +18,7 @@ iranian-apt-detection/
 │   ├── 0921-iranian-apt-july2026-host-indicators.xml # July 2026 host indicators (Cavern Manticore)
 │   ├── 0922-iranian-apt-august2026-ics-indicators.xml # August 2026 ICS host indicators (CyberAv3ngers)
 │   ├── 0923-iranian-apt-august2026-host-indicators.xml # August 2026 host indicators (Olalampo)
+│   ├── 0924-iranian-apt-august2026-rustywater.xml    # August 2026 RustyWater host indicators
 │   └── README.md                                     # Wazuh rules documentation
 │
 ├── configurations/
@@ -76,7 +77,7 @@ iranian-apt-detection/
 
 ## Rule ID Allocation
 
-### Wazuh Rules (100900-101539)
+### Wazuh Rules (100900-101544)
 - **100900-100924**: CVE exploitation detection (0910)
 - **100925-100959**: Behavioral detection (0911)
 - **100940-100959**: Network detection (0912)
@@ -97,6 +98,7 @@ iranian-apt-detection/
 - **101532-101533**: Cavern HollowGraph host indicators — logAzure.txt credential store, cloudlanecdn.com DNS (0921)
 - **101534-101535**: CyberAv3ngers ICS host indicators — Schneider project-file access, Siemens S7 binary path (0922)
 - **101536-101539**: MuddyWater Olalampo host indicators — CHAR, GhostFetch, service masquerade, FMAPP.dll SOCKS5 (0923)
+- **101540-101544**: MuddyWater RustyWater host indicators — Rust agent binary drop, service persistence, Templates state artifacts (0924)
 
 ### Suricata SID Ranges (1000039-2000561)
 - **1000039-2000014**: CVE exploitation signatures

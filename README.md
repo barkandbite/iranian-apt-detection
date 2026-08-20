@@ -1,6 +1,6 @@
 # Iranian APT Detection Rules
 
-[![Version](https://img.shields.io/badge/version-4.0.24-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.0.25-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![MITRE ATT&CK](https://img.shields.io/badge/MITRE%20ATT%26CK-v15-orange.svg)](documentation/MITRE-ATT&CK-Mapping.md)
 
@@ -15,6 +15,10 @@ Three concurrent Iranian campaigns targeting U.S. healthcare disclosed March 24:
 - **Handala/Void Manticore** wiped 200K+ Stryker devices via **Microsoft Intune MDM** abuse — no malware needed. Maryland EKG transmission went dark statewide. DOJ attributed; $10M reward.
 - **Pay2Key v3** (IRGC) hit unnamed U.S. healthcare org with **ChaCha20 + Curve25519** ransomware. Fake Avast AV bypass. **I2P C2** (not Tor). Purely destructive — no ransom demand.
 - **MuddyWater** exploiting **CVE-2025-59287** (Windows WSUS Deserialization RCE, CVSS 9.8) to pre-position on healthcare networks.
+
+## Recent Threats (v4.0.25)
+
+- **NEW (v4.0.25)**: **MuddyWater RustyWater behavioral rules** (SID 2000573-2000575) — complements the v4.0.21 IOC-anchored coverage (SID 2000534-2000537) with signatures that survive C2 rotation: `POST /rw/beacon` + `reqwest/` UA + Base64 body, `GET /rw/task` + `X-Rw-Id` header, `POST /rw/upload` + gzip + `reqwest/` UA. 5 new Wazuh host rules (101540-101544) in new `0924` file cover agent-binary drop patterns, Windows service persistence, and Templates-dir state artifacts.
 
 ## Recent Threats (v4.0.24)
 

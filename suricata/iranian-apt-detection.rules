@@ -2280,3 +2280,15 @@ alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Mudd
 # of the encrypted shellcode blob delivered after the regsvr32 COM dropper.
 # Response-side match (server -> victim) on the file body.
 alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT MuddyWater PatchAgent PTCH v2 Container Download 2026"; flow:to_client,established; file.data; content:"PTCH|02|"; depth:8; reference:url,group-ib.com/blog/muddywater-operation-olalampo/; classtype:trojan-activity; sid:2000572; rev:1; metadata:policy max-detect-ips drop, created_at 2026_08_09, updated_at 2026_08_14;)
+
+# ==========================================================================
+# 2026-08-20 - MuddyWater RustyWater Rust-based RAT (Rescana Aug 2026)
+# Israeli-government-targeted Rust rewrite of the Fooder/MuddyViper family.
+# Backported from barkbite-suricata-by-country (SID 2000573-2000575).
+# ==========================================================================
+
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater RustyWater Rust reqwest Beacon /rw/beacon 2026"; flow:to_server,established; http.method; content:"POST"; http.uri; content:"/rw/beacon"; fast_pattern; nocase; http.user_agent; content:"reqwest/"; nocase; http.request_body; pcre:"/^[A-Za-z0-9+\/]{200,}={0,2}$/"; threshold:type both, track by_src, count 2, seconds 600; reference:url,rescana.com/post/rustywater-iranian-muddywater-apt; reference:url,attack.mitre.org/techniques/T1071/001/; classtype:command-and-control; sid:2000573; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_08_20, updated_at 2026_08_20;)
+
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater RustyWater X-Rw-Id Task Poll 2026"; flow:to_server,established; http.method; content:"GET"; http.uri; content:"/rw/task"; fast_pattern; nocase; http.header_names; content:"X-Rw-Id"; nocase; threshold:type limit, track by_src, count 1, seconds 600; reference:url,rescana.com/post/rustywater-iranian-muddywater-apt; reference:url,attack.mitre.org/techniques/T1071/001/; classtype:command-and-control; sid:2000574; rev:1; metadata:policy max-detect-ips drop, created_at 2026_08_20, updated_at 2026_08_20;)
+
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater RustyWater Gzipped Exfil /rw/upload 2026"; flow:to_server,established; http.method; content:"POST"; http.uri; content:"/rw/upload"; fast_pattern; nocase; http.header; content:"Content-Encoding: gzip"; nocase; http.user_agent; content:"reqwest/"; nocase; threshold:type limit, track by_src, count 1, seconds 900; reference:url,rescana.com/post/rustywater-iranian-muddywater-apt; reference:url,attack.mitre.org/techniques/T1041/; classtype:trojan-activity; sid:2000575; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_08_20, updated_at 2026_08_20;)
