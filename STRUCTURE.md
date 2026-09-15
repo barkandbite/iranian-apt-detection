@@ -28,7 +28,7 @@ iranian-apt-detection/
 │   └── README.md                                     # Configuration guide
 │
 ├── suricata/
-│   ├── iranian-apt-detection.rules                  # Consolidated Suricata IDS signatures (v4.0.24, 449 rules)
+│   ├── iranian-apt-detection.rules                  # Consolidated Suricata IDS signatures (v4.0.25, 452 rules)
 │   └── README.md                                     # Suricata deployment guide
 │
 ├── documentation/
