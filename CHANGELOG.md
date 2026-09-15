@@ -5,6 +5,19 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed — documentation reconciliation (2026-09-15)
+
+Version/count drift left behind by the v4.0.25 release (which updated
+CHANGELOG.md and the top of README.md but not the other docs): the canonical
+rules-file header, `suricata/README.md`, `STRUCTURE.md`, and the README
+deployment/statistics sections still said **449 rules / v4.0.24 / SID max
+2000572**. All now state **452 rules / v4.0.25 / SID 1000039-2000575**, and
+the header's SID-allocation map gains the 2000573-2000575 RustyWater row.
+No rule content changed — `suricata -T` verified, 452 signatures, parity
+with the private repo's `bb-iran-suricata.rules` intact.
+
 ## [4.0.25] - 2026-08-20
 
 ### Added — MuddyWater RustyWater behavioral rules (SID 2000573–2000575)

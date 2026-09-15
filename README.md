@@ -80,7 +80,7 @@ sudo systemctl restart wazuh-manager
 
 ### 2. Deploy Suricata Rules
 ```bash
-# Deploy consolidated rules (v4.0 — single file, 449 signatures)
+# Deploy consolidated rules (v4.0 — single file, 452 signatures)
 sudo cp suricata/iranian-apt-detection.rules /etc/suricata/rules/
 
 # Add to suricata.yaml rule-files section:
@@ -137,7 +137,7 @@ sudo chmod +x /var/ossec/active-response/bin/iranian-apt-active-response.sh
 
 ### Rule Statistics
 - **Wazuh Rules**: 277 detection rules across 11 files
-- **Suricata Signatures**: 449 network signatures (1 consolidated rule file)
+- **Suricata Signatures**: 452 network signatures (1 consolidated rule file)
 - **CVEs Covered**: 40+ including 2025/2026 zero-days
 - **Known C2 IPs**: 37+
 - **Known C2 Domains**: 37+
@@ -201,7 +201,7 @@ iranian-apt-detection/
 │   ├── 0920-iranian-apt-june2026-host-indicators.xml
 │   └── README.md
 ├── suricata/                  # Network IDS signatures
-│   ├── iranian-apt-detection.rules  # Consolidated v4.0 (449 rules)
+│   ├── iranian-apt-detection.rules  # Consolidated v4.0 (452 rules)
 │   └── README.md
 ├── configurations/            # Agent and system configs
 │   ├── sysmon-config-iranian-apt.xml
@@ -319,4 +319,4 @@ These rules are provided as-is for defensive purposes. Users are responsible for
 
 ---
 
-**Last Updated**: August 14, 2026 | **Version**: 4.0.24 | **Maintainer**: Bark&Bite Security Intelligence
+**Last Updated**: August 20, 2026 | **Version**: 4.0.25 | **Maintainer**: Bark&Bite Security Intelligence
