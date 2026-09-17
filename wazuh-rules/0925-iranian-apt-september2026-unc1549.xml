@@ -1,0 +1,54 @@
+<!--
+  Wazuh rules for UNC1549 / Nimbus Manticore toolset expansion (September 2026).
+  Group-IB (Aug 26 2026) documented a TWOSTROKE-like C++ backdoor and a reverse
+  SSH tunneling utility, both masquerading as the Windows Terminal Server SDK
+  DLL "wtsapi32.dll" loaded from a non-system path. Host indicators focus on
+  the sideloaded DLL, the reverse-SSH tunnel process, and the confirmed C2
+  endpoint 172.86.98.113:443. Network-side coverage: Suricata SID 2000576-2000577.
+  Reported publicly: thehackernews.com / Group-IB, Aug 26 2026.
+-->
+<group name="iranian_apt,unc1549,nimbus_manticore,september2026,">
+
+  <rule id="101545" level="12">
+    <if_sid>592</if_sid>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?i)\\wtsapi32\.dll$</field>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?i)\\(AppData|ProgramData|Users\\Public|Temp)\\</field>
+    <description>UNC1549 wtsapi32.dll masquerade written outside System32 - Nimbus Manticore TWOSTROKE-like backdoor / SSH tunneler sideload.</description>
+    <mitre>
+      <id>T1574.001</id>
+      <id>T1036.005</id>
+    </mitre>
+  </rule>
+
+  <rule id="101546" level="13">
+    <if_sid>60103,60104</if_sid>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\wtsapi32\.dll$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(-R\s|remote|reverse|tunnel|172\.86\.98\.113|:443\b)</field>
+    <description>UNC1549 reverse SSH tunneler (wtsapi32.dll masquerade) invoked with reverse-tunnel arguments.</description>
+    <mitre>
+      <id>T1572</id>
+      <id>T1090</id>
+    </mitre>
+  </rule>
+
+  <rule id="101547" level="14">
+    <if_sid>60103,60104</if_sid>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)172\.86\.98\.113</field>
+    <description>UNC1549 Nimbus Manticore confirmed C2 IP 172.86.98.113 present on a process command line.</description>
+    <mitre>
+      <id>T1071.001</id>
+      <id>T1572</id>
+    </mitre>
+  </rule>
+
+  <rule id="101548" level="10">
+    <if_sid>18104,18106</if_sid>
+    <field name="win.eventdata.imagePath" type="pcre2">(?i)\\wtsapi32\.dll</field>
+    <description>Windows service pointing to a wtsapi32.dll image path outside System32 - UNC1549 persistence.</description>
+    <mitre>
+      <id>T1543.003</id>
+      <id>T1574.001</id>
+    </mitre>
+  </rule>
+
+</group>

@@ -2292,3 +2292,15 @@ alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Mudd
 alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater RustyWater X-Rw-Id Task Poll 2026"; flow:to_server,established; http.method; content:"GET"; http.uri; content:"/rw/task"; fast_pattern; nocase; http.header_names; content:"X-Rw-Id"; nocase; threshold:type limit, track by_src, count 1, seconds 600; reference:url,rescana.com/post/rustywater-iranian-muddywater-apt; reference:url,attack.mitre.org/techniques/T1071/001/; classtype:command-and-control; sid:2000574; rev:1; metadata:policy max-detect-ips drop, created_at 2026_08_20, updated_at 2026_08_20;)
 
 alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater RustyWater Gzipped Exfil /rw/upload 2026"; flow:to_server,established; http.method; content:"POST"; http.uri; content:"/rw/upload"; fast_pattern; nocase; http.header; content:"Content-Encoding: gzip"; nocase; http.user_agent; content:"reqwest/"; nocase; threshold:type limit, track by_src, count 1, seconds 900; reference:url,rescana.com/post/rustywater-iranian-muddywater-apt; reference:url,attack.mitre.org/techniques/T1041/; classtype:trojan-activity; sid:2000575; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_08_20, updated_at 2026_08_20;)
+
+# ==========================================================================
+# 2026-09-17 - UNC1549 / Nimbus Manticore toolset expansion (Group-IB Aug 26 2026)
+# TWOSTROKE-like C++ backdoor + reverse SSH tunneler masquerading as
+# wtsapi32.dll. Confirmed C2: 172.86.98.113 (SSH tunneling over TCP/443).
+# Backported from barkbite-suricata-by-country (SID 2000576-2000577).
+# Reported publicly: thehackernews.com / Group-IB, Aug 26 2026.
+# ==========================================================================
+
+alert ip $HOME_NET any -> 172.86.98.113 any (msg:"Bark&Bite - Iranian APT UNC1549 Nimbus Manticore SSH Tunnel C2 IP Outbound 2026"; threshold:type limit, track by_src, count 1, seconds 600; reference:url,thehackernews.com/2026/08/nimbus-manticore-expands-toolset-with.html; reference:url,attack.mitre.org/techniques/T1572/; classtype:command-and-control; sid:2000576; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_09_17, updated_at 2026_09_17;)
+
+alert ip 172.86.98.113 any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT UNC1549 Nimbus Manticore SSH Tunnel C2 IP Inbound 2026"; threshold:type limit, track by_dst, count 1, seconds 600; reference:url,thehackernews.com/2026/08/nimbus-manticore-expands-toolset-with.html; reference:url,attack.mitre.org/techniques/T1572/; classtype:command-and-control; sid:2000577; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_09_17, updated_at 2026_09_17;)

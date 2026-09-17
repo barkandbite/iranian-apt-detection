@@ -36,7 +36,20 @@ girlsbags[.]shop
 onlinepettools[.]shop
 web14[.]info
 web27[.]info
+
+# UNC1549 / Nimbus Manticore SSH-tunnel C2 (Group-IB, Aug 2026)
+172.86.98[.]113   # reverse SSH tunnel over TCP/443
 ```
+
+### UNC1549 / Nimbus Manticore (September 2026) — Key Indicators
+- **SSH-tunnel C2**: `172.86.98.113` over TCP/443 (Suricata SID 2000576/2000577)
+- **DLL masquerade**: `wtsapi32.dll` (Windows Terminal Server SDK) loaded from a
+  non-System32 path — TWOSTROKE-like C++ backdoor and reverse-SSH tunneler
+- **Behavioral**: reverse SSH tunnels riding TCP/443 to blend with TLS
+- **Delivery**: job/recruitment lures (Dream Job variant); trojanized Zoom
+  installer (MiniFast) and OnlyOffice-hosted ZIP (MiniJunk) in related activity
+- **Persistence**: Windows service whose ImagePath points to a masqueraded
+  `wtsapi32.dll` (Wazuh 101545-101548)
 
 ### Dust Specter (April 2026) — Key Indicators
 - **TwinTalk C2**: HTTPS GET with `Authorization: Bearer eyJ...` to randomized hex URI paths

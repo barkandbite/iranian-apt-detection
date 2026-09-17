@@ -19,6 +19,7 @@ iranian-apt-detection/
 │   ├── 0922-iranian-apt-august2026-ics-indicators.xml # August 2026 ICS host indicators (CyberAv3ngers)
 │   ├── 0923-iranian-apt-august2026-host-indicators.xml # August 2026 host indicators (Olalampo)
 │   ├── 0924-iranian-apt-august2026-rustywater.xml    # August 2026 RustyWater host indicators
+│   ├── 0925-iranian-apt-september2026-unc1549.xml    # September 2026 UNC1549/Nimbus Manticore host indicators
 │   └── README.md                                     # Wazuh rules documentation
 │
 ├── configurations/
@@ -99,8 +100,9 @@ iranian-apt-detection/
 - **101534-101535**: CyberAv3ngers ICS host indicators — Schneider project-file access, Siemens S7 binary path (0922)
 - **101536-101539**: MuddyWater Olalampo host indicators — CHAR, GhostFetch, service masquerade, FMAPP.dll SOCKS5 (0923)
 - **101540-101544**: MuddyWater RustyWater host indicators — Rust agent binary drop, service persistence, Templates state artifacts (0924)
+- **101545-101548**: UNC1549/Nimbus Manticore host indicators — wtsapi32.dll masquerade sideload, reverse-SSH tunnel process, C2 IP on command line, service persistence (0925)
 
-### Suricata SID Ranges (1000039-2000561)
+### Suricata SID Ranges (1000039-2000577)
 - **1000039-2000014**: CVE exploitation signatures
 - **2000015-2000030**: C2 infrastructure, post-exploitation, exfiltration
 - **2000031-2000050**: Reconnaissance, web shells, ICS/SCADA, correlation

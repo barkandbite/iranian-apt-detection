@@ -5,6 +5,38 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.26] - 2026-09-17
+
+### Added — UNC1549 / Nimbus Manticore toolset expansion (SID 2000576–2000577)
+
+Group-IB (Aug 26 2026) documented a Nimbus Manticore (UNC1549 / Smoke
+Sandstorm / Subtle Snail) campaign adding a TWOSTROKE-like C++ backdoor and a
+reverse-SSH tunneling utility, both masquerading as the Windows Terminal
+Server SDK DLL `wtsapi32.dll`. The report confirmed a hard-coded SSH-tunnel
+C2 at `172.86.98.113` over TCP/443. Existing behavioral SSH-over-443 coverage
+(SID 2000299 / 2000358) already fingerprints the transport; these rules add
+the high-confidence infrastructure IOC in both directions:
+
+- **SID 2000576** — outbound `$HOME_NET → 172.86.98.113` (any protocol),
+  thresholded 1/600s.
+- **SID 2000577** — inbound `172.86.98.113 → $HOME_NET`.
+
+Backported from the private `barkbite-suricata-by-country` `bb-iran-suricata.rules`.
+The IOC is already public (Group-IB / The Hacker News, Aug 26 2026).
+
+### Added — Wazuh host-side parity rules (101545–101548)
+
+New file `wazuh-rules/0925-iranian-apt-september2026-unc1549.xml`:
+
+- **101545** — `wtsapi32.dll` written outside System32 (AppData / ProgramData
+  / Public / Temp) — DLL-masquerade sideload.
+- **101546** — masqueraded `wtsapi32.dll` process invoked with reverse-tunnel
+  arguments or the C2 endpoint.
+- **101547** — the confirmed C2 IP `172.86.98.113` present on any process
+  command line (level 14).
+- **101548** — Windows service whose ImagePath resolves to a `wtsapi32.dll`
+  outside System32 — persistence.
+
 ## [4.0.25] - 2026-08-20
 
 ### Added — MuddyWater RustyWater behavioral rules (SID 2000573–2000575)
