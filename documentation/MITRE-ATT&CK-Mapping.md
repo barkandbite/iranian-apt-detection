@@ -234,3 +234,17 @@
 ### Defense Evasion
 - **T1574.002 - DLL Side-Loading**: Wazuh 101528 (WinDirStat.exe loading trojanized uxtheme.dll from non-system path)
 - **T1036.005 - Match Legitimate Name or Location**: Wazuh 101529 (execution from C:\ProgramData\WinDir\ masquerade directory), SID 2000553 (google.com.hospitalinstallation.com visual-obfuscation subdomain)
+
+## September 2026 Additions — UNC1549 / Nimbus Manticore Toolset Expansion (Group-IB)
+
+### Command and Control
+- **T1071.001 - Web Protocols**: Wazuh 101547 (confirmed C2 IP 172.86.98.113 on a process command line)
+- **T1572 - Protocol Tunneling**: SIDs 2000576-2000577 (SSH-tunnel C2 IP 172.86.98.113:443, both directions); Wazuh 101546 (reverse-SSH tunneler invoked with tunnel arguments)
+- **T1090 - Proxy**: Wazuh 101546 (reverse SSH tunnel establishing operator relay)
+
+### Defense Evasion
+- **T1574.001 - DLL Search Order Hijacking**: Wazuh 101545/101548 (wtsapi32.dll sideloaded / service ImagePath outside System32)
+- **T1036.005 - Match Legitimate Name or Location**: Wazuh 101545 (wtsapi32.dll masquerading as the Windows Terminal Server SDK DLL from a non-System32 path)
+
+### Persistence
+- **T1543.003 - Windows Service**: Wazuh 101548 (service whose ImagePath resolves to a masqueraded wtsapi32.dll)
