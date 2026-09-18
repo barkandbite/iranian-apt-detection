@@ -5,6 +5,42 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.26] - 2026-09-18
+
+### Added — Mirage Kitten / UNC1549 NodeRabbit + PollCat campaign (SID 2000576–2000581)
+
+Kaspersky Securelist (2026-09-01) documented Mirage Kitten (UNC1549 /
+Nimbus Manticore) delivering trojanized npm "technical challenge" packages
+through fake-job lures, dropping the NodeRabbit and PollCat Node.js
+implants. Check Point (Aug 2026) separately profiled the group's reverse
+SSH tunneler. Six new Suricata rules:
+
+- **SID 2000576/2000577** — `oracle-challenge` S3 staging bucket, TLS SNI
+  and plain-HTTP legs (IOC — expires on bucket rotation).
+- **SID 2000578** — fake-job challenge archive lure names
+  (`Front-Technical-Challenge`, `FrontEnd-Task`, `RankChallenge-react`
+  `.zip` downloads). Survives bucket rotation while naming holds.
+- **SID 2000579** — Nimbus Manticore SSH tunneler C2 `172.86.98.113:443`
+  (priority 1). The existing SSH-over-443 behavioral rule covers rotated
+  infrastructure.
+- **SID 2000580/2000581** — PollCat check-in evasion: flowbit marker on
+  azurewebsites.net flows + alert on the implant's repeated-HTTP-400
+  "successful failure" registration pattern (threshold 5/900s per host).
+
+### Added — Wazuh host-side parity rules (101545–101549)
+
+New file `wazuh-rules/0925-iranian-apt-september2026-noderabbit.xml`:
+hidden `node_modules/.cache/.[hex8]/index.js` implant drop, Node.js
+launched from the hidden cache dir, Git-hook persistence writes, npm
+postinstall spawning out of `node_modules/.cache`, and the
+`RankChallenge-react` PollCat lure artifact.
+
+### Sync
+
+Rules originated in this session and were written to both repos
+simultaneously; Iran SID parity verified (both repos at 458 rules,
+SIDs 1000039–2000581).
+
 ## [4.0.25] - 2026-08-20
 
 ### Added — MuddyWater RustyWater behavioral rules (SID 2000573–2000575)

@@ -1,6 +1,6 @@
 # Iranian APT Detection Rules
 
-[![Version](https://img.shields.io/badge/version-4.0.25-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.0.26-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![MITRE ATT&CK](https://img.shields.io/badge/MITRE%20ATT%26CK-v15-orange.svg)](documentation/MITRE-ATT&CK-Mapping.md)
 
@@ -15,6 +15,10 @@ Three concurrent Iranian campaigns targeting U.S. healthcare disclosed March 24:
 - **Handala/Void Manticore** wiped 200K+ Stryker devices via **Microsoft Intune MDM** abuse — no malware needed. Maryland EKG transmission went dark statewide. DOJ attributed; $10M reward.
 - **Pay2Key v3** (IRGC) hit unnamed U.S. healthcare org with **ChaCha20 + Curve25519** ransomware. Fake Avast AV bypass. **I2P C2** (not Tor). Purely destructive — no ransom demand.
 - **MuddyWater** exploiting **CVE-2025-59287** (Windows WSUS Deserialization RCE, CVSS 9.8) to pre-position on healthcare networks.
+
+## Recent Threats (v4.0.26)
+
+- **NEW (v4.0.26)**: **Mirage Kitten / UNC1549 NodeRabbit + PollCat** fake-job npm campaign (Kaspersky Securelist Sep 2026) — 6 Suricata rules (SID 2000576-2000581): `oracle-challenge` S3 staging (TLS SNI + HTTP), technical-challenge lure archive names, Nimbus Manticore reverse-SSH tunneler C2 `172.86.98.113:443` (Check Point Aug 2026), and PollCat's repeated-HTTP-400 "successful failure" Azure C2 check-in pattern (flowbit pair). 5 new Wazuh host rules (101545-101549) in new `0925` file: hidden `node_modules/.cache` implant drop/launch, Git-hook persistence, npm postinstall spawn, RankChallenge-react artifact.
 
 ## Recent Threats (v4.0.25)
 
