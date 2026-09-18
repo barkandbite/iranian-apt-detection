@@ -38,6 +38,19 @@ web14[.]info
 web27[.]info
 ```
 
+### Mirage Kitten NodeRabbit/PollCat (September 2026) — Key Indicators
+- **Staging**: `oracle-challenge.s3.amazonaws[.]com` bucket; lure archives
+  `Front-Technical-Challenge.zip`, `FrontEnd-Task.zip`, `RankChallenge-react` project
+- **Delivery**: trojanized npm packages `colorized_terminal`, `pretty-log@2.1.0`
+  (postinstall lifecycle script launches implant)
+- **Host artifact**: implant at `node_modules/.cache/.<8-hex>/index.js` run as background node process
+- **Persistence (variant 3)**: VS Code extension dir writes, malicious Git hooks (post-checkout/post-merge)
+- **C2**: AES-256-GCM to `*.azurewebsites.net` (subdomains embed target org names), Cloudflare-fronted
+  domains via NameCheap; PollCat treats HTTP 400 as successful registration — repeated 400s from an
+  Azure App Service host at ~2-min cadence is the network tell
+- **SSH tunneler**: reverse SSH to `172.86.98[.]113:443`, masquerades as wtsapi32.dll
+- **Suricata**: SID 2000576-2000581 | **Wazuh**: 101545-101549
+
 ### Dust Specter (April 2026) — Key Indicators
 - **TwinTalk C2**: HTTPS GET with `Authorization: Bearer eyJ...` to randomized hex URI paths
 - **File artifacts**: `C:\ProgramData\PolGuid\in.txt` and `out.txt` (TwinTask polling)
