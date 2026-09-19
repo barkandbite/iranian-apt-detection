@@ -1,54 +1,122 @@
 name: Validate rules
 
+# Every gate here corresponds to a defect class that actually reached HEAD.
+# Two caused total detection outages:
+#   - Suricata v4.0.21: dsize:>500000 (uint16 overflow) + http.host+nocase
+#     hard error took all 429 rules offline for 26 days.
+#   - Wazuh: level="17" and same_src_ip made analysisd refuse to start,
+#     taking the entire SIEM ruleset offline. xmllint passed throughout.
+#
+# Both engines are therefore BLOCKING gates. XML well-formedness is necessary
+# but nowhere near sufficient: Wazuh's OS_XML parser is stricter than standard
+# XML (no CDATA) and analysisd rejects constructs no XML parser sees.
+
 on:
   pull_request:
     paths:
       - 'suricata/**'
       - 'wazuh-rules/**'
+      - 'configurations/**'
+      - 'cdb-lists/**'
+      - 'tools/lint-rules.py'
       - '.github/workflows/validate-rules.yml'
   push:
-    branches:
-      - main
+    branches: [main]
     paths:
       - 'suricata/**'
       - 'wazuh-rules/**'
+      - 'configurations/**'
+      - 'cdb-lists/**'
+  workflow_dispatch:
 
 jobs:
-  suricata-test:
+  static-lint:
+    name: Static lint (blocking)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: XML well-formedness
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq libxml2-utils
+          xmllint --noout wazuh-rules/*.xml
+          echo "XML well-formed (necessary, NOT sufficient - see analysisd job)"
+
+      - name: Ruleset linter
+        run: python3 tools/lint-rules.py
+
+  suricata-load:
+    name: Suricata load test (blocking)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Suricata 7 and xmllint
+      - name: Install Suricata 7
         run: |
-          sudo apt-get update
-          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y suricata libxml2-utils
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq suricata
+          suricata -V
 
-      - name: Validate Suricata rule files
+      - name: Load every Suricata rule file
         run: |
           mkdir -p /tmp/suri
           fail=0
           for f in suricata/*.rules; do
             [ -f "$f" ] || continue
             echo "=== $f ==="
-            if ! suricata -T -S "$f" -l /tmp/suri 2>&1 | tee /tmp/out; then
-              fail=1
-            fi
-            if grep -qE '^E:' /tmp/out; then
-              echo "::error file=$f::rule parse errors found"
+            suricata -T -S "$f" -l /tmp/suri 2>&1 | tee /tmp/out
+            rc=${PIPESTATUS[0]}
+            if [ "$rc" -ne 0 ] || grep -qE '^E:|Loading signatures failed' /tmp/out; then
+              echo "::error file=$f::Suricata refused to load this file"
               fail=1
             fi
           done
           exit $fail
 
-      - name: Validate Wazuh XML rule files
+      - name: Duplicate SID check
         run: |
-          fail=0
-          for f in wazuh-rules/*.xml; do
-            [ -f "$f" ] || continue
-            if ! xmllint --noout "$f"; then
-              echo "::error file=$f::XML validation failed"
-              fail=1
-            fi
-          done
-          exit $fail
+          dupes=$(grep -hoP '\bsid:\d+' suricata/*.rules | sort | uniq -d)
+          if [ -n "$dupes" ]; then
+            echo "::error::duplicate SIDs (silent rule override): $dupes"
+            exit 1
+          fi
+          echo "no duplicate SIDs"
+
+  wazuh-load:
+    name: Wazuh analysisd load test (blocking)
+    runs-on: ubuntu-latest
+    container:
+      image: wazuh/wazuh-manager:4.14.7
+      options: --user root
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Load ruleset into analysisd
+        run: |
+          set -e
+          cp wazuh-rules/09*.xml /var/ossec/etc/rules/
+          chown wazuh:wazuh /var/ossec/etc/rules/09*.xml || true
+
+          # CDB lists referenced by rules must exist for the load to resolve.
+          mkdir -p /var/ossec/etc/lists
+          if compgen -G "cdb-lists/*" > /dev/null; then
+            for f in cdb-lists/*; do
+              if [ -f "$f" ] && [ "$(basename "$f")" != "README.md" ]; then
+                cp "$f" /var/ossec/etc/lists/
+              fi
+            done
+            chown -R wazuh:wazuh /var/ossec/etc/lists || true
+          fi
+
+          echo "=== wazuh-analysisd -t ==="
+          out=$(/var/ossec/bin/wazuh-analysisd -t 2>&1 || true)
+          echo "$out"
+          if echo "$out" | grep -iE 'ERROR|CRITICAL' | grep -qv 'resource limit'; then
+            echo "::error::analysisd rejected the ruleset - it would refuse to start"
+            exit 1
+          fi
+          echo "analysisd accepted all rule files"

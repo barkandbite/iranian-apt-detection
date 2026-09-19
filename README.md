@@ -133,7 +133,7 @@ iranian-apt-detection/
 |-- configurations/                 <-- OPTIONAL: endpoint configs
 |   |-- sysmon-config-iranian-apt.xml   Windows Sysmon config
 |   |-- ossec-agent-iranian-apt.conf    Wazuh agent config
-|   `-- iranian-apt-active-response.xml Active response config
+|   `-- iranian-apt-active-response.xml.example  Active response config (edit first)
 |
 |-- tests/                          <-- FOR DEVELOPERS: test suite
 |   |-- test_suricata_rules.py          Automated tests for all 354 rules
