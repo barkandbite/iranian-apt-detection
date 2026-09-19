@@ -245,7 +245,7 @@
   </rule>
 
   <!-- Critical Infrastructure Correlation -->
-  <rule id="101120" level="17" frequency="2" timeframe="7200">
+  <rule id="101120" level="16" frequency="2" timeframe="7200">
     <if_matched_group>iranian_cloud</if_matched_group>
     <description>Iranian APT: ICS attack combined with wiper preparation - imminent threat</description>
     <mitre>

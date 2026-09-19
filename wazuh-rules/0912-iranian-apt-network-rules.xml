@@ -50,7 +50,7 @@
 
   <rule id="100943" level="15" frequency="5" timeframe="300">
     <if_matched_sid>100942</if_matched_sid>
-    <same_dst_ip />
+    <same_dstip />
     <description>Iranian APT: Multiple large data transfers to same destination - possible exfiltration</description>
     <mitre>
       <id>T1041</id>
@@ -87,7 +87,7 @@
   <rule id="100946" level="13" frequency="50" timeframe="60">
     <if_group>firewall</if_group>
     <action>drop|deny|reject</action>
-    <same_src_ip />
+    <same_source_ip />
     <description>Iranian APT: Port scanning detected from $(src_ip)</description>
     <mitre>
       <id>T1046</id>

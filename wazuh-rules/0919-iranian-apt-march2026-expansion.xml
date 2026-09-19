@@ -642,7 +642,7 @@
   </rule>
 
   <!-- Cross-group: Iranian APT multi-actor campaign (any 3 groups in 4 hours) -->
-  <rule id="101450" level="17" frequency="3" timeframe="14400">
+  <rule id="101450" level="16" frequency="3" timeframe="14400">
     <if_matched_group>iranian_apt</if_matched_group>
     <description>Iranian APT: Multi-actor campaign detected - coordinated nation-state operation</description>
     <mitre>

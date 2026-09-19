@@ -290,7 +290,7 @@
     <group>attack,correlation,campaign,</group>
   </rule>
 
-  <rule id="101023" level="17" frequency="2" timeframe="7200">
+  <rule id="101023" level="16" frequency="2" timeframe="7200">
     <if_matched_group>iranian_unique</if_matched_group>
     <description>Iranian APT: Time-correlated multi-stage attack - nation-state activity confirmed</description>
     <mitre>
