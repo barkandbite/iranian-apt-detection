@@ -153,7 +153,7 @@ def lint_wazuh():
                     'Wazuh 4.x. Use same_location for agent correlation.')
 
             # if_sid takes Wazuh rule IDs, not Windows Event IDs.
-            for im2 in re.finditer(r'<if_sid>\s*(4\d{3})\s*</if_sid>', body):
+            for im2 in re.finditer(r'<if_sid>\s*([\d,\s]*\b4\d{3}\b[\d,\s]*)</if_sid>', body):
                 err('if_sid-windows-eventid', path,
                     f'rule {rid}: <if_sid>{im2.group(1)}</if_sid> looks like a Windows '
                     'Event ID, not a Wazuh rule ID. Use <if_group>windows</if_group> '

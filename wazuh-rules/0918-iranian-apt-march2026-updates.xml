@@ -43,7 +43,7 @@
 
   <!-- CVE-2024-55591: FortiOS Auth Bypass (FortiSetup admin account) -->
   <rule id="101202" level="13">
-    <if_sid>4701,4702</if_sid>
+    <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^4720$|^4732$</field>
     <field name="win.eventdata.targetUserName" type="pcre2">(?i)FortiSetup</field>
     <description>Iranian APT: Suspicious administrator account "FortiSetup" created - possible MuddyWater CVE-2024-55591</description>
