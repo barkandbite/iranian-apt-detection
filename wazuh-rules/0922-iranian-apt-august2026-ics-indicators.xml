@@ -1,0 +1,64 @@
+<!--
+  Wazuh Rules for Iranian APT Detection - August 2026 ICS Host Indicators
+  Version: 1.0
+  Last Updated: 2026-08-02
+
+  Host-side detections complementing the Suricata network signatures
+  (SID 2000564-2000566) for the CyberAv3ngers / IRGC-CEC ICS-targeting
+  expansion described in CISA AA26-097A (updated 2026-07-22). The updated
+  advisory reports the actor exfiltrating PLC project files using the
+  vendors' own legitimate engineering software, and expands scope from
+  Rockwell to Schneider Electric (UMAS) and Siemens (S7comm) controllers,
+  with confirmed ladder-logic tampering that disabled safety shutdown /
+  alarm logic at a US Water & Wastewater victim.
+
+  These rules flag the host-side footprint of that activity: engineering
+  workstations opening/exporting PLC project files, and the vendor
+  programming binaries running from unexpected paths or by unexpected
+  users. Tune to your OT engineering-workstation baseline before enabling
+  at alert level in production — legitimate commissioning work touches
+  the same files.
+
+  Rule ID Range: 101530-101531 (next available after 0921's 101529)
+
+  References:
+    - CISA AA26-097A (updated 2026-07-22):
+      https://www.cisa.gov/news-events/cybersecurity-advisories/aa26-097a
+-->
+<group name="iranian_apt,cyberav3ngers,ics,ot,">
+
+  <!-- Schneider Electric engineering software (EcoStruxure Control Expert /
+       Unity Pro) exporting or opening a PLC project file (.stu/.sta/.xef).
+       On an engineering workstation this is normal during commissioning;
+       outside a change window or from a non-engineer account it matches the
+       AA26-097A project-file exfil pattern. (T0873 / T1005) -->
+  <rule id="101534" level="10">
+    <if_group>sysmon_event_1</if_group>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\(unity ?pro|control ?expert|ecostruxure)[^\\]*\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)\.(stu|sta|xef|zef)\b</field>
+    <description>Iranian APT: CyberAv3ngers - Schneider PLC project file accessed by engineering software (CISA AA26-097A ICS exfil)</description>
+    <mitre>
+      <id>T0873</id>
+      <id>T1005</id>
+    </mitre>
+    <group>attack,collection,cyberav3ngers,ics,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- Siemens TIA Portal / STEP 7 (s7*.exe, Siemens.Automation.*) running
+       from a non-standard path, i.e. outside Program Files. AA26-097A notes
+       the actor stages the vendor programming tool itself to push modified
+       logic; a portable/relocated copy of the S7 programming binary is the
+       host tell for that. (T0843 program download / T1036.005) -->
+  <rule id="101535" level="12">
+    <if_group>sysmon_event_1</if_group>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\(s7[a-z0-9]+|siemens\.automation\.[^\\]+)\.exe$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)^(?!.*\\Program Files).*</field>
+    <description>Iranian APT: CyberAv3ngers - Siemens S7 programming binary executing from non-standard path (CISA AA26-097A ladder-logic tampering)</description>
+    <mitre>
+      <id>T0843</id>
+      <id>T1036.005</id>
+    </mitre>
+    <group>attack,execution,cyberav3ngers,ics,pci_dss_10.6.1,</group>
+  </rule>
+
+</group>

@@ -6,10 +6,10 @@ This directory contains Suricata IDS signatures for detecting Iranian APT networ
 ## Current Ruleset
 
 ### Canonical File: `iranian-apt-detection.rules`
-- **Version**: 4.0 (consolidated from v3.1, v3.2, v3.3)
-- **Last Updated**: 2026-03-30
-- **SID Range**: 1000039–2000461
-- **Total Rules**: 338 signatures
+- **Version**: 4.0.24 (consolidated from v3.1, v3.2, v3.3 + ongoing updates)
+- **Last Updated**: 2026-08-14
+- **SID Range**: 1000039–2000572
+- **Total Rules**: 449 signatures
 - **Zero duplicate SIDs**
 - **Requires**: Suricata 7.0+
 
@@ -26,20 +26,37 @@ This directory contains Suricata IDS signatures for detecting Iranian APT networ
 | 2000231–2000359 | 129 | March 2026 expansion: Cisco SD-WAN, MDM wiper, Olalampo, healthcare, correlation |
 | 2000360–2000456 | 97 | ICS/PCOM, TAMECAT, Infy blockchain DGA, FortiOS/Ivanti chains (renumbered from v3.3) |
 | 2000457–2000461 | 5 | CRESCENTHARVEST RAT (APT35/Charming Kitten, Feb 2026) |
+| 2000462–2000477 | 16 | Boggy Serpens/BlackBeard, Nuso, Infy Tonnerre, Dust Specter TwinTalk/SPLITDROP |
+| 2000478–2000501 | 24 | CyberAv3ngers ICS/PLC (AA26-097A), Infy IOC update, MuddyWater ChainShell/CastleRAT/Fooder C2 |
+| 2000502–2000515 | 14 | APT34/OilRig Dark Scepter C2 domains (Hunt.io Apr 2026), MuddyWater AS136557 IP |
+| 2000516–2000518 | 3 | Cloud C2 domains: datadrift.somee.com, prism-west-candy.glitch.me, line.completely.workers.dev |
+| 2000519–2000520 | 2 | Prince of Persia (Infy) Foudre replacement C2 IPs (SafeBreach) |
+| 2000521–2000523 | 3 | MuddyWater Stagecomp/Darkcomp staging IPs + ms_upd.exe behavioral (Rapid7) |
+| 2000524–2000527 | 4 | MuddyWater Teams false flag C2: moonzonet.com, uploadfiler.com, adm-pulse.com, 116.203.208.186 |
+| 2000528–2000533 | 6 | CyberAv3ngers Rockwell/Allen-Bradley PLC targeting (CISA AA26-097A) |
+| 2000534–2000537 | 4 | MuddyWater RustyWater Rust RAT: nomercys.it.com C2 + 159.198.66.153 (THN/ProtosLabs) |
+| 2000538–2000549 | 12 | Screening Serpens (UNC1549) MiniUpdate + MiniJunk V2 Azure C2 (Unit 42 May 2026) |
+| 2000550–2000552 | 3 | CVE-2025-34291 Langflow CORS bypass + RCE, MuddyWater initial access (CISA KEV) |
+| 2000553–2000561 | 9 | Cavern Manticore modular C2 framework (MOIS/OilRig-Lyceum nexus, Check Point July 2026) |
+| 2000562–2000563 | 2 | Cavern HollowGraph M365 Graph-API C2 + DNS-tunnel credential refresh (cloudlanecdn.com) |
+| 2000564–2000566 | 3 | CyberAv3ngers Schneider UMAS + Siemens S7comm ICS tampering (CISA AA26-097A) |
+| 2000567–2000572 | 6 | MuddyWater Operation Olalampo: GhostBackDoor French-language API C2, HTTP_VIP, PatchAgent |
 
 ### Threat Group Coverage
 
 | Group | Malware/Tools | SIDs |
 |-------|---------------|------|
-| MuddyWater | Dindoor, RustyWater, MuddyViper/Fooder, TWINTASK, PowGoop, CHAR | ~40 |
-| CyberAv3ngers | IOCONTROL, PCOM PLC exploitation, RabbitMQ, DoH | ~25 |
+| MuddyWater | Dindoor, RustyWater, MuddyViper/Fooder, TWINTASK, PowGoop, CHAR, ChainShell/CastleRAT | ~45 |
+| CyberAv3ngers | IOCONTROL, PCOM PLC, RabbitMQ, DoH, Rockwell CIP/EtherNet-IP, Modbus, S7comm | ~33 |
 | APT34 (OilRig) | Spearal DNS, Veaty, STEALHOOK, Dark Scepter | ~10 |
 | APT35 (Charming Kitten) | BellaCPP, PowerLess v3, CRESCENTHARVEST RAT | ~12 |
 | APT42 (RedKitten) | TAMECAT, WezRat, SloppyMIO, GitHub dead-drop | ~10 |
 | Handala/Void Manticore | Stryker MDM wiper, Telegram C2, Intune mass wipe | ~15 |
 | UNC1549 (Nimbus Manticore) | LIGHTRAIL, POLLBLEND, TWOSTROKE, DEEPROOT, MINIBIKE | ~10 |
 | Pioneer Kitten | CVE-2024-24919, CVE-2024-3400, Backblaze exfil | ~8 |
-| Infy (Prince of Persia) | Tornado, Tonnerre, blockchain DGA, Telegram bot | ~6 |
+| Dust Specter | TwinTalk, SPLITDROP C2, domain IOCs | ~10 |
+| Boggy Serpens/BlackBeard | Nuso backdoor | ~5 |
+| Infy (Prince of Persia) | Tornado, Tonnerre, blockchain DGA, Telegram bot, IOC update | ~11 |
 | CottonSandstorm | WezRat, credential theft | ~5 |
 | Sicarii RaaS | Connectivity burst, file.io exfil | ~4 |
 | Crafty Camel (Sosano) | PDF+HTA polyglot, C2 domains | ~4 |

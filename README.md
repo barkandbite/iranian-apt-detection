@@ -36,7 +36,7 @@ You only need the section that matches the software you already run. Skip the re
 
 You need **one file**: `suricata/iranian-apt-detection.rules`
 
-This single file contains all 354 network detection signatures.
+This single file contains all 452 network detection signatures.
 
 ```bash
 # Copy the rules file into your Suricata rules directory
@@ -123,11 +123,11 @@ configurations/ossec-agent-iranian-apt.conf
 iranian-apt-detection/
 |
 |-- suricata/                       <-- SURICATA USERS: start here
-|   |-- iranian-apt-detection.rules     One file, 354 network signatures
+|   |-- iranian-apt-detection.rules     One file, 452 network signatures
 |   `-- README.md                       Suricata-specific docs
 |
 |-- wazuh-rules/                    <-- WAZUH USERS: start here
-|   |-- 0910 through 0919 .xml files   265+ SIEM detection rules
+|   |-- 0910 through 0924 .xml files   294 SIEM detection rules
 |   `-- README.md                       Wazuh-specific docs
 |
 |-- configurations/                 <-- OPTIONAL: endpoint configs

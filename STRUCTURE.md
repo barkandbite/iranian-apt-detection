@@ -14,6 +14,11 @@ iranian-apt-detection/
 │   ├── 0917-iranian-apt-june2025-updates.xml        # June 2025 threat updates
 │   ├── 0918-iranian-apt-march2026-updates.xml       # March 2026 threat updates
 │   ├── 0919-iranian-apt-march2026-expansion.xml     # March 2026 expansion
+│   ├── 0920-iranian-apt-june2026-host-indicators.xml # June 2026 host indicators
+│   ├── 0921-iranian-apt-july2026-host-indicators.xml # July 2026 host indicators (Cavern Manticore)
+│   ├── 0922-iranian-apt-august2026-ics-indicators.xml # August 2026 ICS host indicators (CyberAv3ngers)
+│   ├── 0923-iranian-apt-august2026-host-indicators.xml # August 2026 host indicators (Olalampo)
+│   ├── 0924-iranian-apt-august2026-rustywater.xml    # August 2026 RustyWater host indicators
 │   └── README.md                                     # Wazuh rules documentation
 │
 ├── configurations/
@@ -23,7 +28,7 @@ iranian-apt-detection/
 │   └── README.md                                     # Configuration guide
 │
 ├── suricata/
-│   ├── iranian-apt-detection.rules                  # Consolidated Suricata IDS signatures (v5.0, 354 rules)
+│   ├── iranian-apt-detection.rules                  # Consolidated Suricata IDS signatures (v4.0.24, 449 rules)
 │   └── README.md                                     # Suricata deployment guide
 │
 ├── documentation/
@@ -34,15 +39,8 @@ iranian-apt-detection/
 │   ├── MITRE-ATT&CK-Mapping.md                      # MITRE framework mapping
 │   └── Sector-Vulnerability-Analysis.md             # Sector-specific analysis
 │
-├── tests/
-│   ├── __init__.py                                  # Package marker
-│   ├── conftest.py                                  # Pytest fixtures / SuricataTestRunner
-│   ├── test_suricata_rules.py                       # Parameterized tests for all 354 SIDs
-│   └── requirements.txt                             # Test dependencies (scapy, pytest)
-│
 ├── tools/
 │   ├── test.sh                                      # Rule validation script
-│   ├── test_suricata.sh                             # Suricata validation + test runner
 │   ├── deploy-iranian-apt-rules.sh                  # Main deployment script
 │   ├── iranian-apt-active-response.sh               # Active response script
 │   ├── deploy-active-response.sh                    # Active response deployment
@@ -57,6 +55,7 @@ iranian-apt-detection/
 │   ├── 0900-iranian-apt-detection-master.xml        # Consolidated Wazuh rules (optional)
 │   ├── iranian-apt.rules                            # Original Suricata rules v1.0
 │   ├── iranian-apt-cloud-ai.rules                   # Cloud rules (merged)
+│   ├── cyberav3ngers-ioc-aa26-097a.rules            # IOC rules merged into main file (v4.0.10)
 │   ├── iranian-apt-2025-06-29                       # June updates archive
 │   └── README.md                                     # Archive documentation
 │
@@ -73,12 +72,12 @@ iranian-apt-detection/
 1. **Wazuh Rules**: Deploy all files from `wazuh-rules/09*.xml`
 2. **Sysmon**: Deploy `configurations/sysmon-config-iranian-apt.xml` to Windows endpoints
 3. **Agent Config**: Add content from `configurations/ossec-agent-iranian-apt.conf` to agents
-4. **Suricata**: Copy `suricata/iranian-apt-detection.rules` to your rules directory
+4. **Suricata**: Copy all `.rules` files from `suricata/` to your rules directory
 5. **Active Response**: Run `tools/deploy-active-response.sh` for automated response
 
 ## Rule ID Allocation
 
-### Wazuh Rules (100900-101510)
+### Wazuh Rules (100900-101544)
 - **100900-100924**: CVE exploitation detection (0910)
 - **100925-100959**: Behavioral detection (0911)
 - **100940-100959**: Network detection (0912)
@@ -91,8 +90,17 @@ iranian-apt-detection/
 - **101300-101477**: March 2026 expansion (0919)
 - **101480-101510**: Healthcare emergency (0919)
 - **101511-101515**: Dust Specter TwinTalk/SPLITDROP host indicators (0919)
+- **101516-101521**: CyberAv3ngers Rockwell PLC host-side detection (0919)
+- **101522**: CVE-2025-34291 Langflow post-RCE process spawn (0919)
+- **101523-101527**: Dindoor/Fakeset June 2026 host indicators — Deno exec, Rclone exfil, Quick Assist, signer subjects (0920)
+- **101528-101529**: Cavern Manticore host indicators — WinDirStat/uxtheme.dll sideload, ProgramData\WinDir masquerade (0921)
+- **101530-101531**: MuddyWater Chaos false-flag host indicators — ms_upd.exe stager, Game.exe RAT C2 (0920)
+- **101532-101533**: Cavern HollowGraph host indicators — logAzure.txt credential store, cloudlanecdn.com DNS (0921)
+- **101534-101535**: CyberAv3ngers ICS host indicators — Schneider project-file access, Siemens S7 binary path (0922)
+- **101536-101539**: MuddyWater Olalampo host indicators — CHAR, GhostFetch, service masquerade, FMAPP.dll SOCKS5 (0923)
+- **101540-101544**: MuddyWater RustyWater host indicators — Rust agent binary drop, service persistence, Templates state artifacts (0924)
 
-### Suricata SID Ranges (1000039-2000477)
+### Suricata SID Ranges (1000039-2000561)
 - **1000039-2000014**: CVE exploitation signatures
 - **2000015-2000030**: C2 infrastructure, post-exploitation, exfiltration
 - **2000031-2000050**: Reconnaissance, web shells, ICS/SCADA, correlation
@@ -105,6 +113,22 @@ iranian-apt-detection/
 - **2000462-2000466**: Boggy Serpens/BlackBeard + Nuso backdoor
 - **2000467**: Infy Tonnerre replacement C2
 - **2000468-2000477**: Dust Specter TwinTalk/SPLITDROP C2 + domain IOCs
+- **2000478-2000485**: CyberAv3ngers Rockwell CompactLogix/Micro850 PLC targeting (CISA AA26-097A)
+- **2000486-2000490**: Infy/Prince of Persia IOC update (45.80.149.3, ddnsking.com, conningstone.net, hbmc.net)
+- **2000491-2000493**: MuddyWater ChainShell/CastleRAT Russian MaaS (TAG-150)
+- **2000494-2000495**: MuddyWater Fooder/MuddyViper C2 IOC update (Trellix Apr 2026)
+- **2000496-2000497**: CyberAv3ngers IOC infrastructure IPs (CISA AA26-097A) — merged into main file (v4.0.10)
+- **2000498-2000501**: CyberAv3ngers ICS/OT behavioral (EtherNet/IP, Dropbear SSH, Modbus, S7comm)
+- **2000502-2000515**: APT34/OilRig Dark Scepter C2 domains (Hunt.io Apr 2026), MuddyWater AS136557 IP
+- **2000516-2000518**: Iranian APT cloud C2 domains (Trellix May 2026: somee.com, glitch.me, workers.dev)
+- **2000519-2000520**: Prince of Persia (Infy) Foudre replacement C2 IPs (SafeBreach Feb 2026)
+- **2000521-2000523**: MuddyWater Stagecomp/Darkcomp staging IPs + dropper behavioral (Rapid7 May 2026)
+- **2000524-2000527**: MuddyWater Teams false flag C2 (moonzonet.com, uploadfiler.com, adm-pulse.com, 116.203.208.186)
+- **2000528-2000533**: CyberAv3ngers Rockwell/Allen-Bradley PLC targeting (CISA AA26-097A)
+- **2000534-2000537**: MuddyWater RustyWater Rust RAT (nomercys.it.com, 159.198.66.153)
+- **2000538-2000549**: Screening Serpens (UNC1549) MiniUpdate + MiniJunk V2 Azure C2 (Unit 42)
+- **2000550-2000552**: CVE-2025-34291 Langflow CORS bypass + RCE (CISA KEV, MuddyWater)
+- **2000553-2000561**: Cavern Manticore modular C2 framework — domains, X-User-token beacon, x-db-* SQL module headers, cac.aspx webshell, /socket WebSocket (Check Point July 2026)
 
 ## File Naming Conventions
 

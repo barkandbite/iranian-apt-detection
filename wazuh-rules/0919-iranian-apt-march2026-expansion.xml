@@ -1010,4 +1010,99 @@
     <group>attack,c2,dust_specter,iranian_apt,pci_dss_11.4,</group>
   </rule>
 
+  <!-- ========== CYBERAV3NGERS ROCKWELL PLC TARGETING — CISA AA26-097A (101516-101521) ========== -->
+  <!-- Source: CISA AA26-097A (April 7, 2026)
+       CyberAv3ngers (IRGC) targeting Rockwell Automation CompactLogix/Micro850 PLCs
+       via CVE-2021-22681 auth bypass. Dropbear SSH for persistence.
+       Active against US Water, Energy, Government since March 2026. -->
+
+  <!-- CyberAv3ngers: Dropbear SSH process on OT/ICS host -->
+  <rule id="101516" level="15">
+    <if_group>sysmon_event_1</if_group>
+    <field name="win.eventdata.image" type="pcre2">(?i)dropbear</field>
+    <description>Iranian APT: CyberAv3ngers Dropbear SSH detected on host (CISA AA26-097A PLC persistence)</description>
+    <mitre>
+      <id>T1219</id>
+    </mitre>
+    <group>attack,persistence,cyberav3ngers,iranian_apt,ics,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- CyberAv3ngers: Studio 5000 / RSLogix connection to PLC from unexpected host -->
+  <rule id="101517" level="14">
+    <if_group>sysmon_event_3</if_group>
+    <field name="win.eventdata.destinationPort" type="pcre2">^44818$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)(Studio 5000|RSLogix|Logix Designer)</field>
+    <description>Iranian APT: CyberAv3ngers Studio 5000 connection to PLC port 44818 (CVE-2021-22681)</description>
+    <mitre>
+      <id>T0883</id>
+    </mitre>
+    <group>attack,initial_access,cyberav3ngers,iranian_apt,ics,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- CyberAv3ngers: ACD project file access on disk -->
+  <rule id="101518" level="14">
+    <if_group>sysmon_event_11</if_group>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?i)\.acd$</field>
+    <description>Iranian APT: CyberAv3ngers Rockwell ACD project file created or modified (PLC logic theft/manipulation)</description>
+    <mitre>
+      <id>T1565</id>
+    </mitre>
+    <group>attack,collection,cyberav3ngers,iranian_apt,ics,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- CyberAv3ngers: Network connection to EtherNet/IP port from non-engineering workstation -->
+  <rule id="101519" level="12">
+    <if_group>sysmon_event_3</if_group>
+    <field name="win.eventdata.destinationPort" type="pcre2">^44818$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)(cmd|powershell|python|curl|wget|nmap)</field>
+    <description>Iranian APT: CyberAv3ngers suspicious process connecting to EtherNet/IP port 44818</description>
+    <mitre>
+      <id>T0883</id>
+    </mitre>
+    <group>attack,lateral_movement,cyberav3ngers,iranian_apt,ics,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- CyberAv3ngers: Outbound SSH to OT port range (persistence indicator) -->
+  <rule id="101520" level="13">
+    <if_group>sysmon_event_3</if_group>
+    <field name="win.eventdata.destinationPort" type="pcre2">^(44818|2222|20256)$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)(ssh|putty|plink)</field>
+    <description>Iranian APT: CyberAv3ngers SSH connection to OT port (PLC backdoor access)</description>
+    <mitre>
+      <id>T1219</id>
+    </mitre>
+    <group>attack,c2,cyberav3ngers,iranian_apt,ics,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- CyberAv3ngers: Linux Dropbear SSH service on embedded device -->
+  <rule id="101521" level="15">
+    <if_sid>5700</if_sid>
+    <match type="pcre2">(?i)dropbear</match>
+    <description>Iranian APT: CyberAv3ngers Dropbear SSH service detected in syslog (embedded/PLC device compromise)</description>
+    <mitre>
+      <id>T1219</id>
+    </mitre>
+    <group>attack,persistence,cyberav3ngers,iranian_apt,ics,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- ========== CVE-2025-34291 LANGFLOW (MUDDYWATER) — 101522 ========== -->
+  <!-- Source: Obsidian Security, CISA KEV 2026-05-21, Snyk SNYK-PYTHON-LANGFLOWBASE-14221425
+       Public reporting attributes in-the-wild exploitation to MuddyWater (Iranian MOIS).
+       Network-side coverage: Suricata SID 2000534-2000536.
+       Host-side: Langflow validate/code RCE drops Python child processes that spawn
+       shells or curl/wget — the post-RCE signature on the Langflow host. -->
+
+  <!-- Langflow uvicorn/python parent spawning shell or download tool — RCE indicator -->
+  <rule id="101522" level="15">
+    <if_group>sysmon_event_1,audit_command</if_group>
+    <field name="win.eventdata.parentImage" type="pcre2">(?i)(python|uvicorn|langflow)</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)(\\cmd\.exe|\\powershell\.exe|\\bash|\\sh|\\wget|\\curl)</field>
+    <description>Iranian APT: CVE-2025-34291 Langflow validate/code RCE — Python/uvicorn parent spawning shell or download tool</description>
+    <mitre>
+      <id>T1190</id>
+      <id>T1059.006</id>
+    </mitre>
+    <group>attack,execution,muddywater,langflow,iranian_apt,cve_2025_34291,pci_dss_10.6.1,</group>
+  </rule>
+
 </group>

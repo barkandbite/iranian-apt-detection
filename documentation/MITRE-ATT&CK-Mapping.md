@@ -203,3 +203,34 @@
 
 ### Defense Evasion
 - **T1574.002 - DLL Side-Loading**: Wazuh 101512, 101513 (libvlc.dll/hostfxr.dll sideloading)
+
+---
+
+## April 2026 Additions — CyberAv3ngers Rockwell PLC Targeting (CISA AA26-097A)
+
+### Initial Access (ICS)
+- **T0883 - Internet Accessible Device**: SIDs 2000478-2000481, 2000484, Wazuh 101517, 101519 (EtherNet/IP CIP commands to internet-exposed PLCs)
+
+### Command and Control
+- **T0885/T1219 - Remote Access Software**: SIDs 2000482, 2000485, Wazuh 101516, 101520, 101521 (Dropbear SSH persistence on OT ports)
+
+### Impact (ICS)
+- **T1565 - Stored Data Manipulation**: SID 2000483, Wazuh 101518 (Rockwell ACD project file theft for HMI/SCADA display manipulation)
+---
+
+## July 2026 Additions — Cavern Manticore Modular C2 Framework (Check Point Research)
+
+### Command and Control
+- **T1071.001 - Web Protocols**: SIDs 2000553-2000558 (C2 domains hospitalinstallation.com / adserviceupdate.com / hygienehistory.com; X-User-token beacon poll GET /profile and result submit POST /gallery)
+- **T1071.001 - Web Protocols (WebSocket)**: SID 2000561 (wss:///socket alternative channel)
+- **T1090 - Proxy (SOCKS5)**: covered behaviorally by SID 2000561 (tunnel module rides the /socket WebSocket relay)
+
+### Credential Access / Collection
+- **T1213 / T1005 - Data from Information Repositories**: SID 2000559 (SQL browser module passing x-db-user/x-db-password credential pseudo-headers)
+
+### Persistence / Privilege Escalation
+- **T1505.003 - Web Shell**: SID 2000560 (cac.aspx operator-deployed IIS handler)
+
+### Defense Evasion
+- **T1574.002 - DLL Side-Loading**: Wazuh 101528 (WinDirStat.exe loading trojanized uxtheme.dll from non-system path)
+- **T1036.005 - Match Legitimate Name or Location**: Wazuh 101529 (execution from C:\ProgramData\WinDir\ masquerade directory), SID 2000553 (google.com.hospitalinstallation.com visual-obfuscation subdomain)

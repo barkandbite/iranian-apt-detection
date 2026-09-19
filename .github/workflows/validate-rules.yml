@@ -1,0 +1,54 @@
+name: Validate rules
+
+on:
+  pull_request:
+    paths:
+      - 'suricata/**'
+      - 'wazuh-rules/**'
+      - '.github/workflows/validate-rules.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'suricata/**'
+      - 'wazuh-rules/**'
+
+jobs:
+  suricata-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Suricata 7 and xmllint
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y suricata libxml2-utils
+
+      - name: Validate Suricata rule files
+        run: |
+          mkdir -p /tmp/suri
+          fail=0
+          for f in suricata/*.rules; do
+            [ -f "$f" ] || continue
+            echo "=== $f ==="
+            if ! suricata -T -S "$f" -l /tmp/suri 2>&1 | tee /tmp/out; then
+              fail=1
+            fi
+            if grep -qE '^E:' /tmp/out; then
+              echo "::error file=$f::rule parse errors found"
+              fail=1
+            fi
+          done
+          exit $fail
+
+      - name: Validate Wazuh XML rule files
+        run: |
+          fail=0
+          for f in wazuh-rules/*.xml; do
+            [ -f "$f" ] || continue
+            if ! xmllint --noout "$f"; then
+              echo "::error file=$f::XML validation failed"
+              fail=1
+            fi
+          done
+          exit $fail

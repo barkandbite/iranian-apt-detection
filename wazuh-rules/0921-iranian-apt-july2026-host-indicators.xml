@@ -1,0 +1,84 @@
+<!--
+  Wazuh Rules for Iranian APT Detection - July 2026 Host Indicators
+  Version: 1.0
+  Last Updated: 2026-07-07
+
+  Host-side detections complementing the Suricata network signatures
+  (SID 2000553-2000561) for the Cavern Manticore modular C2 framework
+  (Check Point Research, July 2026). Cavern Manticore is an Iran
+  MOIS-linked actor (OilRig/Lyceum nexus) targeting Israeli government
+  and IT-sector organizations.
+
+  The Cavern (ex-Cav3rn) agent deploys via DLL sideloading: a legitimate
+  WinDirStat.exe copied to C:\ProgramData\WinDir\ loads a trojanized
+  uxtheme.dll (83 exports, 82 empty stubs, real entry at ordinal #20
+  EnableThemeDialogTexture). Config lives in config.txt (JSON keys
+  i/xd/int) in the working directory.
+
+  Rule ID Range: 101528-101529 (next available after 0920's 101527)
+
+  References:
+  - Check Point Research "Cavern Manticore: Exposing Iran-Linked Modular
+    C2 Framework" (July 2026)
+-->
+
+<group name="iranian_apt,july2026_host,cavern_manticore,">
+
+  <!-- ========== CAVERN MANTICORE DLL SIDELOAD CHAIN (101528-101529) ========== -->
+
+  <!-- WinDirStat.exe loading uxtheme.dll from a non-System32 path
+       (Sysmon Event 7 ImageLoad). Legitimate uxtheme.dll loads only from
+       %SystemRoot%\System32 / SysWOW64; a copy loaded from ProgramData or
+       any user-writable directory alongside WinDirStat is the Cavern
+       sideload. (T1574.002) -->
+  <rule id="101528" level="14">
+    <if_group>sysmon_event7</if_group>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\windirstat\.exe$</field>
+    <field name="win.eventdata.imageLoaded" type="pcre2">(?i)^(?!.*\\Windows\\(System32|SysWOW64)\\).*\\uxtheme\.dll$</field>
+    <description>Iranian APT: Cavern Manticore - WinDirStat.exe sideloading uxtheme.dll from non-system path (Cavern agent entry)</description>
+    <mitre>
+      <id>T1574.002</id>
+      <id>T1036.005</id>
+    </mitre>
+    <group>attack,defense_evasion,cavern_manticore,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- Any process executing from C:\ProgramData\WinDir\ (Sysmon Event 1).
+       This directory is the Cavern deployment path and does not exist on
+       clean systems — ProgramData\WinDir masquerades as a Windows path.
+       (T1036.005) -->
+  <rule id="101529" level="13">
+    <if_group>sysmon_event_1</if_group>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\ProgramData\\WinDir\\</field>
+    <description>Iranian APT: Cavern Manticore - process execution from C:\ProgramData\WinDir\ masquerade directory</description>
+    <mitre>
+      <id>T1036.005</id>
+      <id>T1574.002</id>
+    </mitre>
+    <group>attack,defense_evasion,cavern_manticore,pci_dss_10.6.1,</group>
+  </rule>
+
+
+  <rule id="101532" level="13">
+    <if_group>syscheck,sysmon_event_11</if_group>
+    <field name="file" type="pcre2">(?i)\\logAzure\.txt$</field>
+    <description>Iranian APT: Cavern HollowGraph - logAzure.txt Graph credential store dropped to disk</description>
+    <mitre>
+      <id>T1552.001</id>
+      <id>T1036.005</id>
+    </mitre>
+    <group>attack,credential_access,cavern_manticore,hollowgraph,pci_dss_10.6.1,</group>
+  </rule>
+
+  <rule id="101533" level="13">
+    <if_group>sysmon_event_22</if_group>
+    <field name="win.eventdata.queryName" type="pcre2">(?i)(^|\.)cloudlanecdn\.com$</field>
+    <description>Iranian APT: Cavern HollowGraph - host DNS query to C2 domain cloudlanecdn.com</description>
+    <mitre>
+      <id>T1071.001</id>
+      <id>T1568.002</id>
+    </mitre>
+    <group>attack,command_and_control,cavern_manticore,hollowgraph,pci_dss_10.6.1,</group>
+  </rule>
+
+</group>
