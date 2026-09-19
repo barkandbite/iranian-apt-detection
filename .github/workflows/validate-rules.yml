@@ -92,32 +92,48 @@ jobs:
   wazuh-load:
     name: Wazuh analysisd load test (blocking)
     runs-on: ubuntu-latest
-    container:
-      image: wazuh/wazuh-manager:4.14.7
-      options: --user root
     steps:
       - uses: actions/checkout@v4
+
+      # NOTE: deliberately NOT a `container: wazuh/wazuh-manager` job.
+      # That image populates /var/ossec/etc at ENTRYPOINT, and GitHub Actions
+      # container jobs replace the entrypoint, so the init never runs and
+      # analysisd dies on a missing etc/internal_options.conf before it ever
+      # reads a rule. Installing the package gives a fully provisioned
+      # /var/ossec, which is what the rules actually need.
+      - name: Install Wazuh manager
+        run: |
+          set -e
+          curl -sSL https://packages.wazuh.com/key/GPG-KEY-WAZUH \
+            | sudo gpg --no-default-keyring \
+                --keyring gnupg-ring:/usr/share/keyrings/wazuh.gpg --import
+          sudo chmod 644 /usr/share/keyrings/wazuh.gpg
+          echo "deb [signed-by=/usr/share/keyrings/wazuh.gpg] https://packages.wazuh.com/4.x/apt/ stable main" \
+            | sudo tee /etc/apt/sources.list.d/wazuh.list
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq wazuh-manager
+          dpkg -l wazuh-manager | tail -1
 
       - name: Load ruleset into analysisd
         run: |
           set -e
-          cp wazuh-rules/09*.xml /var/ossec/etc/rules/
-          chown wazuh:wazuh /var/ossec/etc/rules/09*.xml || true
+          sudo cp wazuh-rules/09*.xml /var/ossec/etc/rules/
+          sudo chown wazuh:wazuh /var/ossec/etc/rules/09*.xml || true
 
           # CDB lists referenced by rules must exist for the load to resolve.
-          mkdir -p /var/ossec/etc/lists
-          if compgen -G "cdb-lists/*" > /dev/null; then
-            for f in cdb-lists/*; do
-              if [ -f "$f" ] && [ "$(basename "$f")" != "README.md" ]; then
-                cp "$f" /var/ossec/etc/lists/
-              fi
-            done
-            chown -R wazuh:wazuh /var/ossec/etc/lists || true
-          fi
+          sudo mkdir -p /var/ossec/etc/lists
+          for f in cdb-lists/*; do
+            if [ -f "$f" ] && [ "$(basename "$f")" != "README.md" ]; then
+              sudo cp "$f" /var/ossec/etc/lists/
+            fi
+          done
+          sudo chown -R wazuh:wazuh /var/ossec/etc/lists || true
 
           echo "=== wazuh-analysisd -t ==="
-          out=$(/var/ossec/bin/wazuh-analysisd -t 2>&1 || true)
+          out=$(sudo /var/ossec/bin/wazuh-analysisd -t 2>&1 || true)
           echo "$out"
+          # "Could not set resource limit for file descriptors" is an
+          # unprivileged-environment warning, not a ruleset problem.
           if echo "$out" | grep -iE 'ERROR|CRITICAL' | grep -qv 'resource limit'; then
             echo "::error::analysisd rejected the ruleset - it would refuse to start"
             exit 1
