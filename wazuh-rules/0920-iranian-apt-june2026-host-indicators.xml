@@ -32,7 +32,7 @@
 
   <!-- Deno runtime process create on Windows (T1059.007 JavaScript) -->
   <rule id="101523" level="13">
-    <if_group>sysmon_event_1</if_group>
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.image" type="pcre2">(?i)\\deno(\.exe)?$|\\deno[-_]\w+\.exe$</field>
     <description>Iranian APT: MuddyWater Dindoor - Deno JavaScript runtime execution detected (Windows)</description>
     <mitre>
@@ -57,7 +57,7 @@
 
   <!-- Rclone command line with copy/sync to non-corporate cloud (Dindoor exfil pattern) -->
   <rule id="101525" level="14">
-    <if_group>sysmon_event_1</if_group>
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.image" type="pcre2">(?i)\\rclone(\.exe)?$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(copy|sync|copyto|moveto)\s.+(wasabi|backblaze|b2:|s3:)</field>
     <description>Iranian APT: MuddyWater Dindoor - Rclone exfiltration to Wasabi/Backblaze cloud storage detected</description>
@@ -72,7 +72,7 @@
 
   <!-- Quick Assist launched via Outlook/Teams click-through (Rapid7 May 2026 IOC) -->
   <rule id="101526" level="16">
-    <if_group>sysmon_event_1</if_group>
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.image" type="pcre2">(?i)\\quickassist\.exe$</field>
     <field name="win.eventdata.parentImage" type="pcre2">(?i)\\(outlook|teams|ms-teams|msedge|chrome)\.exe$</field>
     <description>Iranian APT: MuddyWater Quick Assist remote support launched from Outlook/Teams/browser - possible Chaos ransomware false-flag pretext</description>
@@ -88,7 +88,7 @@
 
   <!-- Signed binary with known MuddyWater-associated code-signing subject (Dindoor signer "Amy Cherne") -->
   <rule id="101527" level="14">
-    <if_group>sysmon_event_1</if_group>
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.signature" type="pcre2">(?i)Amy\s+Cherne|Donald\s+Gay</field>
     <description>Iranian APT: MuddyWater Dindoor - binary signed by known campaign code-signing subject (Amy Cherne or Donald Gay)</description>
     <mitre>
@@ -100,7 +100,7 @@
 
 
   <rule id="101530" level="14">
-    <if_group>sysmon_event_1</if_group>
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.image" type="pcre2">(?i)\\ms_upd\.exe$</field>
     <description>Iranian APT: MuddyWater Chaos false flag - ms_upd.exe stager execution (drops Game.exe trojanized WebView2 RAT)</description>
     <mitre>
@@ -112,7 +112,7 @@
   </rule>
 
   <rule id="101531" level="15">
-    <if_group>sysmon_event_3</if_group>
+    <if_group>sysmon_event3</if_group>
     <field name="win.eventdata.image" type="pcre2">(?i)\\Game\.exe$</field>
     <field name="win.eventdata.destinationHostname" type="pcre2">(?i)(moonzonet\.com|uploadfiler\.com)</field>
     <description>Iranian APT: MuddyWater Chaos false flag - Game.exe RAT outbound to known C2 (moonzonet.com or uploadfiler.com)</description>

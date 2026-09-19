@@ -31,7 +31,7 @@
 
   <!-- TEMPLELOCK Event Log Manipulation -->
   <rule id="101123" level="15">
-    <if_group>sysmon_event_1</if_group>
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(templelock|eventlog.*thread|log.*service.*kill)</field>
     <description>Iranian APT: TEMPLELOCK event log manipulation detected</description>
     <mitre>
@@ -43,7 +43,7 @@
 
   <!-- Event Log Service Thread Termination -->
   <rule id="101124" level="15">
-    <if_group>sysmon_event_8</if_group>
+    <if_group>sysmon_event8</if_group>
     <field name="win.eventdata.targetImage" type="pcre2">services.exe</field>
     <field name="win.eventdata.sourceImage" negate="yes" type="pcre2">services.exe|svchost.exe|System</field>
     <description>Iranian APT: Suspicious thread creation in services.exe - possible TEMPLELOCK</description>
@@ -56,7 +56,7 @@
 
   <!-- TOFULOAD/TOFUDRV HTTP.sys Abuse -->
   <rule id="101125" level="14">
-    <if_group>sysmon_event_1</if_group>
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(tofuload|tofudrv|http\.sys.*ioctl)</field>
     <description>Iranian APT: TOFULOAD/TOFUDRV HTTP.sys abuse detected</description>
     <mitre>
@@ -68,7 +68,7 @@
 
   <!-- AI-Generated Phishing Process Patterns -->
   <rule id="101126" level="14">
-    <if_group>sysmon_event_1</if_group>
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(react.*build|webpack|babel.*compile).*phish</field>
     <description>Iranian APT: AI-generated phishing kit compilation detected</description>
     <mitre>
@@ -80,7 +80,7 @@
 
   <!-- Passive Backdoor Installation -->
   <rule id="101127" level="13">
-    <if_group>sysmon_event_3</if_group>
+    <if_group>sysmon_event3</if_group>
     <field name="win.eventdata.initiated" type="pcre2">false</field>
     <field name="win.eventdata.destinationPort" type="pcre2">443|8443|8080</field>
     <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)(chrome|firefox|iexplore|edge|winhttp)</field>
@@ -94,7 +94,7 @@
 
   <!-- IOCONTROL MQTT Communication -->
   <rule id="101128" level="15">
-    <if_group>sysmon_event_3</if_group>
+    <if_group>sysmon_event3</if_group>
     <field name="win.eventdata.destinationPort" type="pcre2">8883|1883</field>
     <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)(mqtt|mosquitto|hivemq)</field>
     <description>Iranian APT: IOCONTROL MQTT communication from non-MQTT process - $(win.eventdata.image)</description>
@@ -107,7 +107,7 @@
 
   <!-- Cryptocurrency Exchange API Abuse -->
   <rule id="101129" level="13">
-    <if_group>sysmon_event_3</if_group>
+    <if_group>sysmon_event3</if_group>
     <field name="win.eventdata.destinationHostname" type="pcre2">(?i)(nobitex|binance|coinbase|kraken).*api</field>
     <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)(chrome|firefox|trading|wallet)</field>
     <description>Iranian APT: Suspicious cryptocurrency exchange API access - $(win.eventdata.destinationHostname)</description>
@@ -120,7 +120,7 @@
 
   <!-- Azure Resource Manager Abuse -->
   <rule id="101130" level="13">
-    <if_group>sysmon_event_3</if_group>
+    <if_group>sysmon_event3</if_group>
     <field name="win.eventdata.destinationHostname" type="pcre2">management.azure.com</field>
     <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)(azure|powershell|az|msedge|chrome)</field>
     <description>Iranian APT: Azure Resource Manager access from suspicious process - $(win.eventdata.image)</description>
@@ -133,7 +133,7 @@
 
   <!-- Windows Filter Driver Installation -->
   <rule id="101131" level="15">
-    <if_group>sysmon_event_6</if_group>
+    <if_group>sysmon_event6</if_group>
     <field name="win.eventdata.imagePath" type="pcre2">(?i)(sheed|templedrop|iranian).*\.sys</field>
     <description>Iranian APT: Suspicious filter driver loaded - $(win.eventdata.imagePath)</description>
     <mitre>
@@ -148,7 +148,7 @@
   <!-- June 2025 Campaign Correlation -->
   <rule id="101132" level="14" frequency="3" timeframe="7200">
     <if_matched_group>iranian_june2025</if_matched_group>
-    <same_agent />
+    <same_location />
     <description>Iranian APT: June 2025 multi-technique campaign detected - active nation-state threat</description>
     <mitre>
       <id>T1204</id>
@@ -196,7 +196,7 @@
 
   <!-- HTTP.sys IOCTL Abuse Detection -->
   <rule id="101136" level="15">
-    <if_group>sysmon_event_1</if_group>
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)DeviceIoControl.*HTTP|IOCTL.*0x12000C</field>
     <description>Iranian APT: HTTP.sys IOCTL manipulation detected - possible TOFUDRV</description>
     <mitre>
@@ -220,7 +220,8 @@
 
   <!-- Passive Backdoor Service Creation -->
   <rule id="101138" level="13">
-    <if_sid>4697</if_sid>
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^4697$</field>
     <field name="win.eventdata.serviceName" type="pcre2">(?i)(health|status|ping|check).*service</field>
     <field name="win.eventdata.serviceFileName" type="pcre2">(?i).*443|.*8443|.*8080</field>
     <description>Iranian APT: Passive backdoor service created - $(win.eventdata.serviceName)</description>
@@ -245,7 +246,7 @@
 
   <!-- IOCONTROL Industrial Process Manipulation -->
   <rule id="101140" level="15">
-    <if_group>sysmon_event_1</if_group>
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(ladder.*logic|plc.*program|scada.*control)</field>
     <field name="win.eventdata.parentImage" negate="yes" type="pcre2">(?i)(rslogix|step7|tia.*portal)</field>
     <description>Iranian APT: IOCONTROL industrial process manipulation detected</description>
@@ -285,7 +286,7 @@
   <!-- Multiple Windows Technique Correlation -->
   <rule id="101143" level="14" frequency="2" timeframe="3600">
     <if_matched_group>iranian_june2025</if_matched_group>
-    <same_agent />
+    <same_location />
     <description>Iranian APT: Multiple Windows-specific attack techniques detected - sophisticated compromise</description>
     <mitre>
       <id>T1204</id>
@@ -323,7 +324,7 @@
 
   <!-- WebSocket Phishing Backend Communication -->
   <rule id="101146" level="15">
-    <if_group>sysmon_event_3</if_group>
+    <if_group>sysmon_event3</if_group>
     <field name="win.eventdata.destinationPort" type="pcre2">8569|8570|8571</field>
     <field name="win.eventdata.destinationHostname" type="pcre2">(?i)(idea-home|auth-portal|secure-verify)\.online</field>
     <description>Iranian APT: WebSocket phishing backend connection - $(win.eventdata.destinationHostname)</description>
@@ -395,7 +396,7 @@
 
   <!-- Azure Resource Manager Mass Queries -->
   <rule id="101150" level="13" frequency="20" timeframe="300">
-    <if_matched_group>sysmon_event_3</if_matched_group>
+    <if_matched_group>sysmon_event3</if_matched_group>
     <field name="win.eventdata.destinationHostname" type="pcre2">management.azure.com</field>
     <same_source_ip />
     <description>Iranian APT: Azure Resource Manager mass enumeration detected</description>
@@ -408,7 +409,7 @@
 
   <!-- AI API Abuse for Content Generation -->
   <rule id="101151" level="14">
-    <if_group>sysmon_event_3</if_group>
+    <if_group>sysmon_event3</if_group>
     <field name="win.eventdata.destinationHostname" type="pcre2">(?i)(api\.openai\.com|api\.anthropic\.com)</field>
     <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)(chrome|firefox|edge|browser)</field>
     <description>Iranian APT: AI API access from non-browser process - possible content generation</description>
@@ -421,7 +422,7 @@
 
   <!-- Mass Cryptocurrency Exchange Connections -->
   <rule id="101152" level="13" frequency="10" timeframe="600">
-    <if_matched_group>sysmon_event_3</if_matched_group>
+    <if_matched_group>sysmon_event3</if_matched_group>
     <field name="win.eventdata.destinationHostname" type="pcre2">(?i)(binance|coinbase|kraken|kucoin|nobitex)</field>
     <same_source_ip />
     <description>Iranian APT: Mass cryptocurrency exchange access - possible theft operation</description>
@@ -434,7 +435,7 @@
 
   <!-- TEMPLEDROP Driver Network Activity -->
   <rule id="101153" level="15">
-    <if_group>sysmon_event_3</if_group>
+    <if_group>sysmon_event3</if_group>
     <field name="win.eventdata.image" type="pcre2">system</field>
     <field name="win.eventdata.destinationPort" type="pcre2">443|8443</field>
     <field name="win.eventdata.destinationIp" negate="yes" type="pcre2">^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)</field>
@@ -463,7 +464,7 @@
   <!-- June 2025 Network Campaign Correlation -->
   <rule id="101155" level="14" frequency="3" timeframe="7200">
     <if_matched_group>iranian_june2025</if_matched_group>
-    <same_agent />
+    <same_location />
     <description>Iranian APT: June 2025 multi-vector network campaign - active nation-state operation</description>
     <mitre>
       <id>T1204</id>

@@ -22,7 +22,7 @@
   </rule>
 
   <rule id="100941" level="5">
-    <if_group>web_log</if_group>
+    <if_group>web</if_group>
     <regex type="pcre2">User-Agent.*\(compatible\s*;\s*$\)|User-Agent.*Python|User-Agent.*curl|User-Agent.*wget</regex>
     <status>200</status>
     <!-- FP PROFILE: curl / wget / python user-agents with HTTP 200 describe every
@@ -80,7 +80,7 @@
   </rule>
 
   <rule id="100945" level="13">
-    <if_group>firewall,web_log</if_group>
+    <if_group>firewall|web</if_group>
     <url type="pcre2">/[a-zA-Z0-9]{1,4}$|/pixel\.gif$|/g\.gif$|/p\.gif$</url>
     <status>200</status>
     <description>Iranian APT: Potential Cobalt Strike C2 communication pattern</description>
@@ -136,7 +136,7 @@
 
   <!-- Known Iranian C2 Infrastructure Patterns -->
   <rule id="100949" level="15">
-    <if_group>sysmon_event_22,firewall,web_log</if_group>
+    <if_group>sysmon_event_22|firewall|web</if_group>
     <regex type="pcre2">apps\.gist\.githubapp|gupdate\.net|microsoft-update\.net|windows-update\.org</regex>
     <description>Iranian APT: Known C2 infrastructure domain detected</description>
     <mitre>
@@ -166,7 +166,7 @@
 
   <!-- BitCoin Activity Detection -->
   <rule id="100951" level="16">
-    <if_group>web_log,sysmon_event_22</if_group>
+    <if_group>web|sysmon_event_22</if_group>
     <regex type="pcre2">bitcoin|btc|bc1q|blockchain\.info|coinbase</regex>
     <description>Iranian APT: Cryptocurrency-related activity detected - possible ransomware</description>
     <mitre>
@@ -178,7 +178,7 @@
 
   <!-- Ngrok/Tunneling Detection -->
   <rule id="100952" level="8">
-    <if_group>firewall,sysmon_event_3</if_group>
+    <if_group>firewall|sysmon_event3</if_group>
     <regex type="pcre2">ngrok\.io|\.ngrok\.com|tunnels\.api\.tunnels|localhost\.run</regex>
     <description>Iranian APT: Reverse tunnel service detected - $(url)</description>
     <mitre>
@@ -210,7 +210,7 @@
 
   <!-- Exchange/Outlook Network Activity -->
   <rule id="100955" level="13">
-    <if_group>web_log</if_group>
+    <if_group>web</if_group>
     <url type="pcre2">/owa/auth/.*\.aspx|/ecp/.*\.aspx|/aspnet_client/.*\.aspx</url>
     <status>200|201</status>
     <description>Iranian APT: Suspicious Exchange web shell access pattern</description>
@@ -235,7 +235,7 @@
   </rule>
 
   <rule id="100957" level="13">
-    <if_group>web_log</if_group>
+    <if_group>web</if_group>
     <regex type="pcre2">POST.*\/owa\/auth\/Current\/.*themes|POST.*\/ecp\/default\.flt</regex>
     <description>Iranian APT: Exchange ProxyLogon exploitation pattern detected</description>
     <mitre>
@@ -248,7 +248,7 @@
   <!-- Combined Network Indicators -->
   <rule id="100954" level="14" frequency="5" timeframe="600">
     <if_matched_group>iranian_network</if_matched_group>
-    <same_agent />
+    <same_location />
     <description>Iranian APT: Multiple C2 indicators detected - active compromise likely</description>
     <mitre>
       <id>T1102</id>

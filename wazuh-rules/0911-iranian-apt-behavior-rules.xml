@@ -11,7 +11,7 @@
 
   <!-- Remote Access Tool Detection -->
   <rule id="100920" level="8">
-    <if_group>sysmon_event_1</if_group>
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.image" type="pcre2">(?i)(anydesk|ngrok|ligolo|meshcentral|meshagent)\.exe</field>
     <description>Iranian APT: Remote access tool execution detected - $(win.eventdata.image)</description>
     <mitre>
@@ -58,7 +58,7 @@
 
   <!-- Known Iranian APT Backdoor Names -->
   <rule id="100924" level="15">
-    <if_group>sysmon_event_1</if_group>
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.image" type="pcre2">(?i)(havoc|hanifnet|hxlibrary|neoexpressrat|systembc|tickler)</field>
     <description>Iranian APT: Known backdoor execution detected - $(win.eventdata.image)</description>
     <mitre>
@@ -98,7 +98,7 @@
 
   <!-- Credential Harvesting -->
   <rule id="100927" level="11">
-    <if_group>sysmon_event_1</if_group>
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(mimikatz|sekurlsa|lsadump|hashdump|credential)</field>
     <description>Iranian APT: Credential dumping tool execution detected</description>
     <mitre>
@@ -134,7 +134,7 @@
   </rule>
 
   <rule id="100930" level="14">
-    <if_group>sysmon_event_1</if_group>
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(psexec|wmic.*process|winrs|enter-pssession)</field>
     <description>Iranian APT: Remote execution tool usage detected</description>
     <mitre>
@@ -206,7 +206,7 @@
   </rule>
 
   <rule id="100937" level="13">
-    <if_group>sysmon_event_1</if_group>
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.parentImage" type="pcre2">w3wp.exe</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(cmd\.exe|powershell|whoami|net user|ipconfig)</field>
     <description>Iranian APT: Exchange web process spawning suspicious child - $(win.eventdata.image)</description>
@@ -218,7 +218,7 @@
   </rule>
 
   <rule id="100938" level="13">
-    <if_group>sysmon_event_3</if_group>
+    <if_group>sysmon_event3</if_group>
     <field name="win.eventdata.image" type="pcre2">outlook.exe</field>
     <field name="win.eventdata.destinationPort" type="pcre2">445|139</field>
     <field name="win.eventdata.destinationIp" negate="yes" type="pcre2">^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)</field>
@@ -233,7 +233,7 @@
   <!-- Combined Indicators -->
   <rule id="100935" level="14" frequency="3" timeframe="300">
     <if_matched_group>iranian_behavior</if_matched_group>
-    <same_agent />
+    <same_location />
     <description>Iranian APT: Multiple attack stages detected - likely active compromise</description>
     <mitre>
       <id>T1486</id>

@@ -48,7 +48,7 @@
        clean systems — ProgramData\WinDir masquerades as a Windows path.
        (T1036.005) -->
   <rule id="101529" level="11">
-    <if_group>sysmon_event_1</if_group>
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.image" type="pcre2">(?i)\\ProgramData\\WinDir\\</field>
     <description>Iranian APT: Cavern Manticore - process execution from C:\ProgramData\WinDir\ masquerade directory</description>
     <mitre>
@@ -60,7 +60,7 @@
 
 
   <rule id="101532" level="13">
-    <if_group>syscheck,sysmon_event_11</if_group>
+    <if_group>syscheck|sysmon_event_11</if_group>
     <field name="file" type="pcre2">(?i)\\logAzure\.txt$</field>
     <description>Iranian APT: Cavern HollowGraph - logAzure.txt Graph credential store dropped to disk</description>
     <mitre>

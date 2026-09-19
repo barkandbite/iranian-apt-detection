@@ -46,7 +46,7 @@
   </rule>
 
   <rule id="100983" level="11">
-    <if_group>sysmon_event_1</if_group>
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(wevtutil.*cl|clear-eventlog)</field>
     <description>Iranian APT: Event log clearing command executed</description>
     <mitre>
@@ -69,7 +69,7 @@
   </rule>
 
   <rule id="100985" level="11">
-    <if_group>sysmon_event_1</if_group>
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)sc\.exe.*(create|config).*binpath</field>
     <description>Iranian APT: Service creation via sc.exe detected</description>
     <mitre>
@@ -81,7 +81,8 @@
 
   <!-- Account Manipulation -->
   <rule id="100986" level="11">
-    <if_sid>4720</if_sid>
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^4720$</field>
     <field name="win.eventdata.targetUserName" type="pcre2">(?i)(admin|svc|service|backup|temp|test)</field>
     <time>22:00-06:00</time>
     <description>Iranian APT: Suspicious account created during off-hours - $(win.eventdata.targetUserName)</description>
@@ -93,7 +94,8 @@
   </rule>
 
   <rule id="100987" level="11">
-    <if_sid>4732</if_sid>
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^4732$</field>
     <field name="win.eventdata.targetUserName" type="pcre2">Administrators|Domain Admins|Enterprise Admins</field>
     <description>Iranian APT: User added to privileged group - $(win.eventdata.targetUserName)</description>
     <mitre>
@@ -105,7 +107,8 @@
 
   <!-- RDP Activity -->
   <rule id="100988" level="14">
-    <if_sid>4624</if_sid>
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^4624$</field>
     <field name="win.eventdata.logonType" type="pcre2">10</field>
     <field name="win.eventdata.ipAddress" negate="yes" type="pcre2">^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)</field>
     <description>Iranian APT: External RDP login from $(win.eventdata.ipAddress)</description>
@@ -118,7 +121,7 @@
 
   <!-- Shadow Copy Deletion -->
   <rule id="100989" level="16">
-    <if_group>sysmon_event_1</if_group>
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(vssadmin.*delete.*shadows|wmic.*shadowcopy.*delete|bcdedit.*recoveryenabled.*no)</field>
     <description>Iranian APT: Shadow copy deletion command detected</description>
     <mitre>
@@ -168,7 +171,7 @@
 
   <!-- Process Injection -->
   <rule id="100993" level="13">
-    <if_group>sysmon_event_8</if_group>
+    <if_group>sysmon_event8</if_group>
     <field name="win.eventdata.sourceImage" negate="yes" type="pcre2">(?i)(chrome|firefox|teams|outlook|system32)</field>
     <field name="win.eventdata.targetImage" type="pcre2">(?i)(explorer\.exe|svchost\.exe|winlogon\.exe|services\.exe)</field>
     <description>Iranian APT: Process injection detected into $(win.eventdata.targetImage)</description>
@@ -206,7 +209,7 @@
   </rule>
 
   <rule id="100997" level="13">
-    <if_group>sysmon_event_1</if_group>
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.parentImage" type="pcre2">(?i)w3wp\.exe</field>
     <field name="win.eventdata.parentCommandLine" type="pcre2">MSExchangeOWAAppPool|MSExchangeECPAppPool</field>
     <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)csc\.exe|cvtres\.exe|conhost\.exe</field>
@@ -219,7 +222,8 @@
   </rule>
 
   <rule id="100998" level="8">
-    <if_sid>4698</if_sid>
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^4698$</field>
     <field name="win.eventdata.taskName" type="pcre2">(?i)outlook|exchange|update|windows</field>
     <field name="win.eventdata.command" type="pcre2">(?i)(powershell|cmd|rundll32|regsvr32|mshta)</field>
     <description>Iranian APT: Suspicious scheduled task created - $(win.eventdata.taskName)</description>
@@ -233,7 +237,7 @@
   <!-- Combined Windows Indicators -->
   <rule id="100995" level="14" frequency="3" timeframe="300">
     <if_matched_group>iranian_windows</if_matched_group>
-    <same_agent />
+    <same_location />
     <description>Iranian APT: Multiple Windows attack techniques detected - active compromise</description>
     <mitre>
       <id>T1486</id>

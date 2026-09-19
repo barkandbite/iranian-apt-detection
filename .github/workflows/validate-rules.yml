@@ -120,22 +120,48 @@ jobs:
           sudo cp wazuh-rules/09*.xml /var/ossec/etc/rules/
           sudo chown wazuh:wazuh /var/ossec/etc/rules/09*.xml || true
 
-          # CDB lists referenced by rules must exist for the load to resolve.
+          # CDB lists must be BOTH copied and declared in ossec.conf, or
+          # analysisd warns "List could not be loaded" and silently ignores
+          # every rule that references them.
           sudo mkdir -p /var/ossec/etc/lists
+          decl=""
           for f in cdb-lists/*; do
             if [ -f "$f" ] && [ "$(basename "$f")" != "README.md" ]; then
               sudo cp "$f" /var/ossec/etc/lists/
+              decl="$decl    <list>etc/lists/$(basename "$f")</list>\n"
             fi
           done
           sudo chown -R wazuh:wazuh /var/ossec/etc/lists || true
+          sudo sed -i "s|<list>etc/lists/audit-keys</list>|$decl    <list>etc/lists/audit-keys</list>|" \
+            /var/ossec/etc/ossec.conf
 
           echo "=== wazuh-analysisd -t ==="
           out=$(sudo /var/ossec/bin/wazuh-analysisd -t 2>&1 || true)
           echo "$out"
-          # "Could not set resource limit for file descriptors" is an
-          # unprivileged-environment warning, not a ruleset problem.
+
+          # Hard failures: analysisd refuses to start, whole ruleset offline.
+          # "resource limit" is an unprivileged-runner warning, not a defect.
           if echo "$out" | grep -iE 'ERROR|CRITICAL' | grep -qv 'resource limit'; then
             echo "::error::analysisd rejected the ruleset - it would refuse to start"
             exit 1
           fi
+
+          # Silent failures: the file loads but individual rules never fire.
+          # These are the failure mode this whole ruleset exists to avoid, so
+          # they are blocking too.
+          if echo "$out" | grep -q 'deprecated field option'; then
+            echo "::error::a rule uses a deprecated option that analysisd ignores"
+            exit 1
+          fi
+          if echo "$out" | grep -q 'could not be loaded'; then
+            echo "::error::a CDB list failed to load - rules referencing it are ignored"
+            exit 1
+          fi
+
+          # Group-not-found depends on which decoders/integrations a deployment
+          # runs, so it is reported but not blocking.
+          ignored=$(echo "$out" | grep -c 'will be ignored' || true)
+          echo "rules ignored (deployment-dependent groups): $ignored"
+          echo "$out" | grep 'will be ignored' || true
+
           echo "analysisd accepted all rule files"

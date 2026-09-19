@@ -11,9 +11,9 @@
 
   <!-- AWS Targeting -->
   <rule id="101100" level="10">
-    <if_group>web_log</if_group>
+    <if_group>web</if_group>
     <url>169.254.169.254/latest/meta-data/</url>
-    <!-- FP PROFILE: narrower than it looks. This is web_log, so it fires when a
+    <!-- FP PROFILE: narrower than it looks. This is web, so it fires when a
          web server RECEIVES a request whose URL contains the IMDS address, which
          is the SSRF-to-credential-theft pattern rather than an instance using
          IMDS normally. Still fires on SSRF scanners and security testing.
@@ -124,7 +124,7 @@
 
   <!-- Supply Chain Attacks -->
   <rule id="101109" level="14">
-    <if_group>sysmon_event_3</if_group>
+    <if_group>sysmon_event3</if_group>
     <field name="win.eventdata.destinationHostname" type="pcre2">(?i)(registry\.npmjs\.org|pypi\.org|rubygems\.org)</field>
     <field name="win.eventdata.destinationPort" type="pcre2">443</field>
     <description>Iranian APT: Package repository connection - possible supply chain attack</description>
@@ -146,7 +146,7 @@
 
   <!-- AI-Enhanced Attack Detection -->
   <rule id="101111" level="14">
-    <if_group>sysmon_event_3</if_group>
+    <if_group>sysmon_event3</if_group>
     <field name="win.eventdata.destinationHostname" type="pcre2">(?i)(api\.openai\.com|api\.anthropic\.com|generativelanguage\.googleapis\.com)</field>
     <description>Iranian APT: AI API access detected - possible content generation</description>
     <mitre>
@@ -156,7 +156,7 @@
   </rule>
 
   <rule id="101112" level="6">
-    <if_group>web_log</if_group>
+    <if_group>web</if_group>
     <url>/v1/completions|/v1/chat/completions|/v1/embeddings</url>
     <regex type="pcre2">phishing|spear-phishing|social.?engineering|malware|exploit</regex>
     <!-- FP PROFILE: fires on ANY call to an LLM completions endpoint whose body
@@ -174,7 +174,7 @@
 
   <!-- Mobile Device Targeting -->
   <rule id="101113" level="13">
-    <if_group>web_log</if_group>
+    <if_group>web</if_group>
     <regex type="pcre2">User-Agent:.*Android|User-Agent:.*iPhone|User-Agent:.*iPad</regex>
     <url>/api/device/register|/mobile/check-in|/app/heartbeat</url>
     <description>Iranian APT: Mobile device C2 registration detected</description>
@@ -197,7 +197,7 @@
 
   <!-- Blockchain/Cryptocurrency -->
   <rule id="101115" level="14">
-    <if_group>sysmon_event_3</if_group>
+    <if_group>sysmon_event3</if_group>
     <field name="win.eventdata.destinationPort" type="pcre2">8332|8333|18332|18333|30303|8545</field>
     <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)(bitcoin|ethereum|geth|parity)</field>
     <description>Iranian APT: Blockchain node connection from suspicious process</description>
@@ -208,7 +208,7 @@
   </rule>
 
   <rule id="101116" level="5">
-    <if_group>web_log</if_group>
+    <if_group>web</if_group>
     <url>api.binance.com|api.kraken.com|api.kucoin.com|api.okex.com</url>
     <regex type="pcre2">X-MBX-APIKEY|API-Key|KC-API-KEY</regex>
     <!-- FP PROFILE: fires on any authenticated call to a mainstream exchange API.
@@ -261,7 +261,7 @@
   <!-- Critical Infrastructure Correlation -->
   <rule id="101120" level="16" frequency="2" timeframe="7200">
     <if_matched_group>iranian_cloud</if_matched_group>
-    <same_agent />
+    <same_location />
     <description>Iranian APT: ICS attack combined with wiper preparation - imminent threat</description>
     <mitre>
       <id>T0813</id>
@@ -273,7 +273,7 @@
   <!-- Cloud Campaign Detection -->
   <rule id="101121" level="14" frequency="3" timeframe="3600">
     <if_matched_group>iranian_cloud</if_matched_group>
-    <same_agent />
+    <same_location />
     <description>Iranian APT: Multi-cloud targeting detected - organized campaign</description>
     <mitre>
       <id>T1078.004</id>

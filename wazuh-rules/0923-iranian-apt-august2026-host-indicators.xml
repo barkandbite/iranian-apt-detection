@@ -30,7 +30,7 @@
        Rust backdoor as novaservice.exe; no clean system runs a "novaservice"
        from Public\Downloads. (T1036.005, T1105) -->
   <rule id="101536" level="8">
-    <if_group>sysmon_event_1</if_group>
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.image" type="pcre2">(?i)\\Users\\Public\\Downloads\\novaservice\.exe$</field>
     <description>Iranian APT: MuddyWater Olalampo - CHAR novaservice.exe execution from Public\Downloads</description>
     <mitre>
@@ -44,7 +44,7 @@
        (Sysmon Event 1). The burnutill directory + burn.exe combination is the
        GhostFetch second-stage persistence path. (T1547.001, T1055) -->
   <rule id="101537" level="8">
-    <if_group>sysmon_event_1</if_group>
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.image" type="pcre2">(?i)\\microsoft\\windows\\burnutill\\burn\.exe$</field>
     <description>Iranian APT: MuddyWater Olalampo - GhostFetch burnutill\burn.exe persistence execution</description>
     <mitre>

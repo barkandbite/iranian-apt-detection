@@ -131,6 +131,34 @@ def lint_wazuh():
                         f'rule {rid}: <field name="{fm.group(1)}"> rejected -- '
                         f'"Field is static". Use <{fm.group(1)}>.')
 
+            # Sysmon groups: events 1-9 have NO underscore, 10+ DO.
+            # sysmon_event_3 does not exist; the rule is silently ignored.
+            for sm2 in re.finditer(r'sysmon_event_([1-9])\b', body):
+                err('sysmon-group-naming', path,
+                    f'rule {rid}: "sysmon_event_{sm2.group(1)}" is not a Wazuh group. '
+                    f'Events 1-9 have no underscore: use "sysmon_event{sm2.group(1)}". '
+                    'The rule loads but is silently ignored.')
+
+            # if_group reads the whole string as ONE group name; "|" is the OR.
+            for gm in re.finditer(r'<if_group>([^<]*)</if_group>', body):
+                if ',' in gm.group(1):
+                    err('if_group-comma', path,
+                        f'rule {rid}: <if_group>{gm.group(1)}</if_group> is read as a '
+                        'single literal group name. Use "|" as the separator.')
+
+            # same_agent was removed; analysisd warns and ignores it.
+            if re.search(r'<same_agent\s*/>', body):
+                err('deprecated-anchor', path,
+                    f'rule {rid}: same_agent is deprecated and non-functional in '
+                    'Wazuh 4.x. Use same_location for agent correlation.')
+
+            # if_sid takes Wazuh rule IDs, not Windows Event IDs.
+            for im2 in re.finditer(r'<if_sid>\s*(4\d{3})\s*</if_sid>', body):
+                err('if_sid-windows-eventid', path,
+                    f'rule {rid}: <if_sid>{im2.group(1)}</if_sid> looks like a Windows '
+                    'Event ID, not a Wazuh rule ID. Use <if_group>windows</if_group> '
+                    'plus a win.system.eventID field match.')
+
             if 'frequency=' in attrs:
                 if not re.search(r'<if_matched_(sid|group|level)>', body):
                     err('frequency-no-if-matched', path,

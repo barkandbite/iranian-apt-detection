@@ -28,7 +28,7 @@
   <!-- ================= EGRESS: highest-value direction ================= -->
 
   <rule id="101550" level="15">
-    <if_group>firewall,ids,web_log</if_group>
+    <if_group>firewall|ids|web</if_group>
     <list field="dstip" lookup="address_match_key">etc/lists/malicious-ip</list>
     <description>Iranian APT: outbound connection to known actor C2 IP $(dstip)</description>
     <mitre>
@@ -61,7 +61,7 @@
   </rule>
 
   <rule id="101553" level="15">
-    <if_group>web_log,proxy</if_group>
+    <if_group>web|proxy</if_group>
     <list field="url" lookup="match_key">etc/lists/malicious-domains-t1</list>
     <description>Iranian APT: HTTP request to known actor C2 domain</description>
     <mitre>
@@ -76,7 +76,7 @@
        source IP is frequently translated or absent, so this fires rarely and
        is easy to spoof when it does. -->
   <rule id="101554" level="12">
-    <if_group>firewall,ids</if_group>
+    <if_group>firewall|ids</if_group>
     <list field="srcip" lookup="address_match_key">etc/lists/malicious-ip</list>
     <description>Iranian APT: inbound connection from known actor C2 IP $(srcip)</description>
     <mitre>
@@ -105,7 +105,7 @@
        IOC is meaningfully different from routine use. -->
   <rule id="101556" level="14" frequency="2" timeframe="3600">
     <if_matched_group>ioc_match</if_matched_group>
-    <same_agent />
+    <same_location />
     <description>Iranian APT: multiple IOC matches on the same host within one hour</description>
     <mitre>
       <id>T1071</id>
