@@ -49,6 +49,9 @@ jobs:
       - name: Ruleset linter
         run: python3 tools/lint-rules.py
 
+      - name: CDB lists in sync with Suricata ruleset
+        run: python3 tools/extract-iocs.py --check
+
   suricata-load:
     name: Suricata load test (blocking)
     runs-on: ubuntu-latest
