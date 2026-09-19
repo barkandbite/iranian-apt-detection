@@ -34,8 +34,8 @@
 
   <rule id="101102" level="14">
     <if_group>aws_cloudtrail</if_group>
-    <field name="aws.eventName">AssumeRoleWithWebIdentity|AssumeRoleWithSAML</field>
-    <field name="aws.sourceIPAddress" negate="yes">^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)</field>
+    <field name="aws.eventName" type="pcre2">AssumeRoleWithWebIdentity|AssumeRoleWithSAML</field>
+    <field name="aws.sourceIPAddress" negate="yes" type="pcre2">^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)</field>
     <description>Iranian APT: External AWS role assumption detected</description>
     <mitre>
       <id>T1550.001</id>
@@ -57,8 +57,8 @@
 
   <rule id="101104" level="15">
     <if_group>azure_activity</if_group>
-    <field name="azure.operationName">Microsoft.Storage/storageAccounts/listKeys/action</field>
-    <field name="azure.caller" negate="yes">@yourdomain.com</field>
+    <field name="azure.operationName" type="pcre2">Microsoft.Storage/storageAccounts/listKeys/action</field>
+    <field name="azure.caller" negate="yes" type="pcre2">@yourdomain.com</field>
     <description>Iranian APT: Azure storage account keys accessed by external user</description>
     <mitre>
       <id>T1552.005</id>
@@ -70,8 +70,8 @@
   <!-- GCP Targeting -->
   <rule id="101105" level="14">
     <if_group>gcp_audit</if_group>
-    <field name="gcp.protoPayload.methodName">storage.objects.list|storage.objects.get</field>
-    <field name="gcp.protoPayload.authenticationInfo.principalEmail" negate="yes">@yourdomain.com</field>
+    <field name="gcp.protoPayload.methodName" type="pcre2">storage.objects.list|storage.objects.get</field>
+    <field name="gcp.protoPayload.authenticationInfo.principalEmail" negate="yes" type="pcre2">@yourdomain.com</field>
     <description>Iranian APT: GCP storage access by external principal</description>
     <mitre>
       <id>T1530</id>
@@ -82,8 +82,8 @@
   <!-- Kubernetes/Container Attacks -->
   <rule id="101106" level="14">
     <if_group>kubernetes_audit</if_group>
-    <field name="kubernetes.verb">create|patch</field>
-    <field name="kubernetes.objectRef.resource">pods|deployments</field>
+    <field name="kubernetes.verb" type="pcre2">create|patch</field>
+    <field name="kubernetes.objectRef.resource" type="pcre2">pods|deployments</field>
     <field name="kubernetes.objectRef.name" type="pcre2">(?i)(debug|test|temp|shell|exec)</field>
     <description>Iranian APT: Suspicious Kubernetes pod/deployment created</description>
     <mitre>
@@ -95,9 +95,9 @@
 
   <rule id="101107" level="15">
     <if_group>kubernetes_audit</if_group>
-    <field name="kubernetes.verb">get|list</field>
-    <field name="kubernetes.objectRef.resource">secrets</field>
-    <field name="kubernetes.user.username" negate="yes">system:serviceaccount:kube-system</field>
+    <field name="kubernetes.verb" type="pcre2">get|list</field>
+    <field name="kubernetes.objectRef.resource" type="pcre2">secrets</field>
+    <field name="kubernetes.user.username" negate="yes" type="pcre2">system:serviceaccount:kube-system</field>
     <description>Iranian APT: Kubernetes secrets accessed - credential theft likely</description>
     <mitre>
       <id>T1552.007</id>
@@ -108,7 +108,7 @@
   <rule id="101108" level="15">
     <if_group>docker</if_group>
     <match>exec</match>
-    <regex>sh -c|/bin/bash|/bin/sh|cmd.exe</regex>
+    <regex type="pcre2">sh -c|/bin/bash|/bin/sh|cmd.exe</regex>
     <description>Iranian APT: Interactive shell execution in container</description>
     <mitre>
       <id>T1609</id>
@@ -121,7 +121,7 @@
   <rule id="101109" level="14">
     <if_group>sysmon_event_3</if_group>
     <field name="win.eventdata.destinationHostname" type="pcre2">(?i)(registry\.npmjs\.org|pypi\.org|rubygems\.org)</field>
-    <field name="win.eventdata.destinationPort">443</field>
+    <field name="win.eventdata.destinationPort" type="pcre2">443</field>
     <description>Iranian APT: Package repository connection - possible supply chain attack</description>
     <mitre>
       <id>T1195.001</id>
@@ -153,7 +153,7 @@
   <rule id="101112" level="15">
     <if_group>web_log</if_group>
     <url>/v1/completions|/v1/chat/completions|/v1/embeddings</url>
-    <regex>phishing|spear-phishing|social.?engineering|malware|exploit</regex>
+    <regex type="pcre2">phishing|spear-phishing|social.?engineering|malware|exploit</regex>
     <description>Iranian APT: AI API used for malicious content generation</description>
     <mitre>
       <id>T1566</id>
@@ -165,7 +165,7 @@
   <!-- Mobile Device Targeting -->
   <rule id="101113" level="14">
     <if_group>web_log</if_group>
-    <regex>User-Agent:.*Android|User-Agent:.*iPhone|User-Agent:.*iPad</regex>
+    <regex type="pcre2">User-Agent:.*Android|User-Agent:.*iPhone|User-Agent:.*iPad</regex>
     <url>/api/device/register|/mobile/check-in|/app/heartbeat</url>
     <description>Iranian APT: Mobile device C2 registration detected</description>
     <mitre>
@@ -188,7 +188,7 @@
   <!-- Blockchain/Cryptocurrency -->
   <rule id="101115" level="14">
     <if_group>sysmon_event_3</if_group>
-    <field name="win.eventdata.destinationPort">8332|8333|18332|18333|30303|8545</field>
+    <field name="win.eventdata.destinationPort" type="pcre2">8332|8333|18332|18333|30303|8545</field>
     <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)(bitcoin|ethereum|geth|parity)</field>
     <description>Iranian APT: Blockchain node connection from suspicious process</description>
     <mitre>
@@ -200,7 +200,7 @@
   <rule id="101116" level="15">
     <if_group>web_log</if_group>
     <url>api.binance.com|api.kraken.com|api.kucoin.com|api.okex.com</url>
-    <regex>X-MBX-APIKEY|API-Key|KC-API-KEY</regex>
+    <regex type="pcre2">X-MBX-APIKEY|API-Key|KC-API-KEY</regex>
     <description>Iranian APT: Cryptocurrency exchange API usage - possible laundering</description>
     <mitre>
       <id>T1496</id>
@@ -212,7 +212,7 @@
   <rule id="101117" level="15">
     <if_group>suricata</if_group>
     <field name="alert.signature" type="pcre2">Modbus|DNP3|IEC-104|S7comm</field>
-    <field name="alert.category">Attempted Administrator Privilege Gain</field>
+    <field name="alert.category" type="pcre2">Attempted Administrator Privilege Gain</field>
     <description>Iranian APT: Industrial control system protocol attack detected</description>
     <mitre>
       <id>T0821</id>
@@ -234,7 +234,7 @@
   </rule>
 
   <rule id="101119" level="14" frequency="5" timeframe="300">
-    <if_group>sysmon_event_22</if_group>
+    <if_matched_group>sysmon_event_22</if_matched_group>
     <same_field>win.eventdata.queryName</same_field>
     <different_field>win.eventdata.queryResults</different_field>
     <description>Iranian APT: Fast flux DNS behavior detected</description>
@@ -247,6 +247,7 @@
   <!-- Critical Infrastructure Correlation -->
   <rule id="101120" level="16" frequency="2" timeframe="7200">
     <if_matched_group>iranian_cloud</if_matched_group>
+    <same_agent />
     <description>Iranian APT: ICS attack combined with wiper preparation - imminent threat</description>
     <mitre>
       <id>T0813</id>
@@ -258,6 +259,7 @@
   <!-- Cloud Campaign Detection -->
   <rule id="101121" level="16" frequency="3" timeframe="3600">
     <if_matched_group>iranian_cloud</if_matched_group>
+    <same_agent />
     <description>Iranian APT: Multi-cloud targeting detected - organized campaign</description>
     <mitre>
       <id>T1078.004</id>

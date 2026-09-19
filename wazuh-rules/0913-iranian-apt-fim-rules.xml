@@ -195,6 +195,7 @@
   <!-- Combined FIM Indicators -->
   <rule id="100972" level="16" frequency="5" timeframe="300">
     <if_matched_group>iranian_fim</if_matched_group>
+    <same_agent />
     <description>Iranian APT: Multiple suspicious file operations detected</description>
     <mitre>
       <id>T1055</id>

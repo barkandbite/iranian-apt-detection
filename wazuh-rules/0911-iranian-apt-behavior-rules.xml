@@ -35,7 +35,7 @@
   <!-- Web Shell Detection -->
   <rule id="100922" level="15">
     <if_group>web_scan</if_group>
-    <regex>\.jsp\?cmd=|\.aspx\?cmd=|eval\(|system\(|shell_exec|passthru</regex>
+    <regex type="pcre2">\.jsp\?cmd=|\.aspx\?cmd=|eval\(|system\(|shell_exec|passthru</regex>
     <description>Iranian APT: Web shell command execution attempt detected</description>
     <mitre>
       <id>T1505.003</id>
@@ -47,7 +47,7 @@
   <rule id="100923" level="15">
     <if_group>sysmon_event_11</if_group>
     <field name="win.eventdata.targetFilename" type="pcre2">(?i)(wwwroot|inetpub|apache|nginx|httpd).*(\.jsp|\.aspx|\.php|\.asp)</field>
-    <field name="win.eventdata.image" negate="yes">w3wp.exe|httpd.exe|nginx.exe</field>
+    <field name="win.eventdata.image" negate="yes" type="pcre2">w3wp.exe|httpd.exe|nginx.exe</field>
     <description>Iranian APT: Suspicious web shell file creation - $(win.eventdata.targetFilename)</description>
     <mitre>
       <id>T1505.003</id>
@@ -118,8 +118,8 @@
   <!-- Lateral Movement -->
   <rule id="100929" level="14">
     <if_group>authentication_success</if_group>
-    <field name="win.eventdata.logonType">3|10</field>
-    <field name="win.eventdata.authenticationPackageName">NTLM</field>
+    <field name="win.eventdata.logonType" type="pcre2">3|10</field>
+    <field name="win.eventdata.authenticationPackageName" type="pcre2">NTLM</field>
     <time>01:00-05:00</time>
     <description>Iranian APT: Suspicious off-hours lateral movement detected</description>
     <mitre>
@@ -144,7 +144,7 @@
   <rule id="100931" level="14">
     <if_sid>5104</if_sid>
     <field name="win.eventdata.product" type="pcre2">(?i)(defender|antivirus|endpoint protection|symantec|mcafee|kaspersky)</field>
-    <field name="win.eventdata.state">stopped|disabled</field>
+    <field name="win.eventdata.state" type="pcre2">stopped|disabled</field>
     <description>Iranian APT: Security software disabled - $(win.eventdata.product)</description>
     <mitre>
       <id>T1562.001</id>
@@ -156,7 +156,7 @@
   <rule id="100932" level="14">
     <if_group>windows</if_group>
     <match>powershell.exe</match>
-    <regex>-enc|-encodedcommand|hidden|bypass|noprofile</regex>
+    <regex type="pcre2">-enc|-encodedcommand|hidden|bypass|noprofile</regex>
     <description>Iranian APT: Obfuscated PowerShell execution detected</description>
     <mitre>
       <id>T1059.001</id>
@@ -203,7 +203,7 @@
 
   <rule id="100937" level="14">
     <if_group>sysmon_event_1</if_group>
-    <field name="win.eventdata.parentImage">w3wp.exe</field>
+    <field name="win.eventdata.parentImage" type="pcre2">w3wp.exe</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(cmd\.exe|powershell|whoami|net user|ipconfig)</field>
     <description>Iranian APT: Exchange web process spawning suspicious child - $(win.eventdata.image)</description>
     <mitre>
@@ -215,9 +215,9 @@
 
   <rule id="100938" level="15">
     <if_group>sysmon_event_3</if_group>
-    <field name="win.eventdata.image">outlook.exe</field>
-    <field name="win.eventdata.destinationPort">445|139</field>
-    <field name="win.eventdata.destinationIp" negate="yes">^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)</field>
+    <field name="win.eventdata.image" type="pcre2">outlook.exe</field>
+    <field name="win.eventdata.destinationPort" type="pcre2">445|139</field>
+    <field name="win.eventdata.destinationIp" negate="yes" type="pcre2">^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)</field>
     <description>Iranian APT: Outlook connecting to external SMB - potential CVE-2023-23397</description>
     <mitre>
       <id>T1187</id>
@@ -229,6 +229,7 @@
   <!-- Combined Indicators -->
   <rule id="100935" level="16" frequency="3" timeframe="300">
     <if_matched_group>iranian_behavior</if_matched_group>
+    <same_agent />
     <description>Iranian APT: Multiple attack stages detected - likely active compromise</description>
     <mitre>
       <id>T1486</id>

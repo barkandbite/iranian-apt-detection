@@ -19,7 +19,7 @@
   <!-- TEMPLEDROP Kernel Driver Abuse -->
   <rule id="101122" level="15">
     <if_sid>60103</if_sid>
-    <field name="win.system.providerName">Microsoft-Windows-CodeIntegrity</field>
+    <field name="win.system.providerName" type="pcre2">Microsoft-Windows-CodeIntegrity</field>
     <field name="win.eventdata.fileName" type="pcre2">(?i)(sheed|templedrop|iranian.*av)</field>
     <description>Iranian APT: TEMPLEDROP kernel driver abuse detected - $(win.eventdata.fileName)</description>
     <mitre>
@@ -44,8 +44,8 @@
   <!-- Event Log Service Thread Termination -->
   <rule id="101124" level="15">
     <if_group>sysmon_event_8</if_group>
-    <field name="win.eventdata.targetImage">services.exe</field>
-    <field name="win.eventdata.sourceImage" negate="yes">services.exe|svchost.exe|System</field>
+    <field name="win.eventdata.targetImage" type="pcre2">services.exe</field>
+    <field name="win.eventdata.sourceImage" negate="yes" type="pcre2">services.exe|svchost.exe|System</field>
     <description>Iranian APT: Suspicious thread creation in services.exe - possible TEMPLELOCK</description>
     <mitre>
       <id>T1070.001</id>
@@ -81,8 +81,8 @@
   <!-- Passive Backdoor Installation -->
   <rule id="101127" level="14">
     <if_group>sysmon_event_3</if_group>
-    <field name="win.eventdata.initiated">false</field>
-    <field name="win.eventdata.destinationPort">443|8443|8080</field>
+    <field name="win.eventdata.initiated" type="pcre2">false</field>
+    <field name="win.eventdata.destinationPort" type="pcre2">443|8443|8080</field>
     <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)(chrome|firefox|iexplore|edge|winhttp)</field>
     <description>Iranian APT: Passive backdoor accepting inbound connections - $(win.eventdata.image)</description>
     <mitre>
@@ -95,7 +95,7 @@
   <!-- IOCONTROL MQTT Communication -->
   <rule id="101128" level="15">
     <if_group>sysmon_event_3</if_group>
-    <field name="win.eventdata.destinationPort">8883|1883</field>
+    <field name="win.eventdata.destinationPort" type="pcre2">8883|1883</field>
     <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)(mqtt|mosquitto|hivemq)</field>
     <description>Iranian APT: IOCONTROL MQTT communication from non-MQTT process - $(win.eventdata.image)</description>
     <mitre>
@@ -121,7 +121,7 @@
   <!-- Azure Resource Manager Abuse -->
   <rule id="101130" level="14">
     <if_group>sysmon_event_3</if_group>
-    <field name="win.eventdata.destinationHostname">management.azure.com</field>
+    <field name="win.eventdata.destinationHostname" type="pcre2">management.azure.com</field>
     <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)(azure|powershell|az|msedge|chrome)</field>
     <description>Iranian APT: Azure Resource Manager access from suspicious process - $(win.eventdata.image)</description>
     <mitre>
@@ -148,6 +148,7 @@
   <!-- June 2025 Campaign Correlation -->
   <rule id="101132" level="16" frequency="3" timeframe="7200">
     <if_matched_group>iranian_june2025</if_matched_group>
+    <same_agent />
     <description>Iranian APT: June 2025 multi-technique campaign detected - active nation-state threat</description>
     <mitre>
       <id>T1204</id>
@@ -158,8 +159,8 @@
   <!-- Event Log Service Thread Manipulation -->
   <rule id="101133" level="15">
     <if_sid>7034</if_sid>
-    <field name="win.system.eventID">7034</field>
-    <field name="win.eventdata.serviceName">EventLog</field>
+    <field name="win.system.eventID" type="pcre2">7034</field>
+    <field name="win.eventdata.serviceName" type="pcre2">EventLog</field>
     <description>Iranian APT: Windows Event Log service unexpectedly terminated - possible TEMPLELOCK</description>
     <mitre>
       <id>T1070.001</id>
@@ -184,7 +185,7 @@
   <rule id="101135" level="14">
     <if_group>sysmon_event_13</if_group>
     <field name="win.eventdata.targetObject" type="pcre2">(?i)SYSTEM\\CurrentControlSet\\Services\\EventLog</field>
-    <field name="win.eventdata.details">0</field>
+    <field name="win.eventdata.details" type="pcre2">0</field>
     <description>Iranian APT: Event logging selectively disabled via registry</description>
     <mitre>
       <id>T1070.001</id>
@@ -272,7 +273,7 @@
   <rule id="101142" level="14">
     <if_group>sysmon_event_11</if_group>
     <field name="win.eventdata.targetFilename" type="pcre2">(?i)system32\\drivers.*\.(sys|inf)</field>
-    <field name="win.eventdata.image" negate="yes">System|pnputil.exe|driverstore.exe</field>
+    <field name="win.eventdata.image" negate="yes" type="pcre2">System|pnputil.exe|driverstore.exe</field>
     <description>Iranian APT: Unauthorized driver file creation - possible TEMPLEDROP</description>
     <mitre>
       <id>T1014</id>
@@ -284,6 +285,7 @@
   <!-- Multiple Windows Technique Correlation -->
   <rule id="101143" level="16" frequency="2" timeframe="3600">
     <if_matched_group>iranian_june2025</if_matched_group>
+    <same_agent />
     <description>Iranian APT: Multiple Windows-specific attack techniques detected - sophisticated compromise</description>
     <mitre>
       <id>T1204</id>
@@ -322,7 +324,7 @@
   <!-- WebSocket Phishing Backend Communication -->
   <rule id="101146" level="15">
     <if_group>sysmon_event_3</if_group>
-    <field name="win.eventdata.destinationPort">8569|8570|8571</field>
+    <field name="win.eventdata.destinationPort" type="pcre2">8569|8570|8571</field>
     <field name="win.eventdata.destinationHostname" type="pcre2">(?i)(idea-home|auth-portal|secure-verify)\.online</field>
     <description>Iranian APT: WebSocket phishing backend connection - $(win.eventdata.destinationHostname)</description>
     <mitre>
@@ -348,11 +350,16 @@
   <!-- Passive Backdoor Inbound Connections -->
   <rule id="101148" level="15">
     <if_group>firewall</if_group>
-    <direction>inbound</direction>
+    <field name="direction" type="pcre2">inbound</field>
     <dstport>443|8443|8080</dstport>
     <action>allow</action>
     <time>22:00-06:00</time>
-    <srcip negate="yes">^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)</srcip>
+    <!-- "source is external". <srcip> accepts a single CIDR only and rejects
+         regex and comma lists, so RFC1918 exclusion uses a CDB list. Requires
+         <ruleset><list>etc/lists/rfc1918</list></ruleset> in ossec.conf.
+         NOTE: behind NAT the external source IP is often translated or absent,
+         so treat this as a secondary signal. -->
+    <list field="srcip" lookup="not_address_match_key">etc/lists/rfc1918</list>
     <description>Iranian APT: Off-hours inbound connection to web service - possible passive backdoor</description>
     <mitre>
       <id>T1205</id>
@@ -366,7 +373,12 @@
     <if_group>firewall</if_group>
     <dstport>502|20000|44818</dstport>
     <protocol>tcp</protocol>
-    <srcip negate="yes">^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)</srcip>
+    <!-- "source is external". <srcip> accepts a single CIDR only and rejects
+         regex and comma lists, so RFC1918 exclusion uses a CDB list. Requires
+         <ruleset><list>etc/lists/rfc1918</list></ruleset> in ossec.conf.
+         NOTE: behind NAT the external source IP is often translated or absent,
+         so treat this as a secondary signal. -->
+    <list field="srcip" lookup="not_address_match_key">etc/lists/rfc1918</list>
     <description>Iranian APT: External access to industrial protocols (Modbus/DNP3/EtherNet/IP)</description>
     <mitre>
       <id>T0886</id>
@@ -377,8 +389,8 @@
 
   <!-- Azure Resource Manager Mass Queries -->
   <rule id="101150" level="14" frequency="20" timeframe="300">
-    <if_group>sysmon_event_3</if_group>
-    <field name="win.eventdata.destinationHostname">management.azure.com</field>
+    <if_matched_group>sysmon_event_3</if_matched_group>
+    <field name="win.eventdata.destinationHostname" type="pcre2">management.azure.com</field>
     <same_source_ip />
     <description>Iranian APT: Azure Resource Manager mass enumeration detected</description>
     <mitre>
@@ -403,7 +415,7 @@
 
   <!-- Mass Cryptocurrency Exchange Connections -->
   <rule id="101152" level="15" frequency="10" timeframe="600">
-    <if_group>sysmon_event_3</if_group>
+    <if_matched_group>sysmon_event_3</if_matched_group>
     <field name="win.eventdata.destinationHostname" type="pcre2">(?i)(binance|coinbase|kraken|kucoin|nobitex)</field>
     <same_source_ip />
     <description>Iranian APT: Mass cryptocurrency exchange access - possible theft operation</description>
@@ -417,9 +429,9 @@
   <!-- TEMPLEDROP Driver Network Activity -->
   <rule id="101153" level="15">
     <if_group>sysmon_event_3</if_group>
-    <field name="win.eventdata.image">system</field>
-    <field name="win.eventdata.destinationPort">443|8443</field>
-    <field name="win.eventdata.destinationIp" negate="yes">^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)</field>
+    <field name="win.eventdata.image" type="pcre2">system</field>
+    <field name="win.eventdata.destinationPort" type="pcre2">443|8443</field>
+    <field name="win.eventdata.destinationIp" negate="yes" type="pcre2">^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)</field>
     <description>Iranian APT: System process making external HTTPS connection - possible TEMPLEDROP activity</description>
     <mitre>
       <id>T1014</id>
@@ -430,7 +442,7 @@
 
   <!-- Industrial Device Reconnaissance -->
   <rule id="101154" level="14" frequency="50" timeframe="300">
-    <if_group>firewall</if_group>
+    <if_matched_group>firewall</if_matched_group>
     <dstport>80|443|8080|8443</dstport>
     <url type="pcre2">(?i)(login|admin|config|setup|device)</url>
     <same_source_ip />
@@ -445,6 +457,7 @@
   <!-- June 2025 Network Campaign Correlation -->
   <rule id="101155" level="16" frequency="3" timeframe="7200">
     <if_matched_group>iranian_june2025</if_matched_group>
+    <same_agent />
     <description>Iranian APT: June 2025 multi-vector network campaign - active nation-state operation</description>
     <mitre>
       <id>T1204</id>

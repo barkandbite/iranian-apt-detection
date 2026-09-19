@@ -36,7 +36,7 @@
   <!-- Event Log Clearing -->
   <rule id="100982" level="15">
     <if_sid>60106</if_sid>
-    <field name="win.system.channel">Security|System</field>
+    <field name="win.system.channel" type="pcre2">Security|System</field>
     <description>Iranian APT: Security/System event log cleared</description>
     <mitre>
       <id>T1070.001</id>
@@ -94,7 +94,7 @@
 
   <rule id="100987" level="15">
     <if_sid>4732</if_sid>
-    <field name="win.eventdata.targetUserName">Administrators|Domain Admins|Enterprise Admins</field>
+    <field name="win.eventdata.targetUserName" type="pcre2">Administrators|Domain Admins|Enterprise Admins</field>
     <description>Iranian APT: User added to privileged group - $(win.eventdata.targetUserName)</description>
     <mitre>
       <id>T1098</id>
@@ -106,8 +106,8 @@
   <!-- RDP Activity -->
   <rule id="100988" level="14">
     <if_sid>4624</if_sid>
-    <field name="win.eventdata.logonType">10</field>
-    <field name="win.eventdata.ipAddress" negate="yes">^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)</field>
+    <field name="win.eventdata.logonType" type="pcre2">10</field>
+    <field name="win.eventdata.ipAddress" negate="yes" type="pcre2">^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)</field>
     <description>Iranian APT: External RDP login from $(win.eventdata.ipAddress)</description>
     <mitre>
       <id>T1021.001</id>
@@ -131,7 +131,7 @@
   <!-- WMI Activity -->
   <rule id="100990" level="14">
     <if_group>sysmon_event_20</if_group>
-    <field name="win.eventdata.destination" negate="yes">localhost|127.0.0.1|::1</field>
+    <field name="win.eventdata.destination" negate="yes" type="pcre2">localhost|127.0.0.1|::1</field>
     <description>Iranian APT: Remote WMI activity detected to $(win.eventdata.destination)</description>
     <mitre>
       <id>T1047</id>
@@ -143,7 +143,7 @@
   <!-- Credential Dumping -->
   <rule id="100991" level="15">
     <if_group>sysmon_event_10</if_group>
-    <field name="win.eventdata.targetImage">lsass.exe</field>
+    <field name="win.eventdata.targetImage" type="pcre2">lsass.exe</field>
     <field name="win.eventdata.grantedAccess" type="pcre2">0x1410|0x1010|0x1438|0x143a|0x1418</field>
     <description>Iranian APT: LSASS memory access detected - possible credential dumping</description>
     <mitre>
@@ -183,7 +183,7 @@
   <rule id="100994" level="15">
     <if_sid>5104</if_sid>
     <field name="win.eventdata.serviceName" type="pcre2">(?i)(defender|sense|antimalware|symantec|mcafee|kaspersky|sophos)</field>
-    <field name="win.eventdata.state">stopped</field>
+    <field name="win.eventdata.state" type="pcre2">stopped</field>
     <description>Iranian APT: Security service stopped - $(win.eventdata.serviceName)</description>
     <mitre>
       <id>T1562.001</id>
@@ -195,7 +195,7 @@
   <!-- Exchange/Outlook Specific Detections -->
   <rule id="100996" level="15">
     <if_sid>18103</if_sid>
-    <field name="win.eventdata.application">MSExchange</field>
+    <field name="win.eventdata.application" type="pcre2">MSExchange</field>
     <match>Set-OabVirtualDirectory</match>
     <description>Iranian APT: Exchange OAB virtual directory modification detected</description>
     <mitre>
@@ -233,6 +233,7 @@
   <!-- Combined Windows Indicators -->
   <rule id="100995" level="16" frequency="3" timeframe="300">
     <if_matched_group>iranian_windows</if_matched_group>
+    <same_agent />
     <description>Iranian APT: Multiple Windows attack techniques detected - active compromise</description>
     <mitre>
       <id>T1486</id>

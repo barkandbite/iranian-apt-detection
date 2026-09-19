@@ -242,7 +242,7 @@
   <!-- Sicarii: Fake WinDefender service creation -->
   <rule id="101340" level="15">
     <if_sid>60010</if_sid>
-    <field name="win.eventdata.serviceName">WinDefender</field>
+    <field name="win.eventdata.serviceName" type="pcre2">WinDefender</field>
     <description>Iranian APT: Sicarii RaaS fake WinDefender service installed</description>
     <mitre>
       <id>T1543.003</id>
@@ -254,7 +254,7 @@
   <!-- Sicarii: Local account SysAdmin creation -->
   <rule id="101341" level="15">
     <if_sid>4720</if_sid>
-    <field name="win.eventdata.targetUserName">SysAdmin</field>
+    <field name="win.eventdata.targetUserName" type="pcre2">SysAdmin</field>
     <description>Iranian APT: Sicarii RaaS SysAdmin account created</description>
     <mitre>
       <id>T1136.001</id>
@@ -408,7 +408,7 @@
     <if_group>sysmon_event_7</if_group>
     <field name="win.eventdata.image" type="pcre2">(?i)VGAuthCLI\.exe</field>
     <field name="win.eventdata.imageLoaded" type="pcre2">(?i)VGAuth\.dll</field>
-    <field name="win.eventdata.signed">false</field>
+    <field name="win.eventdata.signed" type="pcre2">false</field>
     <description>Iranian APT: UNC1549 DLL sideloading via VMware VGAuth</description>
     <mitre>
       <id>T1574.001</id>
@@ -421,7 +421,7 @@
     <if_group>sysmon_event_7</if_group>
     <field name="win.eventdata.image" type="pcre2">(?i)SenseSampleUploader\.exe</field>
     <field name="win.eventdata.imageLoaded" type="pcre2">(?i)userenv\.dll</field>
-    <field name="win.eventdata.signed">false</field>
+    <field name="win.eventdata.signed" type="pcre2">false</field>
     <description>Iranian APT: UNC1549 MINIBIKE DLL sideloading via Defender component</description>
     <mitre>
       <id>T1574.001</id>
@@ -614,6 +614,7 @@
   <!-- Multi-group: Handala techniques combined (uses shared group tag) -->
   <rule id="101440" level="16" frequency="2" timeframe="3600">
     <if_matched_group>handala</if_matched_group>
+    <same_agent />
     <description>Iranian APT: Handala/Void Manticore multi-technique wiper campaign detected</description>
     <mitre>
       <id>T1485</id>
@@ -624,6 +625,7 @@
   <!-- Multi-group: UNC1549 toolset correlation -->
   <rule id="101441" level="16" frequency="2" timeframe="7200">
     <if_matched_group>unc1549</if_matched_group>
+    <same_agent />
     <description>Iranian APT: UNC1549 multi-tool compromise detected - aerospace/defense targeting</description>
     <mitre>
       <id>T1574.001</id>
@@ -634,6 +636,7 @@
   <!-- Multi-group: Cotton Sandstorm WezRat + WhiteLock chain -->
   <rule id="101442" level="16" frequency="2" timeframe="7200">
     <if_matched_group>cotton_sandstorm</if_matched_group>
+    <same_agent />
     <description>Iranian APT: Cotton Sandstorm WezRat-to-WhiteLock attack chain detected</description>
     <mitre>
       <id>T1486</id>
@@ -644,6 +647,7 @@
   <!-- Cross-group: Iranian APT multi-actor campaign (any 3 groups in 4 hours) -->
   <rule id="101450" level="16" frequency="3" timeframe="14400">
     <if_matched_group>iranian_apt</if_matched_group>
+    <same_agent />
     <description>Iranian APT: Multi-actor campaign detected - coordinated nation-state operation</description>
     <mitre>
       <id>T1204</id>
@@ -743,7 +747,7 @@
     <if_group>sysmon_event_7</if_group>
     <field name="win.eventdata.image" type="pcre2">(?i)lsass\.exe</field>
     <field name="win.eventdata.imageLoaded" negate="yes" type="pcre2">(?i)(system32|syswow64|program files)</field>
-    <field name="win.eventdata.signed">false</field>
+    <field name="win.eventdata.signed" type="pcre2">false</field>
     <description>Iranian APT: APT34 STEALHOOK unsigned DLL loaded into LSASS</description>
     <mitre>
       <id>T1556.002</id>
@@ -896,7 +900,7 @@
   <rule id="101501" level="15">
     <if_group>sysmon_event_7</if_group>
     <field name="win.eventdata.imageLoaded" type="pcre2">(?i)libvlc\.dll</field>
-    <field name="win.eventdata.signed">false</field>
+    <field name="win.eventdata.signed" type="pcre2">false</field>
     <description>HEALTHCARE Iranian APT: MuddyWater TWINTASK malicious libvlc.dll sideload</description>
     <mitre>
       <id>T1574.002</id>
@@ -908,7 +912,7 @@
   <rule id="101502" level="15">
     <if_group>sysmon_event_7</if_group>
     <field name="win.eventdata.imageLoaded" type="pcre2">(?i)goopdate\.dll</field>
-    <field name="win.eventdata.signed">false</field>
+    <field name="win.eventdata.signed" type="pcre2">false</field>
     <description>HEALTHCARE Iranian APT: MuddyWater PowGoop goopdate.dll sideload</description>
     <mitre>
       <id>T1574.002</id>
@@ -943,6 +947,7 @@
   <!-- Pay2Key v3: Multi-technique pre-encryption chain -->
   <rule id="101510" level="16" frequency="2" timeframe="1800">
     <if_matched_group>pay2key</if_matched_group>
+    <same_agent />
     <description>HEALTHCARE Iranian APT: Pay2Key v3 ransomware attack chain detected - IMMEDIATE ACTION REQUIRED</description>
     <mitre>
       <id>T1486</id>
@@ -968,7 +973,7 @@
   <rule id="101512" level="15">
     <if_group>sysmon_event_7</if_group>
     <field name="win.eventdata.imageLoaded" type="pcre2">(?i)libvlc\.dll</field>
-    <field name="win.eventdata.signed">false</field>
+    <field name="win.eventdata.signed" type="pcre2">false</field>
     <description>Iranian APT: Dust Specter SPLITDROP DLL sideloading (TwinTask via libvlc.dll)</description>
     <mitre>
       <id>T1574.002</id>
@@ -980,7 +985,7 @@
   <rule id="101513" level="15">
     <if_group>sysmon_event_7</if_group>
     <field name="win.eventdata.imageLoaded" type="pcre2">(?i)hostfxr\.dll</field>
-    <field name="win.eventdata.signed">false</field>
+    <field name="win.eventdata.signed" type="pcre2">false</field>
     <description>Iranian APT: Dust Specter TwinTalk C2 orchestrator DLL sideloading (hostfxr.dll)</description>
     <mitre>
       <id>T1574.002</id>
