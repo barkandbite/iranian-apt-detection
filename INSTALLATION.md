@@ -52,7 +52,7 @@ sudo systemctl restart suricata
 ```bash
 sudo cp tools/iranian-apt-active-response.sh /var/ossec/active-response/bin/
 sudo chmod 750 /var/ossec/active-response/bin/iranian-apt-active-response.sh
-# Insert XML from configurations/iranian-apt-active-response.xml into ossec.conf
+# Insert XML from configurations/iranian-apt-active-response.xml.example into ossec.conf
 sudo systemctl restart wazuh-manager
 ```
 

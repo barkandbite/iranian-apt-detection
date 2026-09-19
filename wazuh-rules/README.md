@@ -136,7 +136,7 @@ grep -h "rule id=" /var/ossec/etc/rules/09*.xml | sort | uniq -d
 
 ## Integration with Active Response
 
-Enable active response by adding configuration from `configurations/iranian-apt-active-response.xml` to your `ossec.conf`.
+Enable active response by adding configuration from `configurations/iranian-apt-active-response.xml.example` to your `ossec.conf`.
 
 ## Performance Considerations
 

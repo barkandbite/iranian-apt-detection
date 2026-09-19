@@ -95,7 +95,7 @@ Follow both sections above. You can also optionally enable active response, whic
 ```bash
 sudo cp tools/iranian-apt-active-response.sh /var/ossec/active-response/bin/
 sudo chmod +x /var/ossec/active-response/bin/iranian-apt-active-response.sh
-# Then add the configuration from configurations/iranian-apt-active-response.xml
+# Then add the configuration from configurations/iranian-apt-active-response.xml.example
 # into your Wazuh ossec.conf file.
 ```
 
