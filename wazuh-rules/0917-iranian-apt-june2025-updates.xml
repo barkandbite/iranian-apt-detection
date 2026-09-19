@@ -79,7 +79,7 @@
   </rule>
 
   <!-- Passive Backdoor Installation -->
-  <rule id="101127" level="14">
+  <rule id="101127" level="13">
     <if_group>sysmon_event_3</if_group>
     <field name="win.eventdata.initiated" type="pcre2">false</field>
     <field name="win.eventdata.destinationPort" type="pcre2">443|8443|8080</field>
@@ -106,7 +106,7 @@
   </rule>
 
   <!-- Cryptocurrency Exchange API Abuse -->
-  <rule id="101129" level="15">
+  <rule id="101129" level="13">
     <if_group>sysmon_event_3</if_group>
     <field name="win.eventdata.destinationHostname" type="pcre2">(?i)(nobitex|binance|coinbase|kraken).*api</field>
     <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)(chrome|firefox|trading|wallet)</field>
@@ -119,7 +119,7 @@
   </rule>
 
   <!-- Azure Resource Manager Abuse -->
-  <rule id="101130" level="14">
+  <rule id="101130" level="13">
     <if_group>sysmon_event_3</if_group>
     <field name="win.eventdata.destinationHostname" type="pcre2">management.azure.com</field>
     <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)(azure|powershell|az|msedge|chrome)</field>
@@ -146,7 +146,7 @@
   <!-- ========== ADVANCED WINDOWS DETECTION (101132-101143) ========== -->
 
   <!-- June 2025 Campaign Correlation -->
-  <rule id="101132" level="16" frequency="3" timeframe="7200">
+  <rule id="101132" level="14" frequency="3" timeframe="7200">
     <if_matched_group>iranian_june2025</if_matched_group>
     <same_agent />
     <description>Iranian APT: June 2025 multi-technique campaign detected - active nation-state threat</description>
@@ -207,7 +207,7 @@
   </rule>
 
   <!-- Azure PowerShell Module Abuse -->
-  <rule id="101137" level="14">
+  <rule id="101137" level="13">
     <if_sid>91322</if_sid>
     <field name="win.eventdata.scriptBlockText" type="pcre2">(?i)(New-AzVM|New-AzResourceGroup).*-Location.*"random"</field>
     <description>Iranian APT: Azure PowerShell used for fraudulent resource creation</description>
@@ -219,7 +219,7 @@
   </rule>
 
   <!-- Passive Backdoor Service Creation -->
-  <rule id="101138" level="15">
+  <rule id="101138" level="13">
     <if_sid>4697</if_sid>
     <field name="win.eventdata.serviceName" type="pcre2">(?i)(health|status|ping|check).*service</field>
     <field name="win.eventdata.serviceFileName" type="pcre2">(?i).*443|.*8443|.*8080</field>
@@ -232,7 +232,7 @@
   </rule>
 
   <!-- AI-Generated Content Detection via PowerShell -->
-  <rule id="101139" level="14">
+  <rule id="101139" level="8">
     <if_sid>91322</if_sid>
     <field name="win.eventdata.scriptBlockText" type="pcre2">(?i)(Invoke-RestMethod.*openai|gpt.*api.*key|chatgpt.*generate)</field>
     <description>Iranian APT: PowerShell accessing AI APIs for content generation</description>
@@ -257,7 +257,7 @@
   </rule>
 
   <!-- Cryptocurrency Exchange PowerShell Interaction -->
-  <rule id="101141" level="15">
+  <rule id="101141" level="13">
     <if_sid>91322</if_sid>
     <field name="win.eventdata.scriptBlockText" type="pcre2">(?i)(nobitex|crypto.*exchange).*api</field>
     <field name="win.eventdata.scriptBlockText" type="pcre2">(?i)(withdraw|transfer).*90000000</field>
@@ -283,7 +283,7 @@
   </rule>
 
   <!-- Multiple Windows Technique Correlation -->
-  <rule id="101143" level="16" frequency="2" timeframe="3600">
+  <rule id="101143" level="14" frequency="2" timeframe="3600">
     <if_matched_group>iranian_june2025</if_matched_group>
     <same_agent />
     <description>Iranian APT: Multiple Windows-specific attack techniques detected - sophisticated compromise</description>
@@ -310,7 +310,7 @@
   </rule>
 
   <!-- Azure Subdomain C2 Pattern -->
-  <rule id="101145" level="14">
+  <rule id="101145" level="15">
     <if_group>sysmon_event_22</if_group>
     <field name="win.eventdata.queryName" type="pcre2">^[a-z0-9\-]{8,20}\.azurewebsites\.net$</field>
     <description>Iranian APT: Azure subdomain C2 infrastructure detected - $(win.eventdata.queryName)</description>
@@ -335,10 +335,13 @@
   </rule>
 
   <!-- Cryptocurrency Exchange API Pattern -->
-  <rule id="101147" level="15">
+  <rule id="101147" level="6">
     <if_group>firewall</if_group>
     <url type="pcre2">(?i)(nobitex|binance|coinbase).*api.*(withdraw|transfer)</url>
     <status>200</status>
+    <!-- FP PROFILE: any legitimate withdrawal or transfer via an exchange API
+         matches. Retained mainly for Nobitex, which is Iran-specific context.
+         Level 15 -> 6 (see wazuh-rules/README.md severity rubric). -->
     <description>Iranian APT: Cryptocurrency exchange API access for potential theft</description>
     <mitre>
       <id>T1496</id>
@@ -348,7 +351,7 @@
   </rule>
 
   <!-- Passive Backdoor Inbound Connections -->
-  <rule id="101148" level="15">
+  <rule id="101148" level="5">
     <if_group>firewall</if_group>
     <field name="direction" type="pcre2">inbound</field>
     <dstport>443|8443|8080</dstport>
@@ -360,6 +363,9 @@
          NOTE: behind NAT the external source IP is often translated or absent,
          so treat this as a secondary signal. -->
     <list field="srcip" lookup="not_address_match_key">etc/lists/rfc1918</list>
+    <!-- FP PROFILE: same profile as 101013, normal inbound traffic to an
+         internet-facing service outside business hours.
+         Level 15 -> 5 (see wazuh-rules/README.md severity rubric). -->
     <description>Iranian APT: Off-hours inbound connection to web service - possible passive backdoor</description>
     <mitre>
       <id>T1205</id>
@@ -369,7 +375,7 @@
   </rule>
 
   <!-- Industrial Protocol Abuse -->
-  <rule id="101149" level="15">
+  <rule id="101149" level="13">
     <if_group>firewall</if_group>
     <dstport>502|20000|44818</dstport>
     <protocol>tcp</protocol>
@@ -388,7 +394,7 @@
   </rule>
 
   <!-- Azure Resource Manager Mass Queries -->
-  <rule id="101150" level="14" frequency="20" timeframe="300">
+  <rule id="101150" level="13" frequency="20" timeframe="300">
     <if_matched_group>sysmon_event_3</if_matched_group>
     <field name="win.eventdata.destinationHostname" type="pcre2">management.azure.com</field>
     <same_source_ip />
@@ -414,7 +420,7 @@
   </rule>
 
   <!-- Mass Cryptocurrency Exchange Connections -->
-  <rule id="101152" level="15" frequency="10" timeframe="600">
+  <rule id="101152" level="13" frequency="10" timeframe="600">
     <if_matched_group>sysmon_event_3</if_matched_group>
     <field name="win.eventdata.destinationHostname" type="pcre2">(?i)(binance|coinbase|kraken|kucoin|nobitex)</field>
     <same_source_ip />
@@ -441,7 +447,7 @@
   </rule>
 
   <!-- Industrial Device Reconnaissance -->
-  <rule id="101154" level="14" frequency="50" timeframe="300">
+  <rule id="101154" level="8" frequency="50" timeframe="300">
     <if_matched_group>firewall</if_matched_group>
     <dstport>80|443|8080|8443</dstport>
     <url type="pcre2">(?i)(login|admin|config|setup|device)</url>
@@ -455,7 +461,7 @@
   </rule>
 
   <!-- June 2025 Network Campaign Correlation -->
-  <rule id="101155" level="16" frequency="3" timeframe="7200">
+  <rule id="101155" level="14" frequency="3" timeframe="7200">
     <if_matched_group>iranian_june2025</if_matched_group>
     <same_agent />
     <description>Iranian APT: June 2025 multi-vector network campaign - active nation-state operation</description>

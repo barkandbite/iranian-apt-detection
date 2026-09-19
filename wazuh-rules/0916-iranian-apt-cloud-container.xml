@@ -10,9 +10,14 @@
 <group name="iranian_apt,cloud_security,">
 
   <!-- AWS Targeting -->
-  <rule id="101100" level="14">
+  <rule id="101100" level="10">
     <if_group>web_log</if_group>
     <url>169.254.169.254/latest/meta-data/</url>
+    <!-- FP PROFILE: narrower than it looks. This is web_log, so it fires when a
+         web server RECEIVES a request whose URL contains the IMDS address, which
+         is the SSRF-to-credential-theft pattern rather than an instance using
+         IMDS normally. Still fires on SSRF scanners and security testing.
+         Level 14 -> 10 (see wazuh-rules/README.md severity rubric). -->
     <description>Iranian APT: AWS Instance Metadata Service (IMDS) access attempt</description>
     <mitre>
       <id>T1552.005</id>
@@ -93,7 +98,7 @@
     <group>attack,kubernetes,container,</group>
   </rule>
 
-  <rule id="101107" level="15">
+  <rule id="101107" level="11">
     <if_group>kubernetes_audit</if_group>
     <field name="kubernetes.verb" type="pcre2">get|list</field>
     <field name="kubernetes.objectRef.resource" type="pcre2">secrets</field>
@@ -150,10 +155,15 @@
     <group>attack,ai_tools,</group>
   </rule>
 
-  <rule id="101112" level="15">
+  <rule id="101112" level="6">
     <if_group>web_log</if_group>
     <url>/v1/completions|/v1/chat/completions|/v1/embeddings</url>
     <regex type="pcre2">phishing|spear-phishing|social.?engineering|malware|exploit</regex>
+    <!-- FP PROFILE: fires on ANY call to an LLM completions endpoint whose body
+         mentions security vocabulary. A security team writing phishing-awareness
+         training, a SOC analyst summarising an incident, or a malware researcher
+         all trigger this. Keyword presence is not intent. Ambient signal only.
+         Level 15 -> 6 (see wazuh-rules/README.md severity rubric). -->
     <description>Iranian APT: AI API used for malicious content generation</description>
     <mitre>
       <id>T1566</id>
@@ -163,7 +173,7 @@
   </rule>
 
   <!-- Mobile Device Targeting -->
-  <rule id="101113" level="14">
+  <rule id="101113" level="13">
     <if_group>web_log</if_group>
     <regex type="pcre2">User-Agent:.*Android|User-Agent:.*iPhone|User-Agent:.*iPad</regex>
     <url>/api/device/register|/mobile/check-in|/app/heartbeat</url>
@@ -197,10 +207,14 @@
     <group>attack,cryptocurrency,</group>
   </rule>
 
-  <rule id="101116" level="15">
+  <rule id="101116" level="5">
     <if_group>web_log</if_group>
     <url>api.binance.com|api.kraken.com|api.kucoin.com|api.okex.com</url>
     <regex type="pcre2">X-MBX-APIKEY|API-Key|KC-API-KEY</regex>
+    <!-- FP PROFILE: fires on any authenticated call to a mainstream exchange API.
+         Legitimate trading, treasury operations and personal use all match.
+         Exchange usage is not laundering.
+         Level 15 -> 5 (see wazuh-rules/README.md severity rubric). -->
     <description>Iranian APT: Cryptocurrency exchange API usage - possible laundering</description>
     <mitre>
       <id>T1496</id>
@@ -257,7 +271,7 @@
   </rule>
 
   <!-- Cloud Campaign Detection -->
-  <rule id="101121" level="16" frequency="3" timeframe="3600">
+  <rule id="101121" level="14" frequency="3" timeframe="3600">
     <if_matched_group>iranian_cloud</if_matched_group>
     <same_agent />
     <description>Iranian APT: Multi-cloud targeting detected - organized campaign</description>

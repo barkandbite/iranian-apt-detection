@@ -71,7 +71,7 @@
   <!-- ========== QUICK ASSIST PRETEXTING (101526) — MuddyWater Teams False-Flag ========== -->
 
   <!-- Quick Assist launched via Outlook/Teams click-through (Rapid7 May 2026 IOC) -->
-  <rule id="101526" level="13">
+  <rule id="101526" level="16">
     <if_group>sysmon_event_1</if_group>
     <field name="win.eventdata.image" type="pcre2">(?i)\\quickassist\.exe$</field>
     <field name="win.eventdata.parentImage" type="pcre2">(?i)\\(outlook|teams|ms-teams|msedge|chrome)\.exe$</field>
@@ -111,7 +111,7 @@
     <group>attack,execution,muddywater,teams_false_flag,chaos_false_flag,pci_dss_10.6.1,</group>
   </rule>
 
-  <rule id="101531" level="14">
+  <rule id="101531" level="15">
     <if_group>sysmon_event_3</if_group>
     <field name="win.eventdata.image" type="pcre2">(?i)\\Game\.exe$</field>
     <field name="win.eventdata.destinationHostname" type="pcre2">(?i)(moonzonet\.com|uploadfiler\.com)</field>

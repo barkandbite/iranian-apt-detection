@@ -10,7 +10,7 @@
 <group name="iranian_apt,network_detection,">
 
   <!-- C2 Communication Patterns -->
-  <rule id="100940" level="14">
+  <rule id="100940" level="13">
     <if_group>firewall</if_group>
     <srcport>20256</srcport>
     <description>Iranian APT: Unitronics PLC default port communication detected</description>
@@ -21,10 +21,14 @@
     <group>attack,command_control,scada,</group>
   </rule>
 
-  <rule id="100941" level="14">
+  <rule id="100941" level="5">
     <if_group>web_log</if_group>
     <regex type="pcre2">User-Agent.*\(compatible\s*;\s*$\)|User-Agent.*Python|User-Agent.*curl|User-Agent.*wget</regex>
     <status>200</status>
+    <!-- FP PROFILE: curl / wget / python user-agents with HTTP 200 describe every
+         package manager, CI job, uptime check and backup script on the network.
+         Useful as a correlation input, never as a standalone alert.
+         Level 14 -> 5 (see wazuh-rules/README.md severity rubric). -->
     <description>Iranian APT: Suspicious automated tool user-agent detected</description>
     <mitre>
       <id>T1071.001</id>
@@ -34,12 +38,16 @@
   </rule>
 
   <!-- Data Exfiltration Patterns -->
-  <rule id="100942" level="14">
+  <rule id="100942" level="6">
     <if_group>firewall</if_group>
     <protocol>tcp</protocol>
     <dstport>443|8443|8080</dstport>
     <action>allow</action>
     <field name="bytes_sent" type="pcre2">^[5-9]\d{6,}|^[1-9]\d{7,}</field>
+    <!-- FP PROFILE: >5MB outbound to 443/8443/8080 is every file upload, cloud
+         backup, video call, OS update and container pull. Also decoder-dependent
+         (needs a bytes_sent field). Volume alone is not exfiltration.
+         Level 14 -> 6 (see wazuh-rules/README.md severity rubric). -->
     <description>Iranian APT: Large data transfer to external host detected (>5MB)</description>
     <mitre>
       <id>T1041</id>
@@ -48,7 +56,7 @@
     <group>attack,exfiltration,pci_dss_11.4,</group>
   </rule>
 
-  <rule id="100943" level="15" frequency="5" timeframe="300">
+  <rule id="100943" level="14" frequency="5" timeframe="300">
     <if_matched_sid>100942</if_matched_sid>
     <same_dstip />
     <description>Iranian APT: Multiple large data transfers to same destination - possible exfiltration</description>
@@ -60,7 +68,7 @@
   </rule>
 
   <!-- Cobalt Strike Detection -->
-  <rule id="100944" level="15">
+  <rule id="100944" level="13">
     <if_group>ids</if_group>
     <regex type="pcre2">Cobalt Strike|cobaltstrike|beacon\.dll|artifact\.exe</regex>
     <description>Iranian APT: Cobalt Strike beacon detected</description>
@@ -71,7 +79,7 @@
     <group>attack,command_control,cobalt_strike,</group>
   </rule>
 
-  <rule id="100945" level="14">
+  <rule id="100945" level="13">
     <if_group>firewall,web_log</if_group>
     <url type="pcre2">/[a-zA-Z0-9]{1,4}$|/pixel\.gif$|/g\.gif$|/p\.gif$</url>
     <status>200</status>
@@ -84,7 +92,7 @@
   </rule>
 
   <!-- Scanning and Reconnaissance -->
-  <rule id="100946" level="13" frequency="50" timeframe="60">
+  <rule id="100946" level="8" frequency="50" timeframe="60">
     <if_matched_group>firewall</if_matched_group>
     <action>drop|deny|reject</action>
     <same_source_ip />
@@ -115,7 +123,7 @@
   </rule>
 
   <!-- DNS Tunneling Detection -->
-  <rule id="100948" level="14">
+  <rule id="100948" level="8">
     <if_group>sysmon_event_22</if_group>
     <field name="win.eventdata.queryName" type="pcre2">^[a-f0-9]{32,}\.|^[a-zA-Z0-9+/]{40,}\.</field>
     <description>Iranian APT: Possible DNS tunneling detected - suspicious query pattern</description>
@@ -139,11 +147,15 @@
   </rule>
 
   <!-- Encrypted Channel Detection -->
-  <rule id="100950" level="13">
+  <rule id="100950" level="4">
     <if_group>firewall</if_group>
     <protocol>tcp</protocol>
     <dstport>!80,!443,!22,!3389</dstport>
     <regex type="pcre2">TLS|SSL|encrypted</regex>
+    <!-- FP PROFILE: matches any TLS service not on 80/443/22/3389: mail
+         submission, LDAPS, database TLS, RDP gateways, internal APIs, most
+         container traffic.
+         Level 13 -> 4 (see wazuh-rules/README.md severity rubric). -->
     <description>Iranian APT: Encrypted communication on non-standard port $(dstport)</description>
     <mitre>
       <id>T1573</id>
@@ -153,7 +165,7 @@
   </rule>
 
   <!-- BitCoin Activity Detection -->
-  <rule id="100951" level="14">
+  <rule id="100951" level="16">
     <if_group>web_log,sysmon_event_22</if_group>
     <regex type="pcre2">bitcoin|btc|bc1q|blockchain\.info|coinbase</regex>
     <description>Iranian APT: Cryptocurrency-related activity detected - possible ransomware</description>
@@ -165,7 +177,7 @@
   </rule>
 
   <!-- Ngrok/Tunneling Detection -->
-  <rule id="100952" level="15">
+  <rule id="100952" level="8">
     <if_group>firewall,sysmon_event_3</if_group>
     <regex type="pcre2">ngrok\.io|\.ngrok\.com|tunnels\.api\.tunnels|localhost\.run</regex>
     <description>Iranian APT: Reverse tunnel service detected - $(url)</description>
@@ -177,13 +189,17 @@
   </rule>
 
   <!-- Off-Hours Activity -->
-  <rule id="100953" level="13">
+  <rule id="100953" level="4">
     <if_group>firewall</if_group>
     <time>22:00-06:00</time>
     <weekday>weekends</weekday>
     <action>allow</action>
     <protocol>tcp</protocol>
     <field name="bytes_sent" type="pcre2">^[1-9]\d{5,}</field>
+    <!-- FP PROFILE: "off-hours" assumes one timezone and a 9 to 5 workforce.
+         Scheduled backups, cron, patch windows, on-call admin work and colleagues
+         in other timezones all match. Time of day is weak signal alone.
+         Level 13 -> 4 (see wazuh-rules/README.md severity rubric). -->
     <description>Iranian APT: Suspicious off-hours network activity detected</description>
     <mitre>
       <id>T1029</id>
@@ -193,7 +209,7 @@
   </rule>
 
   <!-- Exchange/Outlook Network Activity -->
-  <rule id="100955" level="15">
+  <rule id="100955" level="13">
     <if_group>web_log</if_group>
     <url type="pcre2">/owa/auth/.*\.aspx|/ecp/.*\.aspx|/aspnet_client/.*\.aspx</url>
     <status>200|201</status>
@@ -205,7 +221,7 @@
     <group>attack,webshell,exchange,</group>
   </rule>
 
-  <rule id="100956" level="14">
+  <rule id="100956" level="13">
     <if_group>firewall</if_group>
     <protocol>tcp</protocol>
     <srcport>445|139</srcport>
@@ -218,7 +234,7 @@
     <group>attack,credential_relay,</group>
   </rule>
 
-  <rule id="100957" level="15">
+  <rule id="100957" level="13">
     <if_group>web_log</if_group>
     <regex type="pcre2">POST.*\/owa\/auth\/Current\/.*themes|POST.*\/ecp\/default\.flt</regex>
     <description>Iranian APT: Exchange ProxyLogon exploitation pattern detected</description>
@@ -230,7 +246,7 @@
   </rule>
 
   <!-- Combined Network Indicators -->
-  <rule id="100954" level="16" frequency="5" timeframe="600">
+  <rule id="100954" level="14" frequency="5" timeframe="600">
     <if_matched_group>iranian_network</if_matched_group>
     <same_agent />
     <description>Iranian APT: Multiple C2 indicators detected - active compromise likely</description>
