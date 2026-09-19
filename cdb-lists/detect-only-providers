@@ -1,0 +1,22 @@
+# GENERATED FILE -- do not edit by hand.
+# Regenerate:  python3 tools/extract-iocs.py
+# Source:      suricata/*.rules
+atera.com:abused_legitimate_service
+azurewebsites.net:abused_legitimate_service
+cloudflare-dns.com:abused_legitimate_service
+ddnsking.com:abused_legitimate_service
+dns.google:abused_legitimate_service
+duckdns.org:abused_legitimate_service
+filemail.com:abused_legitimate_service
+glitch.me:abused_legitimate_service
+it.com:abused_legitimate_service
+net.anydesk.com:abused_legitimate_service
+netbird.io:abused_legitimate_service
+ngrok.io:abused_legitimate_service
+onlyoffice.com:abused_legitimate_service
+pdq.com:abused_legitimate_service
+privatedns.org:abused_legitimate_service
+screenconnect.com:abused_legitimate_service
+somee.com:abused_legitimate_service
+syncromsp.com:abused_legitimate_service
+workers.dev:abused_legitimate_service

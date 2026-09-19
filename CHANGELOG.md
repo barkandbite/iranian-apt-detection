@@ -5,6 +5,112 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.1.0] - 2026-09-19
+
+### Fixed -- P0: the Wazuh ruleset did not load at all
+
+A real Wazuh 4.14.7 manager refuses to start on this ruleset.
+`xmllint --noout wazuh-rules/*.xml` passes on every file, which is why this
+survived to HEAD through v4.0.25. Three defects each took the whole SIEM
+ruleset offline, not just the offending rule:
+
+- `level="17"` on 101023, 101120, 101450. analysisd: *"Invalid level: 17.
+  Must be an integer between 0 and 16"*, then *"Error loading the rules"* and
+  exit. It does not clamp. Same failure class as the Suricata v4.0.22
+  incident, on the SIEM side, undetected.
+- `<same_src_ip />` on 100946: not a valid option. *"Invalid option
+  'same_src_ip'"* -> load abort. Correct spelling is `same_source_ip`.
+- CDATA in 100908's `<regex>`: Wazuh's `OS_XML` parser has no CDATA support
+  and reads `<!` as a comment opener, giving *"XMLERR: Element 'regex' not
+  closed"*.
+
+Ten further classes fixed until analysisd accepted all 16 files: PCRE syntax
+in `<regex>`/`<field>` without `type="pcre2"` (81 tags), `\uXXXX` escapes with
+PCRE2 not built in UTF mode, invalid options `<bytes_sent>`, `<direction>`,
+`<src_ip>`, `<field name="srcip"/"url">` rejected as static fields, `<srcip>`
+given regex and comma lists (accepts one CIDR only), `<weekday>` with `|`
+separators, and 6 `frequency` rules missing `if_matched_*`.
+
+Two patterns were also silently wrong: 100918 used `\p`/`\P` where literal
+`\pipe`/`\PIPE` was intended, and 101020's Log4Shell alternative had an
+unescaped `${`.
+
+### Fixed -- active response was inert
+
+Hyphenated `<rules_id>` ranges match nothing (Wazuh takes a comma list and
+does not expand ranges); `101090-101099` corresponds to no rule in this repo
+at all. `<level>14,15,16</level>` is invalid. `<expect>` was removed in 4.2.
+Integration names matched neither a stock integration nor the `custom-`
+convention, logging *"File not found inside 'integrations'"* on every start.
+`location=all` with no level floor ran the response on every enrolled agent
+for one alert. Config renamed to `.xml.example` with `REPLACE-ME` markers.
+
+### Fixed -- correlation
+
+Added `<same_agent />` to 19 `frequency` rules that counted with no anchor and
+aggregated across the whole fleet. `same_agent` rather than `same_source_ip`:
+these are host-correlation rules and the reference deployment is NAT'd, where
+source IP is translated or absent. Corrected `same_dst_ip` -> `same_dstip`.
+
+### Changed -- severity re-grade
+
+Nearly every rule was level 14 or 15. 184 re-graded against a published rubric
+(wazuh-rules/README.md); 78 that could not be confidently classified were left
+alone rather than flattened. 13 FP-prone rules demoted with explicit
+`FP PROFILE` comments.
+
+### Added
+
+- `tools/lint-rules.py` -- 19 static checks, one per defect class found here.
+- `tools/extract-iocs.py` -- tiered CDB lists generated from the Suricata
+  ruleset. T1 dedicated actor domains (blockable), T2 actor FQDNs on shared
+  providers (block exact FQDN, never the parent), T3 abused legitimate
+  services (never block). `1.1.1.1` and 50+ providers excluded from every
+  blockable output and asserted on each run: `1.1.1.1` appears in a rule
+  header only because that rule detects IOCONTROL using Cloudflare DoH for
+  evasion. Review also caught `onlyoffice.com` (legitimate SaaS used by
+  Screening Serpens for staging) and `privatedns.org` landing in the
+  blockable tier; both moved to T3.
+- `cdb-lists/` -- 4 generated lists plus hand-maintained `rfc1918`.
+- `wazuh-rules/0925-ioc-list-matching.xml` (101550-101556), rating egress
+  above ingress because inbound reputation is near-inert behind NAT.
+- CI: `wazuh-analysisd -t` in a real `wazuh/wazuh-manager:4.14.7` container
+  and `suricata -T` are now blocking gates, plus the linter and a CDB
+  staleness check. Nothing in CI previously executed the Wazuh ruleset, which
+  is how a non-loading ruleset shipped and stayed shipped.
+
+### Merged
+
+`origin/main` v4.0.25 merged in; no detections dropped. 452 Suricata rules
+(SID 1000039-2000575) and 301 Wazuh rules across 16 files. All 452 Suricata
+`msg:` fields standardized to
+`Bark&Bite IRANIAN-APT <Group> - <Description> [CVE-...]`, aliases normalized
+(OilRig -> APT34, Prince of Persia -> Infy, Cavern -> Cavern Manticore).
+
+## [5.0.0] - 2026-04-07
+
+### Changed -- MAJOR RELEASE
+- **Standardized all 354 Suricata rule descriptions** to consistent format: `Bark&Bite IRANIAN-APT <Group> - <Description> [CVE-XXXX-XXXXX]`. Every rule now includes threat group attribution, making SOC triage and SIEM filtering significantly easier.
+- **Removed HEALTHCARE emergency framing** from rule descriptions and README. Healthcare is now one sector among many (energy, water, telecom, finance, defense, transportation, government) in a broader critical infrastructure defense posture.
+- **README rewritten** to reflect the project's role as an open-source defensive toolkit for the US-Iranian cyber conflict, accessible to organizations of all sizes.
+- **Version bump to 5.0.0** due to breaking change in all `msg:` fields (SIEM alert filters keyed on old msg strings will need updating).
+
+### Added
+- **Comprehensive automated test suite** (`tests/`) with synthetic packet generation for every Suricata rule. Uses scapy for pcap crafting and validates alerts via Suricata's eve.json output. Covers HTTP, DNS, TLS/SNI, TCP raw, UDP, IP, SMTP, SMB, RDP, and DCERPC protocols. Includes multi-packet chain tests for flowbit/xbit correlation rules.
+- `tests/test_suricata_rules.py` -- parameterized pytest suite covering all 354 SIDs
+- `tests/conftest.py` -- SuricataTestRunner class and shared fixtures
+- `tests/requirements.txt` -- test dependencies (scapy, pytest)
+
+### Fixed
+- **SID 2000462** (Boggy Serpens BlackBeard Rust C2 Beacon): Fixed mixed sticky buffer error -- converted `http.method`/`http.user_agent` sticky buffers to legacy modifiers for compatibility. (rev 1 -> 2)
+- **SID 2000463** (Boggy Serpens BlackBeard Header Exfil): Fixed `http_user_agent` seen with sticky buffer still set -- simplified to use consistent legacy modifiers. (rev 1 -> 3)
+- **SID 2000465** (Boggy Serpens Phoenix VBA Macro Document Delivery): Fixed `http_content_type` to `file_data` sticky buffer transition error -- switched to `http_stat_code` check. (rev 1 -> 3)
+- **SID 2000468** (Dust Specter TwinTalk JWT C2 Beacon): Fixed mixed sticky buffer error in `http.method`/`http.header`/`http.uri` chain -- converted to legacy modifiers with proper pcre `/U` flag. (rev 1 -> 2)
+- All 354 rules now pass `suricata -T` validation on Suricata 7.0.3 with zero errors.
+
+### Notes
+- Rule description format change is a **breaking change** for SIEM queries filtering on `msg:` content. Old format `"Bark&Bite - Iranian APT ..."` and `"Bark&Bite - HEALTHCARE ..."` are replaced by `"Bark&Bite IRANIAN-APT <Group> - ..."`.
+- The `IRANIAN-APT` keyword and group name prefix enable more precise SIEM filtering (e.g., `alert.signature:"*IRANIAN-APT MuddyWater*"`).
 ## [4.0.25] - 2026-08-20
 
 ### Added — MuddyWater RustyWater behavioral rules (SID 2000573–2000575)

@@ -24,7 +24,7 @@ iranian-apt-detection/
 ├── configurations/
 │   ├── sysmon-config-iranian-apt.xml                # Sysmon configuration
 │   ├── ossec-agent-iranian-apt.conf                 # Wazuh agent config
-│   ├── iranian-apt-active-response.xml              # Active response config
+│   ├── iranian-apt-active-response.xml.example      # Active response config (template)
 │   └── README.md                                     # Configuration guide
 │
 ├── suricata/

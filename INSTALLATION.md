@@ -1,5 +1,55 @@
 # Installation Guide
 
+## Prerequisites (read first)
+
+### Sysmon is required for most of this ruleset
+
+142 Wazuh rule conditions depend on Sysmon event groups
+(`sysmon_event_1/3/6/7/8/10/11/13/20/22`). Without Sysmon on your Windows
+endpoints and the Wazuh Sysmon decoders in place, **the majority of this
+ruleset cannot fire at all**. Sysmon-dominant files, effectively inert
+without it: `0911`, `0914`, `0915`, `0917`, `0918`, `0919`, `0920`, `0921`,
+`0923`, `0924`.
+
+1. Install Sysmon 13+ on Windows endpoints.
+2. Apply `configurations/sysmon-config-iranian-apt.xml`.
+3. Confirm the agent forwards the Sysmon EventChannel.
+4. Verify decoding:
+
+```bash
+/var/ossec/bin/wazuh-logtest -v
+# paste a Sysmon event; Phase 2 must show
+#   win.system.providerName: 'Microsoft-Windows-Sysmon'
+# If Phase 2 shows no decoder, the Sysmon rules cannot match.
+```
+
+### CDB lists are required by some rules
+
+Rules 100947, 101004, 101013, 101148, 101149 and all of
+`0925-ioc-list-matching.xml` reference CDB lists. Install and declare them or
+those rules never match. See [cdb-lists/README.md](cdb-lists/README.md).
+
+### Versions
+
+- Wazuh 4.3+ manager and agents (validated against 4.14.7)
+- Suricata 7.0+ (validated against 7.0.3)
+- Sysmon 13+ on Windows endpoints
+- Python 3.8+ for the tooling
+
+### Validate before you trust it
+
+```bash
+xmllint --noout wazuh-rules/*.xml       # necessary, NOT sufficient
+python3 tools/lint-rules.py             # known defect classes
+sudo /var/ossec/bin/wazuh-analysisd -t  # authoritative
+sudo suricata -T -S suricata/iranian-apt-detection.rules -l /tmp
+```
+
+Wazuh's XML parser is stricter than standard XML and `analysisd` rejects
+constructs `xmllint` accepts. An invalid rule aborts its whole file; an
+invalid `level` aborts manager startup entirely.
+
+
 This guide covers deployment of the Wazuh XML rules and Suricata network signatures contained in this repository.
 
 ## Prerequisites
@@ -52,7 +102,7 @@ sudo systemctl restart suricata
 ```bash
 sudo cp tools/iranian-apt-active-response.sh /var/ossec/active-response/bin/
 sudo chmod 750 /var/ossec/active-response/bin/iranian-apt-active-response.sh
-# Insert XML from configurations/iranian-apt-active-response.xml into ossec.conf
+# Insert XML from configurations/iranian-apt-active-response.xml.example into ossec.conf
 sudo systemctl restart wazuh-manager
 ```
 

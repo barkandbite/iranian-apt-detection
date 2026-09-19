@@ -1,0 +1,187 @@
+<!--
+  Wazuh Active Response Configuration for Iranian APT Detection
+  Version: 5.1.0
+
+  =========================================================================
+  THIS IS AN EXAMPLE FILE. IT WILL NOT WORK AS-IS.
+  =========================================================================
+  Copy the blocks you want into your Wazuh manager's ossec.conf and replace
+  every value marked REPLACE-ME. Deploying this file unedited results in
+  alerts being emailed nowhere and integrations failing to load.
+
+  =========================================================================
+  READ THIS BEFORE ENABLING ACTIVE RESPONSE
+  =========================================================================
+
+  1. SOURCE-IP BLOCKING IS LARGELY INERT ON A NAT'D / SMB NETWORK.
+     The bundled response script keys on the alert's source IP. Where the
+     manager sits behind NAT:
+       - Inbound external source IPs are translated or absent.
+       - Endpoint agents live on RFC1918 subnets, and any correct AR
+         whitelist covers RFC1918, so internal sources are skipped.
+     Net effect: the response fires on almost nothing. Do not treat
+     srcip-based AR as your control.
+
+     Where IP/domain reputation does earn its keep is the EGRESS direction,
+     an internal host calling out to known C2, enforced at your DNS resolver
+     and firewall rather than by an endpoint response.
+
+  2. PREFER HOST-SIDE DETECTION. This ruleset's durable signal is Sysmon
+     process/registry/file artefacts, FIM events and command-line matching,
+     not source-IP reputation.
+
+  3. SCOPE YOUR BLAST RADIUS. <location>all</location> runs the command on
+     EVERY enrolled agent for a single alert. Every block below uses
+     <location>local</location>.
+-->
+
+<!-- =====================================================================
+     Command Definition
+     <expect> was removed in Wazuh 4.2 and is intentionally absent.
+     ===================================================================== -->
+<command>
+  <name>iranian-apt-response</name>
+  <executable>iranian-apt-active-response.sh</executable>
+  <timeout_allowed>yes</timeout_allowed>
+</command>
+
+<!-- =====================================================================
+     Active Response Definitions
+
+     <rules_id> takes a COMMA-SEPARATED LIST. Hyphenated ranges are NOT
+     expanded by Wazuh; a range silently matches nothing. All IDs below are
+     enumerated and verified present in this repository.
+
+     <level> is a SINGLE INTEGER meaning "this level or higher". A comma
+     list is invalid.
+     ===================================================================== -->
+
+<!-- CVE exploitation (0910, rules 100900-100919, all 20 enumerated) -->
+<active-response>
+  <command>iranian-apt-response</command>
+  <location>local</location>
+  <rules_id>100900,100901,100902,100903,100904,100905,100906,100907,100908,100909,100910,100911,100912,100913,100914,100915,100916,100917,100918,100919</rules_id>
+  <timeout>86400</timeout>
+</active-response>
+
+<!-- Web shell activity -->
+<active-response>
+  <command>iranian-apt-response</command>
+  <location>local</location>
+  <rules_id>100931,100990</rules_id>
+  <level>15</level>
+</active-response>
+
+<!-- Credential theft (group has 5 rules) -->
+<active-response>
+  <command>iranian-apt-response</command>
+  <location>local</location>
+  <rules_group>credential_theft</rules_group>
+  <level>15</level>
+</active-response>
+
+<!-- Critical infrastructure (group has 5 rules)
+
+     BLAST RADIUS NOTE: this was previously <location>all</location> with no
+     level floor, so one alert triggered a response on every enrolled agent.
+     Scoped to the reporting agent and floored at level 14. If you genuinely
+     want fleet-wide response for an OT/ICS event, change location to "all"
+     deliberately and keep the level floor.
+-->
+<active-response>
+  <command>iranian-apt-response</command>
+  <location>local</location>
+  <rules_group>critical_infrastructure</rules_group>
+  <level>14</level>
+</active-response>
+
+<!-- Ransomware / wiper -->
+<active-response>
+  <command>iranian-apt-response</command>
+  <location>local</location>
+  <rules_group>ransomware</rules_group>
+  <level>15</level>
+</active-response>
+
+<!-- Broad Iranian APT catch-all.
+     Was <level>14,15,16</level>, which is invalid. A single integer means
+     "this level or higher", so 14 covers 14/15/16. -->
+<active-response>
+  <command>iranian-apt-response</command>
+  <location>local</location>
+  <rules_group>iranian_apt</rules_group>
+  <level>14</level>
+  <timeout>3600</timeout>
+</active-response>
+
+<!-- =====================================================================
+     Alerting
+     ===================================================================== -->
+<alerts>
+  <log_alert_level>3</log_alert_level>
+  <email_alert_level>12</email_alert_level>
+
+  <email_alerts>
+    <email_to>REPLACE-ME-security-team@your-org.example</email_to>
+    <group>iranian_apt</group>
+    <level>14</level>
+    <format>full</format>
+  </email_alerts>
+
+  <email_alerts>
+    <email_to>REPLACE-ME-incident-response@your-org.example</email_to>
+    <group>iranian_apt</group>
+    <level>15</level>
+    <format>sms</format>
+    <do_not_delay>yes</do_not_delay>
+  </email_alerts>
+</alerts>
+
+<!-- =====================================================================
+     Integrations
+
+     Wazuh accepts only these integration names:
+       slack, pagerduty, virustotal, shuffle, maltiverse
+     or a custom name prefixed "custom-" WITH a matching executable present
+     in /var/ossec/integrations/.
+
+     The previous names "iranian-apt-slack" and "iranian-apt-soar" matched
+     neither rule, producing on every manager start:
+       wazuh-integratord: Unable to enable integration for:
+       'iranian-apt-slack'. File not found inside 'integrations'.
+
+     The stock "slack" integration is used below, no custom script needed.
+
+     DISCORD: Discord accepts Slack-format payloads. Append /slack to your
+     Discord webhook URL and the stock slack integration drives Discord with
+     no extra code:
+       https://discord.com/api/webhooks/<id>/<token>/slack
+     ===================================================================== -->
+<integration>
+  <name>slack</name>
+  <hook_url>REPLACE-ME-https://hooks.slack.com/services/XXX/YYY/ZZZ</hook_url>
+  <level>14</level>
+  <group>iranian_apt</group>
+  <alert_format>json</alert_format>
+</integration>
+
+<!--
+  SOAR / generic webhook.
+
+  There is no stock Wazuh integration for arbitrary SOAR platforms. To use
+  one you must BOTH:
+    1. name it with a "custom-" prefix, and
+    2. ship the executable at /var/ossec/integrations/custom-iranian-apt-soar
+       owned root:wazuh, mode 750.
+
+  Left commented out because this repository does not ship that executable.
+
+<integration>
+  <name>custom-iranian-apt-soar</name>
+  <api_key>REPLACE-ME</api_key>
+  <hook_url>REPLACE-ME-https://soar.your-org.example/api/v1/incidents</hook_url>
+  <level>15</level>
+  <group>iranian_apt</group>
+  <alert_format>json</alert_format>
+</integration>
+-->

@@ -27,8 +27,8 @@
   <!-- ========== MUDDYVIPER / FOODER (101300-101309) ========== -->
 
   <!-- MuddyViper: Process creation from known persistence path -->
-  <rule id="101300" level="14">
-    <if_group>sysmon_event_1</if_group>
+  <rule id="101300" level="8">
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.image" type="pcre2">(?i)PPBCompatCache\\ManagerCache</field>
     <description>Iranian APT: MuddyWater MuddyViper execution from persistence path</description>
     <mitre>
@@ -38,8 +38,9 @@
   </rule>
 
   <!-- MuddyViper: Known scheduled task name -->
-  <rule id="101301" level="14">
-    <if_sid>4698</if_sid>
+  <rule id="101301" level="8">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^4698$</field>
     <field name="win.eventdata.taskName" type="pcre2">(?i)ManageOnDriveUpdater</field>
     <description>Iranian APT: MuddyWater MuddyViper persistence scheduled task</description>
     <mitre>
@@ -50,7 +51,7 @@
 
   <!-- MuddyViper: Fake Windows Security credential dialog (T1056.002) -->
   <rule id="101302" level="15">
-    <if_group>sysmon_event_1</if_group>
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)CredUIPromptForWindowsCredentials|CredUnPackAuthenticationBuffer</field>
     <field name="win.eventdata.parentImage" negate="yes" type="pcre2">(?i)explorer\.exe|lsass\.exe|svchost\.exe</field>
     <description>Iranian APT: MuddyWater MuddyViper fake credential prompt</description>
@@ -86,7 +87,7 @@
   <!-- ========== WEZRAT INFOSTEALER (101310-101319) ========== -->
 
   <!-- WezRat: Registry persistence key "Chrome Updater" -->
-  <rule id="101310" level="14">
+  <rule id="101310" level="8">
     <if_group>sysmon_event_13</if_group>
     <field name="win.eventdata.targetObject" type="pcre2">(?i)\\CurrentVersion\\Run</field>
     <field name="win.eventdata.details" type="pcre2">(?i)Chrome Updater|Updater\.exe</field>
@@ -110,7 +111,7 @@
 
   <!-- WezRat: Cookie theft DLL JumpViewUi.dll loaded in-memory -->
   <rule id="101312" level="15">
-    <if_group>sysmon_event_7</if_group>
+    <if_group>sysmon_event7</if_group>
     <field name="win.eventdata.imageLoaded" type="pcre2">(?i)JumpViewUi\.dll</field>
     <description>Iranian APT: Cotton Sandstorm WezRat cookie theft module loaded</description>
     <mitre>
@@ -132,7 +133,7 @@
 
   <!-- WezRat: Mutex creation -->
   <rule id="101314" level="14">
-    <if_group>sysmon_event_1</if_group>
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)FA531CC1-0497-11D3-A180-00105A276C3E</field>
     <description>Iranian APT: Cotton Sandstorm WezRat mutex detected</description>
     <mitre>
@@ -144,8 +145,8 @@
   <!-- ========== HANDALA / VOID MANTICORE WIPER (101320-101339) ========== -->
 
   <!-- Handala: LSASS dump via rundll32 comsvcs.dll MiniDump -->
-  <rule id="101320" level="15">
-    <if_group>sysmon_event_1</if_group>
+  <rule id="101320" level="11">
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)rundll32.*comsvcs\.dll.*MiniDump</field>
     <description>Iranian APT: Handala/Void Manticore LSASS dump via comsvcs.dll</description>
     <mitre>
@@ -155,8 +156,8 @@
   </rule>
 
   <!-- Handala: ADRecon PowerShell framework execution -->
-  <rule id="101321" level="15">
-    <if_group>sysmon_event_1</if_group>
+  <rule id="101321" level="8">
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)ADRecon|Invoke-ADRecon</field>
     <description>Iranian APT: Handala/Void Manticore ADRecon AD enumeration</description>
     <mitre>
@@ -167,8 +168,8 @@
   </rule>
 
   <!-- Handala: NetBird mesh networking tool installation -->
-  <rule id="101322" level="14">
-    <if_group>sysmon_event_1</if_group>
+  <rule id="101322" level="8">
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.image" type="pcre2">(?i)netbird</field>
     <description>Iranian APT: Handala/Void Manticore NetBird mesh tunnel tool</description>
     <mitre>
@@ -179,8 +180,8 @@
   </rule>
 
   <!-- Handala: VeraCrypt used as wiper tool -->
-  <rule id="101323" level="15">
-    <if_group>sysmon_event_1</if_group>
+  <rule id="101323" level="16">
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)veracrypt.*(/v|/q|/s|/p).*(/e|/encrypt)</field>
     <description>Iranian APT: Handala/Void Manticore VeraCrypt encryption wiper</description>
     <mitre>
@@ -191,7 +192,7 @@
   </rule>
 
   <!-- Handala: Propaganda file marker handala.gif -->
-  <rule id="101324" level="15">
+  <rule id="101324" level="16">
     <if_sid>550,553,554</if_sid>
     <field name="file" type="pcre2">(?i)handala\.gif</field>
     <description>Iranian APT: Handala wiper propaganda file marker detected</description>
@@ -202,7 +203,7 @@
   </rule>
 
   <!-- Handala: GPO logon script wiper deployment -->
-  <rule id="101325" level="15">
+  <rule id="101325" level="16">
     <if_group>sysmon_event_11</if_group>
     <field name="win.eventdata.targetFilename" type="pcre2">(?i)\\SYSVOL\\.*\\Scripts\\.*\.(bat|cmd|ps1)</field>
     <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)mmc\.exe|gpmc\.msc</field>
@@ -215,8 +216,8 @@
   </rule>
 
   <!-- Handala: Microsoft Intune mass remote wipe abuse -->
-  <rule id="101326" level="15">
-    <if_group>sysmon_event_3</if_group>
+  <rule id="101326" level="16">
+    <if_group>sysmon_event3</if_group>
     <field name="win.eventdata.destinationHostname" type="pcre2">(?i)graph\.microsoft\.com</field>
     <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)(intune|microsoft|teams|outlook|onedrive)</field>
     <description>Iranian APT: Handala/Void Manticore suspicious Microsoft Graph API access</description>
@@ -227,8 +228,8 @@
   </rule>
 
   <!-- Handala: HKLM registry hive export for credential theft -->
-  <rule id="101327" level="15">
-    <if_group>sysmon_event_1</if_group>
+  <rule id="101327" level="11">
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)reg\.exe.*save.*HKLM\\(SAM|SECURITY|SYSTEM)</field>
     <description>Iranian APT: Handala/Void Manticore registry hive export</description>
     <mitre>
@@ -242,7 +243,7 @@
   <!-- Sicarii: Fake WinDefender service creation -->
   <rule id="101340" level="15">
     <if_sid>60010</if_sid>
-    <field name="win.eventdata.serviceName">WinDefender</field>
+    <field name="win.eventdata.serviceName" type="pcre2">WinDefender</field>
     <description>Iranian APT: Sicarii RaaS fake WinDefender service installed</description>
     <mitre>
       <id>T1543.003</id>
@@ -252,9 +253,10 @@
   </rule>
 
   <!-- Sicarii: Local account SysAdmin creation -->
-  <rule id="101341" level="15">
-    <if_sid>4720</if_sid>
-    <field name="win.eventdata.targetUserName">SysAdmin</field>
+  <rule id="101341" level="11">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^4720$</field>
+    <field name="win.eventdata.targetUserName" type="pcre2">SysAdmin</field>
     <description>Iranian APT: Sicarii RaaS SysAdmin account created</description>
     <mitre>
       <id>T1136.001</id>
@@ -263,7 +265,7 @@
   </rule>
 
   <!-- Sicarii: .sicarii file extension (ransomware encryption) -->
-  <rule id="101342" level="15">
+  <rule id="101342" level="16">
     <if_sid>550,553,554</if_sid>
     <field name="file" type="pcre2">\.sicarii$</field>
     <description>Iranian APT: Sicarii ransomware encrypted file detected</description>
@@ -274,7 +276,7 @@
   </rule>
 
   <!-- Sicarii: destruct.bat persistence script -->
-  <rule id="101343" level="15">
+  <rule id="101343" level="16">
     <if_sid>550,553,554</if_sid>
     <field name="file" type="pcre2">(?i)destruct\.bat</field>
     <description>Iranian APT: Sicarii RaaS destruct.bat persistence script</description>
@@ -286,7 +288,7 @@
   </rule>
 
   <!-- Sicarii: collected_data.zip staging for exfil -->
-  <rule id="101344" level="15">
+  <rule id="101344" level="8">
     <if_sid>550,553,554</if_sid>
     <field name="file" type="pcre2">(?i)collected_data\.zip</field>
     <description>Iranian APT: Sicarii RaaS data staging for exfiltration</description>
@@ -300,7 +302,7 @@
   <!-- ========== WHITELOCK RANSOMWARE (101350-101354) ========== -->
 
   <!-- WhiteLock: .fbin encrypted file extension -->
-  <rule id="101350" level="15">
+  <rule id="101350" level="16">
     <if_sid>550,553,554</if_sid>
     <field name="file" type="pcre2">\.fbin$</field>
     <description>Iranian APT: Cotton Sandstorm WhiteLock ransomware encrypted file</description>
@@ -311,7 +313,7 @@
   </rule>
 
   <!-- WhiteLock: c0ntact.txt ransom note -->
-  <rule id="101351" level="15">
+  <rule id="101351" level="16">
     <if_sid>550,553,554</if_sid>
     <field name="file" type="pcre2">(?i)c0ntact\.txt</field>
     <description>Iranian APT: Cotton Sandstorm WhiteLock ransom note detected</description>
@@ -324,7 +326,7 @@
   <!-- ========== SLOPPYMIO / REDKITTEN (101360-101369) ========== -->
 
   <!-- SloppyMIO: DLL drop path AppVStreamingUX_Multi_User.dll -->
-  <rule id="101360" level="15">
+  <rule id="101360" level="13">
     <if_group>sysmon_event_11</if_group>
     <field name="win.eventdata.targetFilename" type="pcre2">(?i)WindowsMediaSync\\AppVStreamingUX_Multi_User\.dll</field>
     <description>Iranian APT: RedKitten SloppyMIO backdoor DLL dropped</description>
@@ -335,8 +337,9 @@
   </rule>
 
   <!-- SloppyMIO: Scheduled task MediaSyncTask[100-999] -->
-  <rule id="101361" level="14">
-    <if_sid>4698</if_sid>
+  <rule id="101361" level="8">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^4698$</field>
     <field name="win.eventdata.taskName" type="pcre2">^MediaSyncTask[1-9][0-9]{2}$</field>
     <description>Iranian APT: RedKitten SloppyMIO persistence scheduled task</description>
     <mitre>
@@ -346,8 +349,9 @@
   </rule>
 
   <!-- SloppyMIO: Alternate scheduled task name -->
-  <rule id="101362" level="14">
-    <if_sid>4698</if_sid>
+  <rule id="101362" level="8">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^4698$</field>
     <field name="win.eventdata.taskName" type="pcre2">(?i)Enterprise Workstation Health Monitoring</field>
     <description>Iranian APT: RedKitten SloppyMIO alternate persistence task</description>
     <mitre>
@@ -357,7 +361,7 @@
   </rule>
 
   <!-- SloppyMIO: GitHub Gist dead-drop resolver DNS -->
-  <rule id="101363" level="14">
+  <rule id="101363" level="15">
     <if_group>sysmon_event_22</if_group>
     <field name="win.eventdata.queryName" type="pcre2">(?i)gist\.githubusercontent\.com</field>
     <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)(chrome|firefox|edge|code|git)</field>
@@ -371,7 +375,7 @@
   <!-- ========== UNC1549 HOST INDICATORS (101370-101384) ========== -->
 
   <!-- UNC1549: DCSYNCER.SLICK output artifact LOG.txt -->
-  <rule id="101370" level="15">
+  <rule id="101370" level="11">
     <if_group>sysmon_event_11</if_group>
     <field name="win.eventdata.targetFilename" type="pcre2">(?i)(Users\\Public\\LOG\.txt|VMware VGAuth\\LOG\.txt)</field>
     <description>Iranian APT: UNC1549 DCSYNCER.SLICK output artifact detected</description>
@@ -393,7 +397,7 @@
   </rule>
 
   <!-- UNC1549: SIGHTGRAB screenshot output path -->
-  <rule id="101372" level="14">
+  <rule id="101372" level="13">
     <if_group>sysmon_event_11</if_group>
     <field name="win.eventdata.targetFilename" type="pcre2">(?i)Users\\Public\\(Videos|Music)\\\d{4}-\d{2}-\d{2}-\d{2}-\d{2}\\.*\.jpg</field>
     <description>Iranian APT: UNC1549 SIGHTGRAB screenshot capture detected</description>
@@ -404,11 +408,11 @@
   </rule>
 
   <!-- UNC1549: DLL sideloading via VMware VGAuth (LIGHTRAIL/CRASHPAD) -->
-  <rule id="101373" level="15">
-    <if_group>sysmon_event_7</if_group>
+  <rule id="101373" level="11">
+    <if_group>sysmon_event7</if_group>
     <field name="win.eventdata.image" type="pcre2">(?i)VGAuthCLI\.exe</field>
     <field name="win.eventdata.imageLoaded" type="pcre2">(?i)VGAuth\.dll</field>
-    <field name="win.eventdata.signed">false</field>
+    <field name="win.eventdata.signed" type="pcre2">false</field>
     <description>Iranian APT: UNC1549 DLL sideloading via VMware VGAuth</description>
     <mitre>
       <id>T1574.001</id>
@@ -417,11 +421,11 @@
   </rule>
 
   <!-- UNC1549: MINIBIKE Europe - DLL sideloading via Windows Defender -->
-  <rule id="101374" level="15">
-    <if_group>sysmon_event_7</if_group>
+  <rule id="101374" level="11">
+    <if_group>sysmon_event7</if_group>
     <field name="win.eventdata.image" type="pcre2">(?i)SenseSampleUploader\.exe</field>
     <field name="win.eventdata.imageLoaded" type="pcre2">(?i)userenv\.dll</field>
-    <field name="win.eventdata.signed">false</field>
+    <field name="win.eventdata.signed" type="pcre2">false</field>
     <description>Iranian APT: UNC1549 MINIBIKE DLL sideloading via Defender component</description>
     <mitre>
       <id>T1574.001</id>
@@ -430,8 +434,8 @@
   </rule>
 
   <!-- UNC1549: MINIBIKE persistence MigAutoPlay.exe -->
-  <rule id="101375" level="14">
-    <if_group>sysmon_event_1</if_group>
+  <rule id="101375" level="8">
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.image" type="pcre2">(?i)MigAutoPlay\\MigAutoPlay\.exe</field>
     <description>Iranian APT: UNC1549 MINIBIKE persistence executable</description>
     <mitre>
@@ -452,7 +456,7 @@
   </rule>
 
   <!-- UNC1549: Azure C2 subdomain pattern -->
-  <rule id="101377" level="14">
+  <rule id="101377" level="15">
     <if_group>sysmon_event_22</if_group>
     <field name="win.eventdata.queryName" type="pcre2">(?i)(connection-status|automationagency|skychain|airline.*control)[a-z0-9\-]*\.(azurewebsites\.net|cloudapp\.azure\.com)</field>
     <description>Iranian APT: UNC1549 Azure infrastructure C2 pattern</description>
@@ -465,7 +469,7 @@
   <!-- ========== APT42 TAMECAT (101385-101389) ========== -->
 
   <!-- APT42: TAMECAT PowerShell in-memory registry autorun -->
-  <rule id="101385" level="15">
+  <rule id="101385" level="13">
     <if_sid>91322</if_sid>
     <field name="win.eventdata.scriptBlockText" type="pcre2">(?i)(TAMECAT|SpeakSpecter|FromBase64String.*Start-Sleep.*Invoke-Expression)</field>
     <description>Iranian APT: APT42 TAMECAT fileless PowerShell backdoor execution</description>
@@ -477,8 +481,8 @@
   </rule>
 
   <!-- APT42: Discord webhook C2 from non-browser -->
-  <rule id="101386" level="14">
-    <if_group>sysmon_event_3</if_group>
+  <rule id="101386" level="13">
+    <if_group>sysmon_event3</if_group>
     <field name="win.eventdata.destinationHostname" type="pcre2">(?i)discord\.com</field>
     <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)(discord|chrome|firefox|edge|update)</field>
     <description>Iranian APT: APT42 TAMECAT Discord C2 from non-browser</description>
@@ -489,7 +493,7 @@
   </rule>
 
   <!-- APT42: Cloudflare Workers C2 from non-browser -->
-  <rule id="101387" level="14">
+  <rule id="101387" level="13">
     <if_group>sysmon_event_22</if_group>
     <field name="win.eventdata.queryName" type="pcre2">(?i)\.workers\.dev$</field>
     <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)(chrome|firefox|edge|wrangler|cloudflare)</field>
@@ -503,7 +507,7 @@
   <!-- ========== IOCONTROL EXPANDED (101390-101399) ========== -->
 
   <!-- IOCONTROL: FIM detection of persistence script S93InitSystemd.sh -->
-  <rule id="101390" level="15">
+  <rule id="101390" level="8">
     <if_sid>550,553,554</if_sid>
     <field name="file" type="pcre2">(?i)/etc/rc3\.d/S93InitSystemd</field>
     <description>Iranian APT: CyberAv3ngers IOCONTROL persistence script detected</description>
@@ -549,7 +553,7 @@
   <!-- ========== BQTLOCK / BAQIYAT HEZBOLLAH RAAS (101400-101404) ========== -->
 
   <!-- BQT.Lock: Baqiyat ransomware indicators -->
-  <rule id="101400" level="15">
+  <rule id="101400" level="16">
     <if_sid>550,553,554</if_sid>
     <field name="file" type="pcre2">(?i)(baqiyat|bqtlock)</field>
     <description>Iranian APT: Hezbollah BQT.Lock/Baqiyat ransomware artifact detected</description>
@@ -562,7 +566,7 @@
   <!-- ========== MUDDYWATER SERVICE NAME PERSISTENCE (101410-101414) ========== -->
 
   <!-- MuddyWater: MicrosoftVersionUpdater service (Operation Olalampo) -->
-  <rule id="101410" level="14">
+  <rule id="101410" level="8">
     <if_sid>60010</if_sid>
     <field name="win.eventdata.serviceName" type="pcre2">(?i)MicrosoftVersionUpdater</field>
     <description>Iranian APT: MuddyWater Olalampo MicrosoftVersionUpdater persistence</description>
@@ -586,7 +590,7 @@
   <!-- ========== CRAFTY CAMEL / SOSANO (101420-101424) ========== -->
 
   <!-- Sosano: Known C2 domain resolution -->
-  <rule id="101420" level="15">
+  <rule id="101420" level="8">
     <if_group>sysmon_event_22</if_group>
     <field name="win.eventdata.queryName" type="pcre2">(?i)(bokhoreshonline\.com|indicelectronics\.net)</field>
     <description>Iranian APT: Crafty Camel Sosano C2/staging domain resolution</description>
@@ -597,7 +601,7 @@
   </rule>
 
   <!-- Sosano: Polyglot file creation (PDF+HTA) -->
-  <rule id="101421" level="15">
+  <rule id="101421" level="13">
     <if_group>sysmon_event_11</if_group>
     <field name="win.eventdata.targetFilename" type="pcre2">(?i)\.pdf</field>
     <field name="win.eventdata.image" type="pcre2">(?i)mshta\.exe</field>
@@ -614,6 +618,7 @@
   <!-- Multi-group: Handala techniques combined (uses shared group tag) -->
   <rule id="101440" level="16" frequency="2" timeframe="3600">
     <if_matched_group>handala</if_matched_group>
+    <same_location />
     <description>Iranian APT: Handala/Void Manticore multi-technique wiper campaign detected</description>
     <mitre>
       <id>T1485</id>
@@ -624,6 +629,7 @@
   <!-- Multi-group: UNC1549 toolset correlation -->
   <rule id="101441" level="16" frequency="2" timeframe="7200">
     <if_matched_group>unc1549</if_matched_group>
+    <same_location />
     <description>Iranian APT: UNC1549 multi-tool compromise detected - aerospace/defense targeting</description>
     <mitre>
       <id>T1574.001</id>
@@ -634,6 +640,7 @@
   <!-- Multi-group: Cotton Sandstorm WezRat + WhiteLock chain -->
   <rule id="101442" level="16" frequency="2" timeframe="7200">
     <if_matched_group>cotton_sandstorm</if_matched_group>
+    <same_location />
     <description>Iranian APT: Cotton Sandstorm WezRat-to-WhiteLock attack chain detected</description>
     <mitre>
       <id>T1486</id>
@@ -642,8 +649,9 @@
   </rule>
 
   <!-- Cross-group: Iranian APT multi-actor campaign (any 3 groups in 4 hours) -->
-  <rule id="101450" level="17" frequency="3" timeframe="14400">
+  <rule id="101450" level="14" frequency="3" timeframe="14400">
     <if_matched_group>iranian_apt</if_matched_group>
+    <same_location />
     <description>Iranian APT: Multi-actor campaign detected - coordinated nation-state operation</description>
     <mitre>
       <id>T1204</id>
@@ -666,7 +674,7 @@
   </rule>
 
   <!-- WINTAPIX: SafeBoot persistence registry key -->
-  <rule id="101456" level="15">
+  <rule id="101456" level="13">
     <if_group>sysmon_event_13</if_group>
     <field name="win.eventdata.targetObject" type="pcre2">(?i)SafeBoot\\(Minimal|Network)\\WinTapix</field>
     <description>Iranian APT: UNC1860 WINTAPIX SafeBoot persistence detected</description>
@@ -679,8 +687,9 @@
   <!-- ========== FORTIOS PERSISTENCE INDICATORS (101460-101469) ========== -->
 
   <!-- FortiOS: MuddyWater persistence account names -->
-  <rule id="101460" level="15">
-    <if_sid>4720</if_sid>
+  <rule id="101460" level="13">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^4720$</field>
     <field name="win.eventdata.targetUserName" type="pcre2">(?i)^(FortiWiFi|darlen|offices|WADGUtilityAccount)$</field>
     <description>Iranian APT: MuddyWater FortiOS persistence account created</description>
     <mitre>
@@ -690,8 +699,8 @@
   </rule>
 
   <!-- FortiOS: VPN group manipulation ssl-vpn-groupamoss -->
-  <rule id="101461" level="15">
-    <if_group>sysmon_event_1</if_group>
+  <rule id="101461" level="13">
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)ssl-vpn-groupamoss|VPN-Users</field>
     <description>Iranian APT: MuddyWater FortiOS VPN group manipulation detected</description>
     <mitre>
@@ -703,8 +712,9 @@
   <!-- ========== MUDDYWATER SCHEDULED TASKS (101470-101474) ========== -->
 
   <!-- MuddyWater: Known scheduled task names from multiple campaigns -->
-  <rule id="101470" level="14">
-    <if_sid>4698</if_sid>
+  <rule id="101470" level="15">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^4698$</field>
     <field name="win.eventdata.taskName" type="pcre2">(?i)(SynchronizeTimeZone|GoogleChangeManagement|MicrosoftOutLookUpdater|MicrosoftOutLookUpdateSchedule|ForceNetbirdRestart)</field>
     <description>Iranian APT: MuddyWater known persistence scheduled task - $(win.eventdata.taskName)</description>
     <mitre>
@@ -714,8 +724,8 @@
   </rule>
 
   <!-- MuddyWater: Phoenix v4 DLL sideload via jabswitch.exe -->
-  <rule id="101471" level="15">
-    <if_group>sysmon_event_7</if_group>
+  <rule id="101471" level="11">
+    <if_group>sysmon_event7</if_group>
     <field name="win.eventdata.image" type="pcre2">(?i)jabswitch\.exe</field>
     <field name="win.eventdata.imageLoaded" type="pcre2">(?i)vcruntime140\.dll</field>
     <description>Iranian APT: MuddyWater Phoenix v4 DLL sideload via jabswitch.exe</description>
@@ -726,8 +736,8 @@
   </rule>
 
   <!-- MuddyWater: Phoenix v4 persistence path sysprocupdate.exe -->
-  <rule id="101472" level="14">
-    <if_group>sysmon_event_1</if_group>
+  <rule id="101472" level="8">
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.image" type="pcre2">(?i)ProgramData\\sysprocupdate\.exe</field>
     <description>Iranian APT: MuddyWater Phoenix v4 execution from persistence path</description>
     <mitre>
@@ -739,11 +749,11 @@
   <!-- ========== APT34 STEALHOOK (101475-101479) ========== -->
 
   <!-- APT34: STEALHOOK password filter DLL in LSASS -->
-  <rule id="101475" level="15">
-    <if_group>sysmon_event_7</if_group>
+  <rule id="101475" level="11">
+    <if_group>sysmon_event7</if_group>
     <field name="win.eventdata.image" type="pcre2">(?i)lsass\.exe</field>
     <field name="win.eventdata.imageLoaded" negate="yes" type="pcre2">(?i)(system32|syswow64|program files)</field>
-    <field name="win.eventdata.signed">false</field>
+    <field name="win.eventdata.signed" type="pcre2">false</field>
     <description>Iranian APT: APT34 STEALHOOK unsigned DLL loaded into LSASS</description>
     <mitre>
       <id>T1556.002</id>
@@ -779,7 +789,7 @@
   <!-- ========== PAY2KEY v3 RANSOMWARE (101480-101499) ========== -->
 
   <!-- Pay2Key v3: BitLocker suspension (pre-encryption) -->
-  <rule id="101480" level="15">
+  <rule id="101480" level="16">
     <if_sid>91322</if_sid>
     <field name="win.eventdata.scriptBlockText" type="pcre2">(?i)Get-BitLockerVolume.*Suspend-BitLocker</field>
     <description>HEALTHCARE Iranian APT: Pay2Key v3 BitLocker suspension pre-encryption</description>
@@ -791,7 +801,7 @@
   </rule>
 
   <!-- Pay2Key v3: Hyper-V VM termination (pre-encryption) -->
-  <rule id="101481" level="15">
+  <rule id="101481" level="16">
     <if_sid>91322</if_sid>
     <field name="win.eventdata.scriptBlockText" type="pcre2">(?i)Get-VM.*Stop-VM</field>
     <description>HEALTHCARE Iranian APT: Pay2Key v3 Hyper-V VM termination pre-encryption</description>
@@ -802,8 +812,8 @@
   </rule>
 
   <!-- Pay2Key v3: System state backup deletion -->
-  <rule id="101482" level="15">
-    <if_group>sysmon_event_1</if_group>
+  <rule id="101482" level="16">
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)wbadmin.*DELETE.*SYSTEMSTATEBACKUP</field>
     <description>HEALTHCARE Iranian APT: Pay2Key v3 system state backup deletion</description>
     <mitre>
@@ -814,7 +824,7 @@
 
   <!-- Pay2Key v3: Triple event log wipe (security + system + application) -->
   <rule id="101483" level="15">
-    <if_group>sysmon_event_1</if_group>
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)wevtutil.*cl.*(security|system|application)</field>
     <description>HEALTHCARE Iranian APT: Pay2Key v3 event log wipe - $(win.eventdata.commandLine)</description>
     <mitre>
@@ -825,7 +835,7 @@
 
   <!-- Pay2Key v3: Fake Avast AV registration (Windows Security Center bypass) -->
   <rule id="101484" level="15">
-    <if_group>sysmon_event_1</if_group>
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.image" type="pcre2">(?i)wsc_proxy\.exe</field>
     <description>HEALTHCARE Iranian APT: Pay2Key v3 fake Avast Windows Security Center bypass</description>
     <mitre>
@@ -835,7 +845,7 @@
   </rule>
 
   <!-- Pay2Key v3: Ransom note HowToRestoreFiles.txt creation -->
-  <rule id="101485" level="15">
+  <rule id="101485" level="16">
     <if_sid>550,553,554</if_sid>
     <field name="file" type="pcre2">(?i)HowToRestoreFiles\.txt</field>
     <description>HEALTHCARE Iranian APT: Pay2Key v3 ransom note detected</description>
@@ -846,7 +856,7 @@
   </rule>
 
   <!-- Pay2Key v3: Encrypted file extension .6zldh_p2k -->
-  <rule id="101486" level="15">
+  <rule id="101486" level="16">
     <if_sid>550,553,554</if_sid>
     <field name="file" type="pcre2">\.6zldh_p2k$</field>
     <description>HEALTHCARE Iranian APT: Pay2Key v3 encrypted file extension detected</description>
@@ -858,7 +868,7 @@
 
   <!-- Pay2Key v3: NoDefender tool execution (powrprof.exe) -->
   <rule id="101487" level="15">
-    <if_group>sysmon_event_1</if_group>
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.originalFileName" type="pcre2">(?i)powrprof</field>
     <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)system32</field>
     <description>HEALTHCARE Iranian APT: Pay2Key v3 NoDefender tool execution</description>
@@ -869,8 +879,8 @@
   </rule>
 
   <!-- Pay2Key v3: Hibernation disabled (pre-encryption) -->
-  <rule id="101488" level="14">
-    <if_group>sysmon_event_1</if_group>
+  <rule id="101488" level="16">
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)powercfg.*-H\s+off</field>
     <description>HEALTHCARE Iranian APT: Pay2Key v3 hibernation disabled pre-encryption</description>
     <mitre>
@@ -882,7 +892,7 @@
   <!-- ========== MUDDYWATER HEALTHCARE CAMPAIGN (101500-101509) ========== -->
 
   <!-- TWINTASK: Persistence polling file C:\ProgramData\PolGuid\in.txt -->
-  <rule id="101500" level="15">
+  <rule id="101500" level="8">
     <if_sid>550,553,554</if_sid>
     <field name="file" type="pcre2">(?i)ProgramData\\PolGuid\\in\.txt</field>
     <description>HEALTHCARE Iranian APT: MuddyWater TWINTASK persistence file detected</description>
@@ -893,10 +903,10 @@
   </rule>
 
   <!-- MuddyWater: Malicious libvlc.dll DLL sideload -->
-  <rule id="101501" level="15">
-    <if_group>sysmon_event_7</if_group>
+  <rule id="101501" level="11">
+    <if_group>sysmon_event7</if_group>
     <field name="win.eventdata.imageLoaded" type="pcre2">(?i)libvlc\.dll</field>
-    <field name="win.eventdata.signed">false</field>
+    <field name="win.eventdata.signed" type="pcre2">false</field>
     <description>HEALTHCARE Iranian APT: MuddyWater TWINTASK malicious libvlc.dll sideload</description>
     <mitre>
       <id>T1574.002</id>
@@ -905,10 +915,10 @@
   </rule>
 
   <!-- MuddyWater: goopdate.dll DLL sideload (PowGoop) -->
-  <rule id="101502" level="15">
-    <if_group>sysmon_event_7</if_group>
+  <rule id="101502" level="11">
+    <if_group>sysmon_event7</if_group>
     <field name="win.eventdata.imageLoaded" type="pcre2">(?i)goopdate\.dll</field>
-    <field name="win.eventdata.signed">false</field>
+    <field name="win.eventdata.signed" type="pcre2">false</field>
     <description>HEALTHCARE Iranian APT: MuddyWater PowGoop goopdate.dll sideload</description>
     <mitre>
       <id>T1574.002</id>
@@ -918,7 +928,7 @@
 
   <!-- MuddyWater: FMAPP.exe known malware filename -->
   <rule id="101503" level="14">
-    <if_group>sysmon_event_1</if_group>
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.image" type="pcre2">(?i)FMAPP\.exe</field>
     <description>HEALTHCARE Iranian APT: MuddyWater FMAPP.exe malware execution</description>
     <mitre>
@@ -928,7 +938,7 @@
   </rule>
 
   <!-- MuddyWater: Healthcare C2 domain resolution -->
-  <rule id="101504" level="15">
+  <rule id="101504" level="14">
     <if_group>sysmon_event_22</if_group>
     <field name="win.eventdata.queryName" type="pcre2">(?i)(uppdatefile\.com|serialmenot\.com|moonzonet\.com|meetingapp\.site|lecturegenieltd\.pro|girlsbags\.shop|web14\.info)</field>
     <description>HEALTHCARE Iranian APT: MuddyWater healthcare campaign C2 domain</description>
@@ -943,6 +953,7 @@
   <!-- Pay2Key v3: Multi-technique pre-encryption chain -->
   <rule id="101510" level="16" frequency="2" timeframe="1800">
     <if_matched_group>pay2key</if_matched_group>
+    <same_location />
     <description>HEALTHCARE Iranian APT: Pay2Key v3 ransomware attack chain detected - IMMEDIATE ACTION REQUIRED</description>
     <mitre>
       <id>T1486</id>
@@ -954,7 +965,7 @@
   <!-- Ref: Zscaler ThreatLabz March 2026, Trellix Iranian Cyber Capability 2026 -->
 
   <!-- Dust Specter: TwinTask file-based C2 polling via ProgramData\PolGuid -->
-  <rule id="101511" level="14">
+  <rule id="101511" level="13">
     <if_group>sysmon_event_11</if_group>
     <field name="win.eventdata.targetFilename" type="pcre2">(?i)C:\\ProgramData\\PolGuid\\(in|out)\.txt</field>
     <description>Iranian APT: Dust Specter TwinTask file-based C2 polling artifact</description>
@@ -965,10 +976,10 @@
   </rule>
 
   <!-- Dust Specter: SPLITDROP DLL sideloading — unsigned libvlc.dll (TwinTask) -->
-  <rule id="101512" level="15">
-    <if_group>sysmon_event_7</if_group>
+  <rule id="101512" level="11">
+    <if_group>sysmon_event7</if_group>
     <field name="win.eventdata.imageLoaded" type="pcre2">(?i)libvlc\.dll</field>
-    <field name="win.eventdata.signed">false</field>
+    <field name="win.eventdata.signed" type="pcre2">false</field>
     <description>Iranian APT: Dust Specter SPLITDROP DLL sideloading (TwinTask via libvlc.dll)</description>
     <mitre>
       <id>T1574.002</id>
@@ -977,10 +988,10 @@
   </rule>
 
   <!-- Dust Specter: TwinTalk C2 orchestrator — unsigned hostfxr.dll -->
-  <rule id="101513" level="15">
-    <if_group>sysmon_event_7</if_group>
+  <rule id="101513" level="13">
+    <if_group>sysmon_event7</if_group>
     <field name="win.eventdata.imageLoaded" type="pcre2">(?i)hostfxr\.dll</field>
-    <field name="win.eventdata.signed">false</field>
+    <field name="win.eventdata.signed" type="pcre2">false</field>
     <description>Iranian APT: Dust Specter TwinTalk C2 orchestrator DLL sideloading (hostfxr.dll)</description>
     <mitre>
       <id>T1574.002</id>
@@ -989,7 +1000,7 @@
   </rule>
 
   <!-- Dust Specter: Registry persistence via VLC/WingetUI Run key -->
-  <rule id="101514" level="14">
+  <rule id="101514" level="11">
     <if_group>sysmon_event_13</if_group>
     <field name="win.eventdata.targetObject" type="pcre2">(?i)\\CurrentVersion\\Run\\(VLC|WingetUI)</field>
     <description>Iranian APT: Dust Specter registry persistence via VLC/WingetUI Run key</description>
@@ -1000,7 +1011,7 @@
   </rule>
 
   <!-- Dust Specter: C2 domain resolution (extended list) -->
-  <rule id="101515" level="14">
+  <rule id="101515" level="15">
     <if_group>sysmon_event_22</if_group>
     <field name="win.eventdata.queryName" type="pcre2">(?i)(afterworld\.store|onlinepettools\.shop|web27\.info)</field>
     <description>Iranian APT: Dust Specter C2 domain resolution</description>
@@ -1017,8 +1028,8 @@
        Active against US Water, Energy, Government since March 2026. -->
 
   <!-- CyberAv3ngers: Dropbear SSH process on OT/ICS host -->
-  <rule id="101516" level="15">
-    <if_group>sysmon_event_1</if_group>
+  <rule id="101516" level="13">
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.image" type="pcre2">(?i)dropbear</field>
     <description>Iranian APT: CyberAv3ngers Dropbear SSH detected on host (CISA AA26-097A PLC persistence)</description>
     <mitre>
@@ -1028,8 +1039,8 @@
   </rule>
 
   <!-- CyberAv3ngers: Studio 5000 / RSLogix connection to PLC from unexpected host -->
-  <rule id="101517" level="14">
-    <if_group>sysmon_event_3</if_group>
+  <rule id="101517" level="13">
+    <if_group>sysmon_event3</if_group>
     <field name="win.eventdata.destinationPort" type="pcre2">^44818$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)(Studio 5000|RSLogix|Logix Designer)</field>
     <description>Iranian APT: CyberAv3ngers Studio 5000 connection to PLC port 44818 (CVE-2021-22681)</description>
@@ -1040,7 +1051,7 @@
   </rule>
 
   <!-- CyberAv3ngers: ACD project file access on disk -->
-  <rule id="101518" level="14">
+  <rule id="101518" level="13">
     <if_group>sysmon_event_11</if_group>
     <field name="win.eventdata.targetFilename" type="pcre2">(?i)\.acd$</field>
     <description>Iranian APT: CyberAv3ngers Rockwell ACD project file created or modified (PLC logic theft/manipulation)</description>
@@ -1052,7 +1063,7 @@
 
   <!-- CyberAv3ngers: Network connection to EtherNet/IP port from non-engineering workstation -->
   <rule id="101519" level="12">
-    <if_group>sysmon_event_3</if_group>
+    <if_group>sysmon_event3</if_group>
     <field name="win.eventdata.destinationPort" type="pcre2">^44818$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)(cmd|powershell|python|curl|wget|nmap)</field>
     <description>Iranian APT: CyberAv3ngers suspicious process connecting to EtherNet/IP port 44818</description>
@@ -1064,7 +1075,7 @@
 
   <!-- CyberAv3ngers: Outbound SSH to OT port range (persistence indicator) -->
   <rule id="101520" level="13">
-    <if_group>sysmon_event_3</if_group>
+    <if_group>sysmon_event3</if_group>
     <field name="win.eventdata.destinationPort" type="pcre2">^(44818|2222|20256)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)(ssh|putty|plink)</field>
     <description>Iranian APT: CyberAv3ngers SSH connection to OT port (PLC backdoor access)</description>
@@ -1075,7 +1086,7 @@
   </rule>
 
   <!-- CyberAv3ngers: Linux Dropbear SSH service on embedded device -->
-  <rule id="101521" level="15">
+  <rule id="101521" level="13">
     <if_sid>5700</if_sid>
     <match type="pcre2">(?i)dropbear</match>
     <description>Iranian APT: CyberAv3ngers Dropbear SSH service detected in syslog (embedded/PLC device compromise)</description>
@@ -1093,8 +1104,8 @@
        shells or curl/wget — the post-RCE signature on the Langflow host. -->
 
   <!-- Langflow uvicorn/python parent spawning shell or download tool — RCE indicator -->
-  <rule id="101522" level="15">
-    <if_group>sysmon_event_1,audit_command</if_group>
+  <rule id="101522" level="13">
+    <if_group>sysmon_event1|audit_command</if_group>
     <field name="win.eventdata.parentImage" type="pcre2">(?i)(python|uvicorn|langflow)</field>
     <field name="win.eventdata.image" type="pcre2">(?i)(\\cmd\.exe|\\powershell\.exe|\\bash|\\sh|\\wget|\\curl)</field>
     <description>Iranian APT: CVE-2025-34291 Langflow validate/code RCE — Python/uvicorn parent spawning shell or download tool</description>

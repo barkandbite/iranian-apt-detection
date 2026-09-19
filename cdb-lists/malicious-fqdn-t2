@@ -1,0 +1,10 @@
+# GENERATED FILE -- do not edit by hand.
+# Regenerate:  python3 tools/extract-iocs.py
+# Source:      suricata/*.rules
+datadrift.somee.com:iranian_apt_c2_shared_host
+f13.ddnsking.com:iranian_apt_c2_shared_host
+line.completely.workers.dev:iranian_apt_c2_shared_host
+nomercys.it.com:iranian_apt_c2_shared_host
+prism-west-candy.glitch.me:iranian_apt_c2_shared_host
+t13.ddnsking.com:iranian_apt_c2_shared_host
+whatsapp-meeting.duckdns.org:iranian_apt_c2_shared_host
