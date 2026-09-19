@@ -59,7 +59,7 @@ That is it. Suricata will now alert on Iranian APT traffic patterns.
 
 ### I use Wazuh (SIEM)
 
-You need the XML files from the `wazuh-rules/` folder. There are 10 rule files, organized by category so you can deploy all of them or only the ones relevant to your environment:
+You need the XML files from the `wazuh-rules/` folder. There are 16 rule files, organized by category so you can deploy all of them or only the ones relevant to your environment:
 
 | File | What It Detects |
 |------|----------------|
@@ -72,7 +72,13 @@ You need the XML files from the `wazuh-rules/` folder. There are 10 rule files, 
 | `0916-iranian-apt-cloud-container.xml` | Cloud and container attacks: Azure, Kubernetes |
 | `0917-iranian-apt-june2025-updates.xml` | June 2025 campaign coverage |
 | `0918-iranian-apt-march2026-updates.xml` | March 2026 campaign coverage |
-| `0919-iranian-apt-march2026-expansion.xml` | Latest threat families and attack chains |
+| `0919-iranian-apt-march2026-expansion.xml` | March 2026 threat families and attack chains |
+| `0920-iranian-apt-june2026-host-indicators.xml` | June 2026 host indicators (Dindoor/Fakeset, Rclone) |
+| `0921-iranian-apt-july2026-host-indicators.xml` | July 2026 host indicators (Cavern Manticore) |
+| `0922-iranian-apt-august2026-ics-indicators.xml` | ICS host indicators (Schneider, Siemens S7) |
+| `0923-iranian-apt-august2026-host-indicators.xml` | Olalampo host footprint (CHAR, GhostFetch) |
+| `0924-iranian-apt-august2026-rustywater.xml` | RustyWater agent, service persistence |
+| `0925-ioc-list-matching.xml` | CDB list IOC matching (requires `cdb-lists/`) |
 
 ```bash
 # Copy all rule files (recommended)
@@ -127,7 +133,7 @@ iranian-apt-detection/
 |   `-- README.md                       Suricata-specific docs
 |
 |-- wazuh-rules/                    <-- WAZUH USERS: start here
-|   |-- 0910 through 0924 .xml files   294 SIEM detection rules
+|   |-- 0910 through 0925 .xml files   301 SIEM detection rules
 |   `-- README.md                       Wazuh-specific docs
 |
 |-- configurations/                 <-- OPTIONAL: endpoint configs
@@ -136,11 +142,12 @@ iranian-apt-detection/
 |   `-- iranian-apt-active-response.xml.example  Active response config (edit first)
 |
 |-- tests/                          <-- FOR DEVELOPERS: test suite
-|   |-- test_suricata_rules.py          Automated tests for all 354 rules
+|   |-- test_suricata_rules.py          Automated tests for the Suricata ruleset
 |   |-- conftest.py                     Test infrastructure
 |   `-- requirements.txt                Test dependencies
 |
-|-- tools/                          <-- Deployment and testing scripts
+|-- cdb-lists/                      <-- IOC lists (tiered: see its README)
+|-- tools/                          <-- Deployment, linting, IOC extraction
 |-- documentation/                  <-- Threat intelligence and guides
 |-- archive/                        <-- Historical rule versions
 `-- CHANGELOG.md, LICENSE, etc.
