@@ -19,6 +19,8 @@ iranian-apt-detection/
 │   ├── 0922-iranian-apt-august2026-ics-indicators.xml # August 2026 ICS host indicators (CyberAv3ngers)
 │   ├── 0923-iranian-apt-august2026-host-indicators.xml # August 2026 host indicators (Olalampo)
 │   ├── 0924-iranian-apt-august2026-rustywater.xml    # August 2026 RustyWater host indicators
+│   ├── 0925-iranian-apt-september2026-noderabbit.xml # Sept 2026 NodeRabbit/PollCat npm campaign host indicators
+│   ├── 0926-iranian-apt-september2026-unc1549.xml    # Sept 2026 UNC1549 SSH-tunneler host indicators
 │   └── README.md                                     # Wazuh rules documentation
 │
 ├── configurations/
@@ -28,7 +30,7 @@ iranian-apt-detection/
 │   └── README.md                                     # Configuration guide
 │
 ├── suricata/
-│   ├── iranian-apt-detection.rules                  # Consolidated Suricata IDS signatures (v4.0.24, 449 rules)
+│   ├── iranian-apt-detection.rules                  # Consolidated Suricata IDS signatures (v4.0.26, 460 rules)
 │   └── README.md                                     # Suricata deployment guide
 │
 ├── documentation/

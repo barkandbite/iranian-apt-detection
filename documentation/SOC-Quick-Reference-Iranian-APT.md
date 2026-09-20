@@ -36,7 +36,25 @@ girlsbags[.]shop
 onlinepettools[.]shop
 web14[.]info
 web27[.]info
+
+# UNC1549 / Nimbus Manticore SSH-tunnel C2 (Group-IB, Aug 2026)
+172.86.98[.]113   # reverse SSH tunnel over TCP/443
 ```
+
+### Mirage Kitten NodeRabbit/PollCat + Nimbus Manticore (September 2026) — Key Indicators
+- **Staging**: `oracle-challenge.s3.amazonaws[.]com` bucket; lure archives
+  `Front-Technical-Challenge.zip`, `FrontEnd-Task.zip`, `RankChallenge-react` project
+- **Delivery**: trojanized npm packages `colorized_terminal`, `pretty-log@2.1.0`
+  (postinstall lifecycle script launches implant); job/recruitment lures (Dream Job variant)
+- **Host artifact**: implant at `node_modules/.cache/.<8-hex>/index.js` run as background node process
+- **Persistence (variant 3)**: VS Code extension dir writes, malicious Git hooks (post-checkout/post-merge);
+  Windows service whose ImagePath points to a masqueraded `wtsapi32.dll`
+- **C2**: AES-256-GCM to `*.azurewebsites.net` (subdomains embed target org names), Cloudflare-fronted
+  domains via NameCheap; PollCat treats HTTP 400 as successful registration — repeated 400s from an
+  Azure App Service host at ~2-min cadence is the network tell
+- **SSH tunneler**: reverse SSH to `172.86.98[.]113:443`, masquerades as `wtsapi32.dll`
+  (Windows Terminal Server SDK DLL) loaded from a non-System32 path
+- **Suricata**: SID 2000576-2000583 | **Wazuh**: 101545-101549, 101557-101560
 
 ### Dust Specter (April 2026) — Key Indicators
 - **TwinTalk C2**: HTTPS GET with `Authorization: Bearer eyJ...` to randomized hex URI paths

@@ -1,7 +1,7 @@
- # Bark & Bite — Iranian APT Detection Rules (Consolidated)
+# Bark & Bite — Iranian APT Detection Rules (Consolidated)
 # File: iranian-apt-detection.rules
-# Version: 4.0.24
-# Last Updated: 2026-08-14
+# Version: 4.0.26
+# Last Updated: 2026-09-20
 # Credit: Bark & Bite Security
 # License: MIT
 # Repository: https://github.com/barkandbite/iranian-apt-detection
@@ -14,7 +14,7 @@
 # UNC1860, UNC1549, Handala/Void Manticore, APT42/RedKitten, Infy, and emerging groups.
 # Optimized for extremely high accuracy with minimal false positives.
 #
-# Total signatures: 449 rules (SID 1000039-2000572)
+# Total signatures: 452 rules (SID 1000039-2000575)
 # SID Allocation:
 #   1000039-2000030: Core CVE + behavioral detection (v3.1 legacy range)
 #   2000031-2000193: Extended behavioral + C2 patterns
@@ -28,6 +28,7 @@
 #                     MuddyWater Teams false flag, CyberAv3ngers Rockwell)
 #   2000562-2000572: v4.0.24 August 2026 backlog consolidation (Cavern HollowGraph,
 #                     CyberAv3ngers Schneider/Siemens ICS, MuddyWater Olalampo)
+#   2000573-2000575: v4.0.25 MuddyWater RustyWater behavioral (beacon/task/upload)
 #
 # Requires: Suricata 7.0+
 # Recommended: Enable xbits for cross-flow correlation rules
@@ -2292,3 +2293,13 @@ alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Mudd
 alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater RustyWater X-Rw-Id Task Poll 2026"; flow:to_server,established; http.method; content:"GET"; http.uri; content:"/rw/task"; fast_pattern; nocase; http.header_names; content:"X-Rw-Id"; nocase; threshold:type limit, track by_src, count 1, seconds 600; reference:url,rescana.com/post/rustywater-iranian-muddywater-apt; reference:url,attack.mitre.org/techniques/T1071/001/; classtype:command-and-control; sid:2000574; rev:1; metadata:policy max-detect-ips drop, created_at 2026_08_20, updated_at 2026_08_20;)
 
 alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater RustyWater Gzipped Exfil /rw/upload 2026"; flow:to_server,established; http.method; content:"POST"; http.uri; content:"/rw/upload"; fast_pattern; nocase; http.header; content:"Content-Encoding: gzip"; nocase; http.user_agent; content:"reqwest/"; nocase; threshold:type limit, track by_src, count 1, seconds 900; reference:url,rescana.com/post/rustywater-iranian-muddywater-apt; reference:url,attack.mitre.org/techniques/T1041/; classtype:trojan-activity; sid:2000575; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_08_20, updated_at 2026_08_20;)
+
+# --- September 2026: UNC1549/Nimbus Manticore (Mirage Kitten) — NodeRabbit npm campaign, PollCat Azure C2, reverse-SSH tunneler (SID 2000576-2000583) ---
+alert tls $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT UNC1549 NodeRabbit Staging Bucket oracle-challenge S3 TLS SNI 2026"; flow:established,to_server; tls.sni; content:"oracle-challenge.s3"; fast_pattern; reference:url,securelist.com/mirage-kitten-noderabbit-pollcat/; reference:url,attack.mitre.org/techniques/T1566/003/; classtype:trojan-activity; sid:2000576; rev:1; metadata:policy max-detect-ips drop, created_at 2026_09_18, updated_at 2026_09_20;)
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT UNC1549 NodeRabbit Staging Bucket oracle-challenge S3 HTTP 2026"; flow:established,to_server; http.host; content:"s3.amazonaws.com"; http.uri; content:"/oracle-challenge/"; fast_pattern; reference:url,securelist.com/mirage-kitten-noderabbit-pollcat/; reference:url,attack.mitre.org/techniques/T1566/003/; classtype:trojan-activity; sid:2000577; rev:1; metadata:policy max-detect-ips drop, created_at 2026_09_18, updated_at 2026_09_20;)
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT UNC1549 Fake Job Technical Challenge Lure Archive Download 2026"; flow:established,to_server; http.method; content:"GET"; http.uri; pcre:"/(?:Front-?Technical-?Challenge|FrontEnd-?Task|RankChallenge-react)[^\/]*\.zip/i"; threshold:type limit, track by_src, count 1, seconds 3600; reference:url,securelist.com/mirage-kitten-noderabbit-pollcat/; reference:url,attack.mitre.org/techniques/T1204/002/; classtype:trojan-activity; sid:2000578; rev:1; metadata:policy max-detect-ips drop, created_at 2026_09_18, updated_at 2026_09_20;)
+alert tcp $HOME_NET any -> 172.86.98.113 443 (msg:"Bark&Bite - Iranian APT Nimbus Manticore SSH Tunneler C2 172.86.98.113 Port 443 2026"; flow:established,to_server; content:"SSH-"; depth:4; reference:url,thehackernews.com/2026/08/nimbus-manticore-expands-toolset-with.html; reference:url,attack.mitre.org/techniques/T1572/; classtype:command-and-control; sid:2000579; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_09_18, updated_at 2026_09_20;)
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT UNC1549 PollCat Azure App Service Flow Marker 2026"; flow:established,to_server; http.host; content:".azurewebsites.net"; endswith; flowbits:set,iranian.pollcat.azhost; flowbits:noalert; reference:url,securelist.com/mirage-kitten-noderabbit-pollcat/; classtype:misc-activity; sid:2000580; rev:1; metadata:policy max-detect-ips drop, created_at 2026_09_18, updated_at 2026_09_20;)
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT UNC1549 PollCat Azure C2 Repeated HTTP 400 Check-In Pattern 2026"; flow:established,to_client; flowbits:isset,iranian.pollcat.azhost; http.stat_code; content:"400"; threshold:type both, track by_dst, count 5, seconds 900; reference:url,securelist.com/mirage-kitten-noderabbit-pollcat/; reference:url,attack.mitre.org/techniques/T1071/001/; classtype:command-and-control; sid:2000581; rev:1; metadata:policy max-detect-ips drop, created_at 2026_09_18, updated_at 2026_09_20;)
+alert ip $HOME_NET any -> 172.86.98.113 any (msg:"Bark&Bite - Iranian APT UNC1549 Nimbus Manticore SSH Tunnel C2 IP Outbound 2026"; threshold:type limit, track by_src, count 1, seconds 600; reference:url,thehackernews.com/2026/08/nimbus-manticore-expands-toolset-with.html; reference:url,attack.mitre.org/techniques/T1572/; classtype:command-and-control; sid:2000582; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_09_17, updated_at 2026_09_20;)
+alert ip 172.86.98.113 any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT UNC1549 Nimbus Manticore SSH Tunnel C2 IP Inbound 2026"; threshold:type limit, track by_dst, count 1, seconds 600; reference:url,thehackernews.com/2026/08/nimbus-manticore-expands-toolset-with.html; reference:url,attack.mitre.org/techniques/T1572/; classtype:command-and-control; sid:2000583; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_09_17, updated_at 2026_09_20;)
