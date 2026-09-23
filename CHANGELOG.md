@@ -5,7 +5,19 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [4.0.26] - 2026-09-20
+## [4.0.26] - 2026-09-23
+
+### Changed — 2026-09-23 consolidation refinements
+
+- Wazuh parity files renamed to keep the `0925-` prefix clear for PR #54's
+  planned `0925-ioc-list-matching.xml` (rule IDs 101550–101556):
+  `0925-…noderabbit.xml` → `0926-…noderabbit.xml`,
+  `0926-…unc1549.xml` → `0927-…unc1549.xml`. Rule IDs unchanged (they were
+  already allocated around #54's block).
+- Fixed the stale ruleset header (claimed 452 rules / SID max 2000575;
+  actual 460 / 2000583). Same fix applied to the private repo's synced
+  `bb-iran-suricata.rules`, whose header had also drifted (4.0.24 / broken
+  count line).
 
 ### Added — UNC1549 / Mirage Kitten / Nimbus Manticore September 2026 campaigns (SID 2000576–2000583)
 
@@ -30,11 +42,11 @@ UNC1549 fake-job npm supply-chain campaign:**
 
 ### Added — Wazuh host-side parity (101545–101549, 101557–101560)
 
-- `wazuh-rules/0925-iranian-apt-september2026-noderabbit.xml` (101545–101549):
+- `wazuh-rules/0926-iranian-apt-september2026-noderabbit.xml` (101545–101549):
   NodeRabbit implant under `node_modules/.cache/.<hex8>/`, Node.js launch from
   hidden cache, malicious Git hooks, npm postinstall execution chain,
   RankChallenge-react lure artifact.
-- `wazuh-rules/0926-iranian-apt-september2026-unc1549.xml` (101557–101560):
+- `wazuh-rules/0927-iranian-apt-september2026-unc1549.xml` (101557–101560):
   `wtsapi32.dll` masquerade written outside System32, reverse-SSH tunneler
   invocation, C2 IP on process command line, service ImagePath persistence.
   Renumbered from the draft's 101545–101548; 101550–101556 left unallocated

@@ -1,7 +1,7 @@
 # Bark & Bite — Iranian APT Detection Rules (Consolidated)
 # File: iranian-apt-detection.rules
 # Version: 4.0.26
-# Last Updated: 2026-09-20
+# Last Updated: 2026-09-23
 # Credit: Bark & Bite Security
 # License: MIT
 # Repository: https://github.com/barkandbite/iranian-apt-detection
@@ -14,7 +14,7 @@
 # UNC1860, UNC1549, Handala/Void Manticore, APT42/RedKitten, Infy, and emerging groups.
 # Optimized for extremely high accuracy with minimal false positives.
 #
-# Total signatures: 452 rules (SID 1000039-2000575)
+# Total signatures: 460 rules (SID 1000039-2000583)
 # SID Allocation:
 #   1000039-2000030: Core CVE + behavioral detection (v3.1 legacy range)
 #   2000031-2000193: Extended behavioral + C2 patterns
@@ -29,6 +29,8 @@
 #   2000562-2000572: v4.0.24 August 2026 backlog consolidation (Cavern HollowGraph,
 #                     CyberAv3ngers Schneider/Siemens ICS, MuddyWater Olalampo)
 #   2000573-2000575: v4.0.25 MuddyWater RustyWater behavioral (beacon/task/upload)
+#   2000576-2000583: v4.0.26 UNC1549/Nimbus Manticore NodeRabbit npm campaign,
+#                     PollCat Azure C2, reverse-SSH tunneler (Sept 2026)
 #
 # Requires: Suricata 7.0+
 # Recommended: Enable xbits for cross-flow correlation rules
