@@ -234,3 +234,26 @@
 ### Defense Evasion
 - **T1574.002 - DLL Side-Loading**: Wazuh 101528 (WinDirStat.exe loading trojanized uxtheme.dll from non-system path)
 - **T1036.005 - Match Legitimate Name or Location**: Wazuh 101529 (execution from C:\ProgramData\WinDir\ masquerade directory), SID 2000553 (google.com.hospitalinstallation.com visual-obfuscation subdomain)
+
+---
+
+## September 2026 Additions — Mirage Kitten / UNC1549 NodeRabbit + PollCat (Kaspersky Securelist) and Nimbus Manticore Toolset Expansion (Group-IB)
+
+### Initial Access
+- **T1566.003 - Spearphishing via Service**: SIDs 2000576-2000578, Wazuh 101549 (fake-job "technical challenge" lures via recruitment platforms; oracle-challenge S3 staging; RankChallenge-react project)
+- **T1195.002 - Compromise Software Supply Chain**: Wazuh 101545, 101548 (trojanized npm packages colorized_terminal / pretty-log; postinstall lifecycle execution)
+
+### Execution / Defense Evasion
+- **T1059.007 - JavaScript**: Wazuh 101546, 101548 (Node.js implant launch from hidden cache directory)
+- **T1564.001 - Hidden Files and Directories**: Wazuh 101545, 101546 (node_modules/.cache/.<hex8>/ implant path)
+- **T1574.001 - DLL Search Order Hijacking**: Wazuh 101557, 101560 (wtsapi32.dll sideloaded / service ImagePath outside System32)
+- **T1036.005 - Match Legitimate Name or Location**: Wazuh 101557 (wtsapi32.dll masquerading as the Windows Terminal Server SDK DLL from a non-System32 path)
+
+### Persistence
+- **T1546 - Event Triggered Execution**: Wazuh 101547 (malicious Git hooks, NodeRabbit variant 3; VS Code extension persistence)
+- **T1543.003 - Windows Service**: Wazuh 101560 (service whose ImagePath resolves to a masqueraded wtsapi32.dll)
+
+### Command and Control
+- **T1071.001 - Web Protocols**: SIDs 2000580-2000581 (PollCat repeated-HTTP-400 check-in evasion against azurewebsites.net C2); Wazuh 101559 (confirmed C2 IP 172.86.98.113 on a process command line)
+- **T1572 - Protocol Tunneling**: SID 2000579 (Nimbus Manticore reverse SSH tunneler to 172.86.98.113:443, Check Point Aug 2026); SIDs 2000582-2000583 (SSH-tunnel C2 IP, both directions); Wazuh 101558 (reverse-SSH tunneler invoked with tunnel arguments)
+- **T1090 - Proxy**: Wazuh 101558 (reverse SSH tunnel establishing operator relay)
