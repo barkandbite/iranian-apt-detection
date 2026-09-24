@@ -5,6 +5,113 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.27] - 2026-09-24
+
+### Added — MOIS CHOSEN BRICK / HEAVYGRAM observables (SID 2000584–2000585)
+
+UK NCSC + FBI + Netherlands AIVD joint advisory (2026-09-15) on MOIS
+Windows surveillance spyware targeting Iranian dissidents, activists and
+journalists (delivered via WhatsApp/Telegram rapport-building as fake
+Pictory/RunwayML/Norton/KeePass installers). Its C2 rides per-victim
+Telegram Bot IDs — the existing Telegram Bot API behavioral rules
+(getUpdates polling / file exfil) already fire on that fabric — so the new
+network rules cover the advisory's remaining observables:
+
+- **SID 2000584** — DNS resolution of the residential-proxy providers the
+  recent variants route Telegram traffic through (`iproyal.com`,
+  `lightningproxies.net`). Tuning: suppress for hosts authorized to use
+  these services.
+- **SID 2000585** — DNS resolution of the cloud object-storage exfil
+  endpoints (`vultrobjects.com`, `storjshare.io`). Backblaze B2 exfil was
+  already covered by the MuddyWater cloud rules.
+
+### Added — Wazuh host-side parity (101561–101564)
+
+New file `wazuh-rules/0928-iranian-apt-september2026-chosenbrick.xml`:
+
+- **101561** — `SMQDService` / `winappx` Run-key persistence created.
+- **101562** — file written under the masquerading `C:\Windows \SysWOW64`
+  directory (deliberate trailing space).
+- **101563** — Microsoft Defender exclusion added for that path.
+- **101564** — process executed from the trailing-space directory.
+
+### Notes
+
+- The advisory's full hash/IOC appendix (ic3.gov 260915.pdf) is
+  image-scanned and could not be machine-extracted; chase manually for the
+  complete set.
+- Header counts reconciled: 462 rules, SID 1000039–2000585.
+- Rule IDs 101550–101556 remain reserved for PR #54's CDB/IOC-list work.
+
+## [4.0.26] - 2026-09-23
+
+### Changed — 2026-09-23 consolidation refinements
+
+- Wazuh parity files renamed to keep the `0925-` prefix clear for PR #54's
+  planned `0925-ioc-list-matching.xml` (rule IDs 101550–101556):
+  `0925-…noderabbit.xml` → `0926-…noderabbit.xml`,
+  `0926-…unc1549.xml` → `0927-…unc1549.xml`. Rule IDs unchanged (they were
+  already allocated around #54's block).
+- Fixed the stale ruleset header (claimed 452 rules / SID max 2000575;
+  actual 460 / 2000583). Same fix applied to the private repo's synced
+  `bb-iran-suricata.rules`, whose header had also drifted (4.0.24 / broken
+  count line).
+
+### Added — UNC1549 / Mirage Kitten / Nimbus Manticore September 2026 campaigns (SID 2000576–2000583)
+
+Consolidates draft PRs #52 and #53, which had both allocated SIDs from
+2000576 against an unchanged main. All eight rules are retained; the
+UNC1549 SSH-tunnel pair from PR #52 is renumbered 2000582–2000583.
+
+**NodeRabbit / PollCat (Kaspersky Securelist, 2026-09-01) — Mirage Kitten /
+UNC1549 fake-job npm supply-chain campaign:**
+- **SID 2000576** — NodeRabbit staging bucket `oracle-challenge.s3` TLS SNI
+- **SID 2000577** — NodeRabbit staging bucket path over plain HTTP
+- **SID 2000578** — Fake-job "technical challenge" lure archive download
+  (`Front-Technical-Challenge*.zip`, `FrontEnd-Task*.zip`, `RankChallenge-react*.zip`)
+- **SID 2000580** — PollCat Azure App Service host flow marker (noalert correlator)
+- **SID 2000581** — PollCat repeated-HTTP-400 check-in pattern against
+  `*.azurewebsites.net` (PollCat treats 400 as successful registration)
+
+**Nimbus Manticore SSH tunneler (Check Point / Group-IB, Aug 2026):**
+- **SID 2000579** — SSH banner on TCP/443 to confirmed C2 172.86.98.113
+- **SID 2000582** — any-protocol outbound contact with 172.86.98.113
+- **SID 2000583** — inbound contact from 172.86.98.113
+
+### Added — Wazuh host-side parity (101545–101549, 101557–101560)
+
+- `wazuh-rules/0926-iranian-apt-september2026-noderabbit.xml` (101545–101549):
+  NodeRabbit implant under `node_modules/.cache/.<hex8>/`, Node.js launch from
+  hidden cache, malicious Git hooks, npm postinstall execution chain,
+  RankChallenge-react lure artifact.
+- `wazuh-rules/0927-iranian-apt-september2026-unc1549.xml` (101557–101560):
+  `wtsapi32.dll` masquerade written outside System32, reverse-SSH tunneler
+  invocation, C2 IP on process command line, service ImagePath persistence.
+  Renumbered from the draft's 101545–101548; 101550–101556 left unallocated
+  for the CDB list-matching rules proposed in PR #54.
+
+### Notes
+
+- Backported to the private by-country repo in the same session — Iran SID
+  parity verified (both repos at 460 rules, SIDs 1000039–2000583).
+- This entry supersedes draft PRs #51 (docs drift, merged here), #52, and #53.
+- PR #54 (Wazuh manager load fixes, CI, CDB tiering, severity re-grade) is
+  reviewed and recommended to merge; these new Wazuh rules avoid the defect
+  classes it fixes and its claimed rule-ID range.
+
+## [Unreleased]
+
+### Fixed — documentation reconciliation (2026-09-15)
+
+Version/count drift left behind by the v4.0.25 release (which updated
+CHANGELOG.md and the top of README.md but not the other docs): the canonical
+rules-file header, `suricata/README.md`, `STRUCTURE.md`, and the README
+deployment/statistics sections still said **449 rules / v4.0.24 / SID max
+2000572**. All now state **452 rules / v4.0.25 / SID 1000039-2000575**, and
+the header's SID-allocation map gains the 2000573-2000575 RustyWater row.
+No rule content changed — `suricata -T` verified, 452 signatures, parity
+with the private repo's `bb-iran-suricata.rules` intact.
+
 ## [4.0.25] - 2026-08-20
 
 ### Added — MuddyWater RustyWater behavioral rules (SID 2000573–2000575)
