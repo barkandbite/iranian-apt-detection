@@ -5,6 +5,44 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.27] - 2026-09-24
+
+### Added — MOIS CHOSEN BRICK / HEAVYGRAM observables (SID 2000584–2000585)
+
+UK NCSC + FBI + Netherlands AIVD joint advisory (2026-09-15) on MOIS
+Windows surveillance spyware targeting Iranian dissidents, activists and
+journalists (delivered via WhatsApp/Telegram rapport-building as fake
+Pictory/RunwayML/Norton/KeePass installers). Its C2 rides per-victim
+Telegram Bot IDs — the existing Telegram Bot API behavioral rules
+(getUpdates polling / file exfil) already fire on that fabric — so the new
+network rules cover the advisory's remaining observables:
+
+- **SID 2000584** — DNS resolution of the residential-proxy providers the
+  recent variants route Telegram traffic through (`iproyal.com`,
+  `lightningproxies.net`). Tuning: suppress for hosts authorized to use
+  these services.
+- **SID 2000585** — DNS resolution of the cloud object-storage exfil
+  endpoints (`vultrobjects.com`, `storjshare.io`). Backblaze B2 exfil was
+  already covered by the MuddyWater cloud rules.
+
+### Added — Wazuh host-side parity (101561–101564)
+
+New file `wazuh-rules/0928-iranian-apt-september2026-chosenbrick.xml`:
+
+- **101561** — `SMQDService` / `winappx` Run-key persistence created.
+- **101562** — file written under the masquerading `C:\Windows \SysWOW64`
+  directory (deliberate trailing space).
+- **101563** — Microsoft Defender exclusion added for that path.
+- **101564** — process executed from the trailing-space directory.
+
+### Notes
+
+- The advisory's full hash/IOC appendix (ic3.gov 260915.pdf) is
+  image-scanned and could not be machine-extracted; chase manually for the
+  complete set.
+- Header counts reconciled: 462 rules, SID 1000039–2000585.
+- Rule IDs 101550–101556 remain reserved for PR #54's CDB/IOC-list work.
+
 ## [4.0.26] - 2026-09-23
 
 ### Changed — 2026-09-23 consolidation refinements

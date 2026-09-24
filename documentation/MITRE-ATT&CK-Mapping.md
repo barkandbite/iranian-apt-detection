@@ -257,3 +257,14 @@
 - **T1071.001 - Web Protocols**: SIDs 2000580-2000581 (PollCat repeated-HTTP-400 check-in evasion against azurewebsites.net C2); Wazuh 101559 (confirmed C2 IP 172.86.98.113 on a process command line)
 - **T1572 - Protocol Tunneling**: SID 2000579 (Nimbus Manticore reverse SSH tunneler to 172.86.98.113:443, Check Point Aug 2026); SIDs 2000582-2000583 (SSH-tunnel C2 IP, both directions); Wazuh 101558 (reverse-SSH tunneler invoked with tunnel arguments)
 - **T1090 - Proxy**: Wazuh 101558 (reverse SSH tunnel establishing operator relay)
+
+## CHOSEN BRICK / HEAVYGRAM (MOIS surveillance spyware — Sept 2026)
+
+| Technique | ID | Detection |
+|-----------|----|-----------|
+| Spearphishing via Service | T1566.003 | WhatsApp/Telegram rapport-building delivery (advisory context) |
+| Proxy: External Proxy | T1090.002 | Suricata SID 2000584 (iproyal/lightningproxies DNS) |
+| Exfiltration to Cloud Storage | T1567.002 | Suricata SID 2000585 (vultrobjects/storjshare DNS); existing Telegram Bot API rules |
+| Registry Run Keys | T1547.001 | Wazuh 101561 (SMQDService/winappx) |
+| Masquerading: Match Legitimate Name or Location | T1036.005 | Wazuh 101562/101564 (trailing-space "Windows \SysWOW64") |
+| Impair Defenses: Disable or Modify Tools | T1562.001 | Wazuh 101563 (Defender exclusion for masquerade path) |

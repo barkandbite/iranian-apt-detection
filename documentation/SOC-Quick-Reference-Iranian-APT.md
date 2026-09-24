@@ -227,3 +227,22 @@ grep "Iranian APT" /var/log/suricata/fast.log | cut -d'"' -f2 | sort | uniq -c
 - MITRE ATT&CK: https://attack.mitre.org/groups/
 - Wazuh Rules: https://documentation.wazuh.com/current/user-manual/ruleset/
 - Suricata Rules: https://suricata.readthedocs.io/en/latest/rules/
+## CHOSEN BRICK / HEAVYGRAM (MOIS, Sept 2026 joint advisory)
+
+**Who gets hit:** Iranian dissidents, activists, journalists (UK/US/NL and
+global); rapport-building via WhatsApp/Telegram, fake installers (Pictory,
+RunwayML, Norton, KeePass) or "MRI scan results."
+
+**Network signals (SID 2000584–2000585 + existing Telegram Bot rules):**
+- Workstation DNS for `iproyal.com` / `lightningproxies.net` (proxy fabric)
+- Workstation DNS for `vultrobjects.com` / `storjshare.io` (exfil)
+- `api.telegram.org` Bot API traffic from non-Telegram hosts — per-victim
+  bot IDs; the existing getUpdates/file-exfil rules fire here
+
+**Host signals (Wazuh 101561–101564):** `SMQDService`/`winappx` Run keys;
+anything under `C:\Windows \SysWOW64` (note trailing space); Defender
+exclusions for that path. Mutexes: `ytyjyujyu`, `noi672pp434awkc12f`.
+
+**Escalation:** treat as targeted surveillance of an individual, not
+commodity malware — involve the victim sensitively; full IOC annex in
+ic3.gov 260915.pdf.

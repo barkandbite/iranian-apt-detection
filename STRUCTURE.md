@@ -21,6 +21,7 @@ iranian-apt-detection/
 │   ├── 0924-iranian-apt-august2026-rustywater.xml    # August 2026 RustyWater host indicators
 │   ├── 0926-iranian-apt-september2026-noderabbit.xml # Sept 2026 NodeRabbit/PollCat npm campaign host indicators
 │   ├── 0927-iranian-apt-september2026-unc1549.xml    # Sept 2026 UNC1549 SSH-tunneler host indicators
+│   ├── 0928-iranian-apt-september2026-chosenbrick.xml # Sept 2026 MOIS CHOSEN BRICK/HEAVYGRAM host indicators
 │   └── README.md                                     # Wazuh rules documentation
 │
 ├── configurations/
@@ -30,7 +31,7 @@ iranian-apt-detection/
 │   └── README.md                                     # Configuration guide
 │
 ├── suricata/
-│   ├── iranian-apt-detection.rules                  # Consolidated Suricata IDS signatures (v4.0.26, 460 rules)
+│   ├── iranian-apt-detection.rules                  # Consolidated Suricata IDS signatures (v4.0.27, 462 rules)
 │   └── README.md                                     # Suricata deployment guide
 │
 ├── documentation/
