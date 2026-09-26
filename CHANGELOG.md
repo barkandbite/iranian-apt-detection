@@ -5,6 +5,45 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.26] - 2026-09-26
+
+### Added — MuddyWater Darkcomp / Stagecomp behavioral rules (SID 2000576–2000577)
+
+Lyrie Research / Rapid7 (2026) profiled MuddyWater's Chaos-ransomware
+false-flag campaign delivering the **Darkcomp** RAT. The chain: `ms_upd.exe`
+(Stagecomp downloader) fetches `Game.exe` (Darkcomp, masquerading as
+Microsoft's `WebView2APISample`) alongside a genuine `WebView2Loader.dll` and
+an encrypted config `visualwincomp.txt`. Delivery is via Microsoft Teams
+social engineering with a screen-share-mediated MFA bypass and a fake Quick
+Assist portal. Game.exe beacons to its C2 roughly every 60 seconds.
+
+- **SID 2000576** — TLS SNI to the campaign C2 / exfil / lure domains
+  (`moonzonet.com`, `uploadfiler.com`, `adm-pulse.com`). Priority 1.
+- **SID 2000577** — DNS-query companion for the same domains, for hosts where
+  TLS is not inspected. Priority 1.
+
+Both are IOC-anchored (perishable as infrastructure rotates) but give
+high-confidence attribution; the Wazuh host-side rules below survive rotation.
+
+### Added — Wazuh host-side parity rules (101545–101549)
+
+New file `wazuh-rules/0925-iranian-apt-september2026-darkcomp.xml`:
+
+- **101545** — `ms_upd.exe` / `Game.exe` launched from a user-writable path
+  (AppData / Temp / Downloads / ProgramData).
+- **101546** — `Game.exe` carrying the `WebView2APISample` original filename —
+  the Microsoft WebView2 masquerade.
+- **101547** — `visualwincomp.txt` encrypted C2 config written to disk.
+- **101548** — `WebView2Loader.dll` dropped into a user-writable path
+  (side-load staging alongside Game.exe).
+- **101549** — Run-key persistence created for `Game.exe` via `reg.exe`.
+
+### Notes
+
+Rules originated in the private by-country distribution repo and were
+backported here (private → public is a manual step). Suricata `-T` clean;
+`xmllint` clean; no duplicate SIDs or Wazuh rule IDs.
+
 ## [4.0.25] - 2026-08-20
 
 ### Added — MuddyWater RustyWater behavioral rules (SID 2000573–2000575)

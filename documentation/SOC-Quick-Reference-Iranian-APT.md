@@ -36,7 +36,23 @@ girlsbags[.]shop
 onlinepettools[.]shop
 web14[.]info
 web27[.]info
+
+# MuddyWater Darkcomp/Stagecomp domains (September 2026)
+moonzonet[.]com      # Game.exe (Darkcomp RAT) C2, ~60s beacon
+uploadfiler[.]com    # data exfiltration C2 (TCP/443)
+adm-pulse[.]com      # fake Quick Assist login portal (credential/MFA theft)
 ```
+
+### MuddyWater Darkcomp/Stagecomp (September 2026) — Host Artifacts
+| Artifact | Detail |
+|----------|--------|
+| `ms_upd.exe` | Stagecomp downloader (fetches the Darkcomp triad) |
+| `Game.exe` | Darkcomp RAT, masquerades as Microsoft `WebView2APISample` |
+| `WebView2Loader.dll` | genuine Microsoft DLL dropped for side-load staging |
+| `visualwincomp.txt` | encrypted C2 config |
+| Delivery | Microsoft Teams social engineering + screen-share MFA bypass |
+| Suricata SIDs | 2000576 (TLS SNI), 2000577 (DNS) |
+| Wazuh IDs | 101545–101549 (file `0925`) |
 
 ### Dust Specter (April 2026) — Key Indicators
 - **TwinTalk C2**: HTTPS GET with `Authorization: Bearer eyJ...` to randomized hex URI paths
