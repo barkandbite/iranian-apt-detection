@@ -1,0 +1,68 @@
+<!--
+  Wazuh rules for MuddyWater Darkcomp / Stagecomp (September 2026).
+  MuddyWater delivered the Stagecomp downloader (ms_upd.exe), which fetches
+  the Darkcomp RAT (Game.exe) masquerading as Microsoft's WebView2APISample
+  alongside a genuine WebView2Loader.dll and an encrypted config
+  (visualwincomp.txt). Delivery observed via Microsoft Teams social
+  engineering with a screen-share-mediated MFA bypass and a fake Quick Assist
+  portal (adm-pulse.com). Game.exe beacons to its C2 (moonzonet.com) roughly
+  every 60 seconds; exfiltration goes to uploadfiler.com. Host indicators here
+  cover the downloader/RAT binaries, the co-located WebView2 masquerade drop,
+  the encrypted config artifact, and Run-key persistence.
+  Ref: Lyrie Research / Rapid7 MuddyWater Chaos-ransomware false-flag, 2026.
+-->
+<group name="iranian_apt,muddywater,darkcomp,september2026,">
+
+  <rule id="101545" level="12">
+    <if_sid>60103,60104</if_sid>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\(ms_upd|Game)\.exe$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\(AppData\\(Local|Roaming)|Temp|Downloads|ProgramData)\\</field>
+    <description>MuddyWater Darkcomp/Stagecomp binary (ms_upd.exe or Game.exe) launched from a user-writable path.</description>
+    <mitre>
+      <id>T1204.002</id>
+      <id>T1105</id>
+    </mitre>
+  </rule>
+
+  <rule id="101546" level="13">
+    <if_sid>60103,60104</if_sid>
+    <field name="win.eventdata.originalFileName" type="pcre2">(?i)WebView2APISample</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\Game\.exe$</field>
+    <description>Darkcomp RAT running as Game.exe while carrying the WebView2APISample original filename - Microsoft WebView2 masquerade.</description>
+    <mitre>
+      <id>T1036.005</id>
+      <id>T1071.001</id>
+    </mitre>
+  </rule>
+
+  <rule id="101547" level="10">
+    <if_sid>592</if_sid>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?i)\\visualwincomp\.txt$</field>
+    <description>Darkcomp encrypted C2 config (visualwincomp.txt) written to disk.</description>
+    <mitre>
+      <id>T1105</id>
+      <id>T1027</id>
+    </mitre>
+  </rule>
+
+  <rule id="101548" level="10">
+    <if_sid>592</if_sid>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?i)\\WebView2Loader\.dll$</field>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?i)\\(AppData\\(Local|Roaming)|Temp|Downloads|ProgramData)\\</field>
+    <description>WebView2Loader.dll dropped into a user-writable path - Darkcomp side-loading staging alongside Game.exe.</description>
+    <mitre>
+      <id>T1574.002</id>
+    </mitre>
+  </rule>
+
+  <rule id="101549" level="12">
+    <if_sid>60103,60104</if_sid>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\reg\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(CurrentVersion\\Run).{0,200}Game\.exe</field>
+    <description>Run-key persistence created for Darkcomp Game.exe via reg.exe.</description>
+    <mitre>
+      <id>T1547.001</id>
+    </mitre>
+  </rule>
+
+</group>
