@@ -36,7 +36,27 @@ girlsbags[.]shop
 onlinepettools[.]shop
 web14[.]info
 web27[.]info
+
+# HEAVYGRAM / CHOSEN BRICK exfil + proxy infrastructure (September 2026)
+*.vultrobjects[.]com
+*.storjshare[.]io
+*.backblazeb2[.]com
+iproyal[.]com
+lightningproxies[.]net
 ```
+
+### HEAVYGRAM / CHOSEN BRICK (September 2026) — Key Indicators
+Iranian MOIS surveillance spyware (joint NCSC/FBI/AIVD advisory, 2026-09-15).
+Targets dissidents, activists, journalists. Filenames/registry values vary
+between victims — prioritize the behavioral and path indicators below.
+- **C2**: per-victim Telegram bot via `api.telegram.org` (newer variants tunnel through residential proxies `iproyal.com` / `lightningproxies.net`)
+- **Exfil**: cloud object storage `*.vultrobjects.com`, `*.storjshare.io`, `*.backblazeb2.com`
+- **Persistence**: `HKCU\...\CurrentVersion\Run` value names `SMQDService`, `winappx`
+- **Drop paths**: `C:\ProgramData\SMQDServicePackages\...\smqdservice.exe`, `...\MicrosoftDistribution\sysmain\winappx.exe`; also `MsCache.exe`, `chromedriver.exe`
+- **Masquerade**: inserted-space system-directory lookalike `C:\Windows \SysWOW64` (note the space)
+- **Mutexes**: `ytyjyujyu`, `noi672pp434awkc12f`
+- **Delivery lures**: fake installers for Pictory, RunwayML, Norton, Telegram, Adobe Flash Player, KeePass; personal-document lures ("MRI scan results")
+- **Rules**: Suricata SID 2000576-2000578, Wazuh 101545-101550
 
 ### Dust Specter (April 2026) — Key Indicators
 - **TwinTalk C2**: HTTPS GET with `Authorization: Bearer eyJ...` to randomized hex URI paths
