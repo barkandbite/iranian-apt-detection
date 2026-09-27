@@ -5,6 +5,58 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.26] - 2026-09-27
+
+### Added — HEAVYGRAM / CHOSEN BRICK Iranian MOIS spyware (SID 2000576–2000578)
+
+The joint NCSC/FBI/AIVD advisory of 2026-09-15 exposed HEAVYGRAM (FBI name) /
+CHOSEN BRICK (NCSC name), a Windows surveillance implant attributed to Iran's
+Ministry of Intelligence and Security (MOIS). It has been used against
+dissidents, activists and journalists in the UK, US, Netherlands and worldwide
+since 2023. The implant uses a per-victim Telegram bot for C2, cloud object
+storage for exfiltration, and residential proxies to blend Telegram traffic.
+
+Because the network C2 rides encrypted Telegram Bot API traffic and the
+advisory warns that filenames and registry values vary between victims, the
+high-confidence detection is host-side (Wazuh). The Suricata rules add the
+exfil and proxy behavioral anchors that complement the existing generic
+`api.telegram.org` coverage (SID 2000151, 2000152, 2000346):
+
+- **SID 2000576** — TLS SNI beacon to Vultr / Storj object storage
+  (`vultrobjects.com`, `storjshare.io`), threshold 5/300s. Behavioral,
+  complements existing Backblaze B2 coverage.
+- **SID 2000577** — TLS SNI to the residential-proxy providers used to tunnel
+  Telegram C2 (`iproyal.com`, `lightningproxies.net`), threshold 3/300s.
+- **SID 2000578** — high-confidence correlation: a host that both polled a
+  Telegram Bot API endpoint (`iranian.telegram` xbit) and beaconed to
+  Vultr/Storj object storage (`priority:1`).
+
+TUNING: SID 2000576/2000577 fire on legitimate use of the named services.
+Enable on networks that do not use Vultr/Storj object storage or the named
+residential-proxy providers, or raise the threshold to your baseline.
+
+### Added — HEAVYGRAM / CHOSEN BRICK Wazuh host-side rules (101545–101550)
+
+New file `wazuh-rules/0925-iranian-apt-september2026-heavygram.xml`:
+
+- **101545** — Run-key persistence value (`SMQDService` / `winappx`).
+- **101546** — implant binary dropped under a known ProgramData /
+  MicrosoftDistribution path (`smqdservice.exe`, `winappx.exe`).
+- **101547** — inserted-space system-directory lookalike (`C:\Windows \SysWOW64`).
+- **101548** — secondary component (`MsCache.exe` / `chromedriver.exe`)
+  executed from a user-writable path.
+- **101549** — execution mutex (`ytyjyujyu` / `noi672pp434awkc12f`).
+- **101550** — multi-stage correlation (persistence + implant/masquerade on
+  one host) → high-confidence infection.
+
+### Cross-repo note
+
+These rules were authored in this cycle alongside the private
+`barkbite-suricata-by-country` distribution (which added September 2026 CISA
+KEV edge/appliance coverage to its cross-country and China files in the same
+session). Iran SID parity between the two repos is maintained at 455 SIDs
+(1000039–2000578).
+
 ## [4.0.25] - 2026-08-20
 
 ### Added — MuddyWater RustyWater behavioral rules (SID 2000573–2000575)

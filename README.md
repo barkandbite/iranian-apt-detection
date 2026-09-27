@@ -1,6 +1,6 @@
 # Iranian APT Detection Rules
 
-[![Version](https://img.shields.io/badge/version-4.0.25-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.0.26-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![MITRE ATT&CK](https://img.shields.io/badge/MITRE%20ATT%26CK-v15-orange.svg)](documentation/MITRE-ATT&CK-Mapping.md)
 
@@ -22,6 +22,7 @@ Three concurrent Iranian campaigns targeting U.S. healthcare disclosed March 24:
 
 ## Recent Threats (v4.0.24)
 
+- **NEW (v4.0.26)**: **HEAVYGRAM / CHOSEN BRICK** Iranian MOIS spyware (joint NCSC/FBI/AIVD advisory, 2026-09-15) — Windows surveillance implant against dissidents, activists and journalists using a per-victim Telegram bot for C2, Vultr/Storj object-storage exfil, and residential-proxy tunneling. 3 Suricata rules (SID 2000576-2000578: cloud-storage exfil SNI, residential-proxy SNI, Telegram+cloud correlation) + 6 Wazuh host rules (101545-101550, new `0925` file: Run-key persistence, ProgramData drop paths, inserted-space `C:\Windows \SysWOW64` masquerade, execution mutexes, multi-stage correlation).
 - **NEW (v4.0.24)**: **August 2026 backlog consolidation** — merged nine unmerged draft PRs (#40-#48) that had each allocated from the same next-available SID/rule ID, into one collision-free allocation. 11 Suricata rules (SID 2000562-2000572): Cavern **HollowGraph** M365 Graph-API C2 (`cloudlanecdn.com`) + DNS-tunnel credential refresh, **CyberAv3ngers** Schneider UMAS / Siemens S7comm ICS tampering (CISA AA26-097A, OT segments only), **MuddyWater Operation Olalampo** GhostBackDoor French-language API C2 + HTTP_VIP + PatchAgent. 10 Wazuh host rules (101530-101539) incl. new `0922` (ICS) and `0923` (Olalampo) files.
 - **NEW (v4.0.23)**: **Cavern Manticore** modular C2 framework (Check Point July 2026) — Iran MOIS-linked (OilRig/Lyceum nexus) targeting Israeli gov/IT. 9 Suricata rules (SID 2000553-2000561): C2 domains hospitalinstallation.com / adserviceupdate.com / hygienehistory.com, `X-User-token` beacon behavioral (`GET /profile` / `POST /gallery`), `x-db-user`/`x-db-password` SQL-module credential headers, `cac.aspx` IIS webshell, `/socket` WebSocket channel. 2 Wazuh host rules (101528-101529, new `0921` file): WinDirStat.exe→uxtheme.dll sideload, `C:\ProgramData\WinDir\` masquerade execution.
 - **FIXED (v4.0.22 — P0, 26-day production outage)**: `suricata/iranian-apt-detection.rules` failed to load on Suricata 7.0.3 since v4.0.21 shipped 2026-06-11. All 429 rules silently unavailable. Two hard parse errors: SID 2000030 `dsize:>500000` (u16 overflow, corrected to `dsize:>1400` — per-hour threshold of 500 packets stays the volume signal), SID 2000535 `http.host + nocase` (redundant + hard error in 7.0.3, `nocase` removed). Detection intent unchanged for both; revs bumped to 6 and 2.

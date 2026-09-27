@@ -234,3 +234,23 @@
 ### Defense Evasion
 - **T1574.002 - DLL Side-Loading**: Wazuh 101528 (WinDirStat.exe loading trojanized uxtheme.dll from non-system path)
 - **T1036.005 - Match Legitimate Name or Location**: Wazuh 101529 (execution from C:\ProgramData\WinDir\ masquerade directory), SID 2000553 (google.com.hospitalinstallation.com visual-obfuscation subdomain)
+
+## HEAVYGRAM / CHOSEN BRICK — Iranian MOIS spyware (v4.0.26, Sep 2026)
+
+### Command and Control
+- **T1071.001 - Application Layer Protocol: Web Protocols**: per-victim Telegram Bot API C2 (existing SID 2000151/2000152/2000346 provide baseline coverage)
+- **T1090.003 - Proxy: Multi-hop Proxy**: SID 2000577 (residential-proxy providers iproyal.com / lightningproxies.net tunneling Telegram C2)
+
+### Exfiltration
+- **T1567.002 - Exfiltration to Cloud Storage**: SID 2000576 (Vultr/Storj object-storage exfil SNI), SID 2000578 (Telegram + cloud-storage correlation)
+
+### Persistence
+- **T1547.001 - Registry Run Keys / Startup Folder**: Wazuh 101545 (SMQDService / winappx Run-key values)
+
+### Defense Evasion
+- **T1036.005 - Match Legitimate Name or Location**: Wazuh 101546 (ProgramData/MicrosoftDistribution drop paths), 101547 (inserted-space C:\Windows \SysWOW64 lookalike)
+- **T1480 - Execution Guardrails**: Wazuh 101549 (single-instance execution mutex ytyjyujyu / noi672pp434awkc12f)
+
+### Execution / Delivery
+- **T1105 - Ingress Tool Transfer**: Wazuh 101546, 101548 (implant + secondary component staging)
+- **T1059 - Command and Scripting Interpreter**: Wazuh 101548 (MsCache.exe / chromedriver.exe from user-writable path)
