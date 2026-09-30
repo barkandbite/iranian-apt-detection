@@ -8,8 +8,8 @@ This directory contains Suricata IDS signatures for detecting Iranian APT networ
 ### Canonical File: `iranian-apt-detection.rules`
 - **Version**: 4.0.27 (consolidated from v3.1, v3.2, v3.3 + ongoing updates)
 - **Last Updated**: 2026-09-20
-- **SID Range**: 1000039–2000585
-- **Total Rules**: 462 signatures
+- **SID Range**: 1000039–2000589
+- **Total Rules**: 466 signatures
 - **Zero duplicate SIDs**
 - **Requires**: Suricata 7.0+
 
@@ -41,6 +41,10 @@ This directory contains Suricata IDS signatures for detecting Iranian APT networ
 | 2000562–2000563 | 2 | Cavern HollowGraph M365 Graph-API C2 + DNS-tunnel credential refresh (cloudlanecdn.com) |
 | 2000564–2000566 | 3 | CyberAv3ngers Schneider UMAS + Siemens S7comm ICS tampering (CISA AA26-097A) |
 | 2000567–2000572 | 6 | MuddyWater Operation Olalampo: GhostBackDoor French-language API C2, HTTP_VIP, PatchAgent |
+| 2000573–2000575 | 3 | MuddyWater RustyWater behavioral: reqwest UA /rw/beacon, /rw/task X-Rw-Id, /rw/upload gzip exfil (Rescana Aug 2026) |
+| 2000576–2000583 | 8 | UNC1549/Mirage Kitten NodeRabbit S3 staging + PollCat Azure HTTP-400 C2 + Nimbus Manticore SSH tunneler (Kaspersky/Group-IB Sep 2026) |
+| 2000584–2000585 | 2 | MOIS CHOSEN BRICK/HEAVYGRAM: residential-proxy + cloud object-storage exfil DNS (NCSC/FBI/AIVD Sep 2026) |
+| 2000586–2000589 | 4 | MuddyWater Darkcomp TLS SNI; HEAVYGRAM cloud-exfil/proxy TLS SNI + Telegram-xbit correlation (Sep 30 2026) |
 
 ### Threat Group Coverage
 

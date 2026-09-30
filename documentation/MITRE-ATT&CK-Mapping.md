@@ -268,3 +268,31 @@
 | Registry Run Keys | T1547.001 | Wazuh 101561 (SMQDService/winappx) |
 | Masquerading: Match Legitimate Name or Location | T1036.005 | Wazuh 101562/101564 (trailing-space "Windows \SysWOW64") |
 | Impair Defenses: Disable or Modify Tools | T1562.001 | Wazuh 101563 (Defender exclusion for masquerade path) |
+| Proxy: Multi-hop Proxy | T1090.003 | Suricata SID 2000588 (iproyal/lightningproxies TLS SNI) |
+| Exfiltration to Cloud Storage (TLS) | T1567.002 | Suricata SID 2000587 (vultrobjects/storjshare TLS SNI), 2000589 (Telegram-xbit + cloud-exfil correlation, priority 1) |
+| Ingress Tool Transfer | T1105 | Wazuh 101565 (ProgramData/MicrosoftDistribution implant drop), 101566 (MsCache.exe/chromedriver.exe secondary from user-writable path) |
+| Execution Guardrails | T1480 | Wazuh 101567 (mutexes ytyjyujyu / noi672pp434awkc12f) |
+| Multi-stage correlation | — | Wazuh 101568 (persistence + implant/masquerade on one host, level 14) |
+
+---
+
+## September 2026 Additions — MuddyWater Darkcomp / Stagecomp (Lyrie Research / Rapid7)
+
+### Command and Control
+- **T1071.001 - Web Protocols**: SID 2000586 (Darkcomp Game.exe C2 TLS SNI moonzonet/uploadfiler/adm-pulse; ~60s beacon); DNS side covered by existing SID 2000524-2000526
+- **T1071.004 - DNS**: SID 2000524-2000526 (existing; moonzonet.com / uploadfiler.com / adm-pulse.com)
+
+### Initial Access / Execution
+- **T1204.002 - Malicious File**: Wazuh 101569 (ms_upd.exe/Game.exe launch from user-writable path); existing 101530 (ms_upd.exe stager)
+- **T1105 - Ingress Tool Transfer**: Wazuh 101569, 101571 (Stagecomp downloads Darkcomp triad; visualwincomp.txt config drop)
+
+### Defense Evasion
+- **T1036.005 - Match Legitimate Name or Location**: Wazuh 101570 (Game.exe carrying WebView2APISample original filename)
+- **T1574.002 - DLL Side-Loading**: Wazuh 101572 (WebView2Loader.dll dropped into user-writable path for side-load staging)
+- **T1027 - Obfuscated Files or Information**: Wazuh 101571 (encrypted visualwincomp.txt C2 config)
+
+### Persistence
+- **T1547.001 - Registry Run Keys / Startup Folder**: Wazuh 101573 (Run-key persistence for Game.exe via reg.exe)
+
+### Exfiltration
+- **T1041 - Exfiltration Over C2 Channel**: SID 2000586 (uploadfiler.com exfil endpoint over TLS/443); existing 2000525 (DNS)

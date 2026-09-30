@@ -5,6 +5,51 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.28] - 2026-09-30
+
+### Added — September backlog consolidation + MuddyWater Darkcomp TLS SNI + HEAVYGRAM TLS companions (SID 2000586-2000589)
+
+Consolidates the stranded September draft PRs (#51-#53, #55-#59) whose
+content was adopted via the #57 consolidation plus the two post-#57
+dailies (#58 Darkcomp, #59 HEAVYGRAM), deduplicated against existing
+coverage:
+
+- **SID 2000586** — MuddyWater Darkcomp/Stagecomp C2 TLS SNI
+  (`moonzonet.com` / `uploadfiler.com` / `adm-pulse.com`). The DNS side of
+  this campaign was already covered by SID 2000524-2000526 (May 2026), so
+  the draft's companion DNS rule was dropped as redundant rather than
+  ported.
+- **SID 2000587** — CHOSEN BRICK/HEAVYGRAM cloud object-storage exfil TLS
+  SNI (`vultrobjects.com` / `storjshare.io`) — TLS companion to the DNS
+  rule SID 2000585.
+- **SID 2000588** — HEAVYGRAM residential-proxy provider TLS SNI
+  (`iproyal.com` / `lightningproxies.net`) — TLS companion to SID 2000584.
+- **SID 2000589** — priority-1 correlation: cloud object-storage SNI from
+  a host that already tripped the `iranian.telegram` xbit (Telegram Bot
+  API exfil marker, set by SID 2000346) — high-confidence HEAVYGRAM
+  infection signal.
+
+### Added — Wazuh host indicators
+
+- **101565-101568** (`0928`, extended): HEAVYGRAM implant drop paths
+  (`ProgramData\SMQDServicePackages`, `MicrosoftDistribution\sysmain`),
+  MsCache.exe/chromedriver.exe secondary components, execution mutexes
+  (`ytyjyujyu` / `noi672pp434awkc12f`), and a level-14 multi-stage
+  correlation rule.
+- **101569-101573** (`0929`, new file): MuddyWater Darkcomp/Stagecomp —
+  ms_upd.exe/Game.exe launch from user-writable paths, WebView2APISample
+  masquerade, `visualwincomp.txt` encrypted config, WebView2Loader.dll
+  side-load staging, Run-key persistence via reg.exe. Complements the
+  existing 101530-101531 Chaos false-flag rules.
+
+### Notes
+
+- Total: 466 Suricata rules (SID 1000039-2000589), Wazuh through 101573.
+- PR #54 (v5.1.0 Wazuh loadability restructure) is intentionally NOT
+  absorbed here; its file numbering (0925) remains reserved for it and
+  this release numbers around it (0926-0929), following the convention
+  the September consolidations established.
+
 ## [4.0.27] - 2026-09-24
 
 ### Added — MOIS CHOSEN BRICK / HEAVYGRAM observables (SID 2000584–2000585)

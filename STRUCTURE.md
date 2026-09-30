@@ -22,6 +22,7 @@ iranian-apt-detection/
 │   ├── 0926-iranian-apt-september2026-noderabbit.xml # Sept 2026 NodeRabbit/PollCat npm campaign host indicators
 │   ├── 0927-iranian-apt-september2026-unc1549.xml    # Sept 2026 UNC1549 SSH-tunneler host indicators
 │   ├── 0928-iranian-apt-september2026-chosenbrick.xml # Sept 2026 MOIS CHOSEN BRICK/HEAVYGRAM host indicators
+│   ├── 0929-iranian-apt-september2026-darkcomp.xml   # Sept 2026 MuddyWater Darkcomp/Stagecomp host indicators
 │   └── README.md                                     # Wazuh rules documentation
 │
 ├── configurations/
@@ -102,8 +103,10 @@ iranian-apt-detection/
 - **101534-101535**: CyberAv3ngers ICS host indicators — Schneider project-file access, Siemens S7 binary path (0922)
 - **101536-101539**: MuddyWater Olalampo host indicators — CHAR, GhostFetch, service masquerade, FMAPP.dll SOCKS5 (0923)
 - **101540-101544**: MuddyWater RustyWater host indicators — Rust agent binary drop, service persistence, Templates state artifacts (0924)
+- **101565-101568**: CHOSEN BRICK/HEAVYGRAM extended host indicators — implant drop paths, MsCache/chromedriver secondary, execution mutexes, multi-stage correlation (0928)
+- **101569-101573**: MuddyWater Darkcomp/Stagecomp host indicators — ms_upd.exe/Game.exe from user-writable path, WebView2APISample masquerade, visualwincomp.txt config, WebView2Loader.dll side-load, Run-key persistence (0929)
 
-### Suricata SID Ranges (1000039-2000561)
+### Suricata SID Ranges (1000039-2000589)
 - **1000039-2000014**: CVE exploitation signatures
 - **2000015-2000030**: C2 infrastructure, post-exploitation, exfiltration
 - **2000031-2000050**: Reconnaissance, web shells, ICS/SCADA, correlation

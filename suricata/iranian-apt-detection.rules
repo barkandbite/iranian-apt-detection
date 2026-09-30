@@ -1,7 +1,7 @@
 # Bark & Bite — Iranian APT Detection Rules (Consolidated)
 # File: iranian-apt-detection.rules
-# Version: 4.0.27
-# Last Updated: 2026-09-24
+# Version: 4.0.28
+# Last Updated: 2026-09-30
 # Credit: Bark & Bite Security
 # License: MIT
 # Repository: https://github.com/barkandbite/iranian-apt-detection
@@ -14,7 +14,7 @@
 # UNC1860, UNC1549, Handala/Void Manticore, APT42/RedKitten, Infy, and emerging groups.
 # Optimized for extremely high accuracy with minimal false positives.
 #
-# Total signatures: 462 rules (SID 1000039-2000585)
+# Total signatures: 466 rules (SID 1000039-2000589)
 # SID Allocation:
 #   1000039-2000030: Core CVE + behavioral detection (v3.1 legacy range)
 #   2000031-2000193: Extended behavioral + C2 patterns
@@ -2319,3 +2319,9 @@ alert ip 172.86.98.113 any -> $HOME_NET any (msg:"Bark&Bite - Iranian APT UNC154
 # =============================================================================
 alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian MOIS CHOSEN BRICK HEAVYGRAM Residential Proxy Provider DNS Query 2026"; dns.query; pcre:"/(?:^|\.)(?:iproyal\.com|lightningproxies\.net)$/i"; threshold:type limit, track by_src, count 1, seconds 3600; reference:url,ic3.gov/CSA/2026/260915.pdf; reference:url,thehackernews.com/2026/09/iranian-hackers-use-telegram-controlled.html; reference:url,attack.mitre.org/techniques/T1090/002/; classtype:bad-unknown; sid:2000584; rev:1; metadata:policy max-detect-ips drop, created_at 2026_09_24, updated_at 2026_09_24;)
 alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian MOIS CHOSEN BRICK HEAVYGRAM Cloud Object Storage Exfil Domain DNS Query 2026"; dns.query; pcre:"/(?:^|\.)(?:vultrobjects\.com|storjshare\.io)$/i"; threshold:type limit, track by_src, count 1, seconds 3600; reference:url,ic3.gov/CSA/2026/260915.pdf; reference:url,securityaffairs.com/199217/malware/chosen-brick-irans-surveillance-malware.html; reference:url,attack.mitre.org/techniques/T1567/002/; classtype:trojan-activity; sid:2000585; rev:1; metadata:policy max-detect-ips drop, created_at 2026_09_24, updated_at 2026_09_24;)
+
+# --- September 2026 (30th): MuddyWater Darkcomp/Stagecomp C2 TLS SNI (SID 2000586; DNS already covered by 2000524-2000526) + CHOSEN BRICK/HEAVYGRAM TLS-SNI and Telegram-correlation companions to SID 2000584-2000585 (SID 2000587-2000589) ---
+alert tls $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater Darkcomp/Stagecomp C2 TLS SNI 2026"; flow:to_server,established; tls.sni; pcre:"/^(?:[a-z0-9_-]+\.)*(?:moonzonet|uploadfiler|adm-pulse)\.com$/i"; threshold:type limit, track by_src, count 1, seconds 3600; reference:url,lyrie.ai/research/research/2026-05-10-01-deepdive-muddywater-chaos-ransomware-false-flag-microsoft-teams-darkcomp; reference:url,attack.mitre.org/techniques/T1071/001/; classtype:command-and-control; sid:2000586; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_09_26, updated_at 2026_09_26;)
+alert tls $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MOIS CHOSEN BRICK HEAVYGRAM Cloud Object-Storage Exfil SNI 2026"; flow:to_server,established; tls.sni; pcre:"/(?:vultrobjects\.com|storjshare\.io)$/i"; threshold:type both, track by_src, count 5, seconds 300; reference:url,ncsc.gov.uk/news/iranian-cyber-targeting-of-dissidents-activists-and-journalists; reference:url,attack.mitre.org/techniques/T1567/002/; classtype:trojan-activity; sid:2000587; rev:1; metadata:policy max-detect-ips drop, created_at 2026_09_27, updated_at 2026_09_27;)
+alert tls $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MOIS CHOSEN BRICK HEAVYGRAM Residential Proxy Provider SNI 2026"; flow:to_server,established; tls.sni; pcre:"/(?:iproyal\.com|lightningproxies\.net)$/i"; threshold:type both, track by_src, count 3, seconds 300; reference:url,ncsc.gov.uk/news/iranian-cyber-targeting-of-dissidents-activists-and-journalists; reference:url,attack.mitre.org/techniques/T1090/003/; classtype:trojan-activity; sid:2000588; rev:1; metadata:policy max-detect-ips drop, created_at 2026_09_27, updated_at 2026_09_27;)
+alert tls $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MOIS CHOSEN BRICK HEAVYGRAM Telegram+Cloud-Exfil Correlation 2026"; flow:to_server,established; xbits:isset,iranian.telegram,track ip_src; tls.sni; pcre:"/(?:vultrobjects\.com|storjshare\.io)$/i"; reference:url,ncsc.gov.uk/news/iranian-cyber-targeting-of-dissidents-activists-and-journalists; reference:url,attack.mitre.org/techniques/T1567/002/; classtype:trojan-activity; sid:2000589; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_09_27, updated_at 2026_09_27;)

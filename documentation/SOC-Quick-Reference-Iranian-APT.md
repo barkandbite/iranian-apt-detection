@@ -233,15 +233,30 @@ grep "Iranian APT" /var/log/suricata/fast.log | cut -d'"' -f2 | sort | uniq -c
 global); rapport-building via WhatsApp/Telegram, fake installers (Pictory,
 RunwayML, Norton, KeePass) or "MRI scan results."
 
-**Network signals (SID 2000584–2000585 + existing Telegram Bot rules):**
+**Network signals (SID 2000584–2000585 DNS, 2000587–2000589 TLS SNI + Telegram correlation, + existing Telegram Bot rules):**
 - Workstation DNS for `iproyal.com` / `lightningproxies.net` (proxy fabric)
 - Workstation DNS for `vultrobjects.com` / `storjshare.io` (exfil)
 - `api.telegram.org` Bot API traffic from non-Telegram hosts — per-victim
   bot IDs; the existing getUpdates/file-exfil rules fire here
 
-**Host signals (Wazuh 101561–101564):** `SMQDService`/`winappx` Run keys;
+**Host signals (Wazuh 101561–101568):** `SMQDService`/`winappx` Run keys;
 anything under `C:\Windows \SysWOW64` (note trailing space); Defender
-exclusions for that path. Mutexes: `ytyjyujyu`, `noi672pp434awkc12f`.
+exclusions for that path; implant drops under
+`ProgramData\SMQDServicePackages` / `MicrosoftDistribution\sysmain`;
+`MsCache.exe`/`chromedriver.exe` from user-writable paths.
+Mutexes: `ytyjyujyu`, `noi672pp434awkc12f` (101567). Multi-stage
+correlation fires 101568 at level 14.
+
+### MuddyWater Darkcomp/Stagecomp (September 2026) — Host Artifacts
+| Artifact | Detail |
+|----------|--------|
+| `ms_upd.exe` | Stagecomp downloader (fetches the Darkcomp triad) |
+| `Game.exe` | Darkcomp RAT, masquerades as Microsoft `WebView2APISample` |
+| `WebView2Loader.dll` | genuine Microsoft DLL dropped for side-load staging |
+| `visualwincomp.txt` | encrypted C2 config |
+| Delivery | Microsoft Teams social engineering + screen-share MFA bypass; fake Quick Assist portal `adm-pulse[.]com` |
+| Suricata SIDs | 2000586 (TLS SNI); existing 2000523-2000526 (dropper URI + DNS) |
+| Wazuh IDs | 101569–101573 (file `0929`); existing 101530–101531 |
 
 **Escalation:** treat as targeted surveillance of an individual, not
 commodity malware — involve the victim sensitively; full IOC annex in

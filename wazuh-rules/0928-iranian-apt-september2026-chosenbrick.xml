@@ -53,4 +53,46 @@
     <group>attack,execution,</group>
   </rule>
 
+
+  <rule id="101565" level="13">
+    <if_sid>592</if_sid>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?i)(\\ProgramData\\SMQDServicePackages\\|\\MicrosoftDistribution\\sysmain\\winappx\.exe|\\sm[dq]{2}service\.exe)</field>
+    <description>Iranian MOIS CHOSEN BRICK/HEAVYGRAM: implant binary dropped under a known ProgramData/MicrosoftDistribution path</description>
+    <mitre>
+      <id>T1105</id>
+      <id>T1036.005</id>
+    </mitre>
+  </rule>
+
+  <rule id="101566" level="12">
+    <if_sid>60103,60104</if_sid>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\(MsCache|chromedriver)\.exe$</field>
+    <field name="win.eventdata.parentImage" type="pcre2">(?i)\\(ProgramData|Users\\All Users|AppData)\\</field>
+    <description>Iranian MOIS CHOSEN BRICK/HEAVYGRAM: secondary component (MsCache.exe/chromedriver.exe) executed from a user-writable path</description>
+    <mitre>
+      <id>T1105</id>
+      <id>T1059</id>
+    </mitre>
+  </rule>
+
+  <rule id="101567" level="10">
+    <if_sid>61600,61613</if_sid>
+    <field name="win.eventdata.image" type="pcre2">(?i)(ytyjyujyu|noi672pp434awkc12f)</field>
+    <description>Iranian MOIS CHOSEN BRICK/HEAVYGRAM: execution mutex (ytyjyujyu / noi672pp434awkc12f) observed - single-instance marker</description>
+    <mitre>
+      <id>T1480</id>
+    </mitre>
+  </rule>
+
+  <rule id="101568" level="14" frequency="2" timeframe="600">
+    <if_matched_sid>101561</if_matched_sid>
+    <if_sid>101562,101564,101565,101566</if_sid>
+    <same_source_ip />
+    <description>Iranian MOIS CHOSEN BRICK/HEAVYGRAM: multi-stage host activity (persistence + implant/masquerade) on one host - high-confidence infection</description>
+    <mitre>
+      <id>T1547.001</id>
+      <id>T1105</id>
+    </mitre>
+  </rule>
+
 </group>
