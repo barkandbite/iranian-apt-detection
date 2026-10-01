@@ -23,6 +23,7 @@ iranian-apt-detection/
 │   ├── 0927-iranian-apt-september2026-unc1549.xml    # Sept 2026 UNC1549 SSH-tunneler host indicators
 │   ├── 0928-iranian-apt-september2026-chosenbrick.xml # Sept 2026 MOIS CHOSEN BRICK/HEAVYGRAM host indicators
 │   ├── 0929-iranian-apt-september2026-darkcomp.xml   # Sept 2026 MuddyWater Darkcomp/Stagecomp host indicators
+│   ├── 0930-iranian-apt-october2026-minifast.xml     # Oct 2026 Nimbus Manticore MiniFast host indicators
 │   └── README.md                                     # Wazuh rules documentation
 │
 ├── configurations/
@@ -81,7 +82,7 @@ iranian-apt-detection/
 
 ## Rule ID Allocation
 
-### Wazuh Rules (100900-101544)
+### Wazuh Rules (100900-101578)
 - **100900-100924**: CVE exploitation detection (0910)
 - **100925-100959**: Behavioral detection (0911)
 - **100940-100959**: Network detection (0912)
@@ -105,8 +106,9 @@ iranian-apt-detection/
 - **101540-101544**: MuddyWater RustyWater host indicators — Rust agent binary drop, service persistence, Templates state artifacts (0924)
 - **101565-101568**: CHOSEN BRICK/HEAVYGRAM extended host indicators — implant drop paths, MsCache/chromedriver secondary, execution mutexes, multi-stage correlation (0928)
 - **101569-101573**: MuddyWater Darkcomp/Stagecomp host indicators — ms_upd.exe/Game.exe from user-writable path, WebView2APISample masquerade, visualwincomp.txt config, WebView2Loader.dll side-load, Run-key persistence (0929)
+- **101574-101578**: Nimbus Manticore MiniFast host indicators — Zoom\bin\update staging dir, WindowsSecurityUpdate/ZoomUpdateTaskUser scheduled tasks, AppDomain-manager DLLs, .exe.config hijack staging, cmd.exe from implant dir (0930)
 
-### Suricata SID Ranges (1000039-2000589)
+### Suricata SID Ranges (1000039-2000594)
 - **1000039-2000014**: CVE exploitation signatures
 - **2000015-2000030**: C2 infrastructure, post-exploitation, exfiltration
 - **2000031-2000050**: Reconnaissance, web shells, ICS/SCADA, correlation

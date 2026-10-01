@@ -5,6 +5,46 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.29] - 2026-10-01
+
+### Added — Nimbus Manticore MiniFast backdoor coverage (SID 2000590-2000594, Wazuh 101574-101578)
+
+Closes a coverage gap: Check Point's "Fast and Furious" report (2026-05-22)
+on Nimbus Manticore (UNC1549) operations during the Iranian conflict was
+never integrated, despite later Nimbus Manticore work (SSH tunneler,
+NodeRabbit). MiniFast is an AI-assisted-development backdoor delivered via
+fake job lures, a trojanized Zoom installer, and the SEO-poisoned
+getsqldeveloper.com (fake Oracle SQL Developer), using .NET AppDomain
+hijacking instead of DLL sideloading.
+
+**Suricata (`suricata/iranian-apt-detection.rules`):**
+- **2000590** — MiniFast C2 initial handshake: POST `/rg` with
+  `{"clientId":...,"type":"poll"}` JSON (behavioral, survives
+  infrastructure rotation; priority 1)
+- **2000591** — agent registration: POST `/agent/init` with
+  token/pcName/isElevated JSON (priority 1)
+- **2000592** — task-poll beacon: GET `/agent/poll?token=` (thresholded
+  1/600s against the 120s default poll interval)
+- **2000593** — DNS: dedicated apex domains + SEO-poisoning delivery domain
+- **2000594** — TLS SNI: dedicated apexes + typo'd azurewebsites.net
+  masquerade labels (buisness-centeral*, licencemanagers,
+  peerdistsvcmanagers, ...)
+
+**Wazuh (`wazuh-rules/0930-iranian-apt-october2026-minifast.xml`):**
+- **101574** — process launched from `AppData\Local\Zoom\bin\update`
+- **101575** — scheduled-task persistence (WindowsSecurityUpdate /
+  ZoomUpdateTaskUser-*)
+- **101576** — known AppDomain-manager DLL written to user-writable path
+- **101577** — `.exe.config` AppDomain-hijack staging in user-writable path
+- **101578** — cmd.exe spawned from MiniFast staging directory (opcode 0x04)
+
+Cross-repo: same five Suricata rules committed to the private
+by-country distribution in the same session (parity 471/471).
+
+Ref: Check Point Research, "Fast and Furious — Nimbus Manticore Operations
+During the Iranian Conflict", 2026-05-22. MITRE: T1071.001, T1566.002,
+T1574, T1053.005, T1036.005, T1059.003.
+
 ## [4.0.28] - 2026-09-30
 
 ### Added — September backlog consolidation + MuddyWater Darkcomp TLS SNI + HEAVYGRAM TLS companions (SID 2000586-2000589)

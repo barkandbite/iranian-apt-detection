@@ -261,3 +261,26 @@ correlation fires 101568 at level 14.
 **Escalation:** treat as targeted surveillance of an individual, not
 commodity malware — involve the victim sensitively; full IOC annex in
 ic3.gov 260915.pdf.
+
+## Nimbus Manticore MiniFast (October 2026 gap-closure; Check Point 2026-05-22)
+
+### Network Indicators (Suricata 2000590-2000594)
+| Indicator | Meaning |
+|-----------|---------|
+| POST `/rg` with `{"clientId":"<host>:<domain>\<user>","type":"poll"}` | MiniFast initial handshake (server answers HTTP 400 + socketId JSON) |
+| POST `/agent/init` (token/pcName/isElevated JSON) | victim registration |
+| GET `/agent/poll?token=` every ~120s | task-poll beacon |
+| `PUT /upload/`, `GET /files/` | exfil / tool delivery legs (covered by beacon correlation) |
+| DNS/SNI: business-startup.org, buisness-centeral-transportation.com, ramiltonsfinance.com, premierhealthadvisory.com, getsqldeveloper.com | dedicated C2 + SEO-poisoning delivery |
+| SNI: typo'd azurewebsites.net labels (buisness-centeral*, licencemanagers, peerdistsvcmanagers, nanomatrix, global-it-*) | Azure App Service C2 masquerade |
+
+### Host Artifacts (Wazuh 101574-101578)
+| Artifact | Meaning |
+|----------|---------|
+| `%LOCALAPPDATA%\Zoom\bin\update\` execution | second-stage staging (trojanized Zoom installer) |
+| Scheduled tasks `WindowsSecurityUpdate`, `ZoomUpdateTaskUser-<SID>` | persistence (opcode 0xB1 / hijacked updater task) |
+| `uevmonitor.dll` / `InitInstall.dll` / `UpdateChecker.dll` in user-writable path | AppDomain-manager implant DLL (export `CheckForUpdates`) |
+| `<name>.exe.config` dropped beside an exe in user-writable path | .NET AppDomain hijacking staging |
+| `cmd.exe` child of a process in the staging dirs | command-execution opcode 0x04 |
+
+Escalation: treat any `/rg` + `/agent/init` pair as active compromise (priority-1 rules); the beacon alone may be residual. Chrome/146 UA from non-browser processes corroborates.

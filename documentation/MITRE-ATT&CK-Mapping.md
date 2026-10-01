@@ -296,3 +296,20 @@
 
 ### Exfiltration
 - **T1041 - Exfiltration Over C2 Channel**: SID 2000586 (uploadfiler.com exfil endpoint over TLS/443); existing 2000525 (DNS)
+
+## October 2026 Additions — Nimbus Manticore MiniFast backdoor (Check Point "Fast and Furious")
+
+### Initial Access / Delivery
+- **T1566.002 - Spearphishing Link**: SID 2000593 (SEO-poisoned getsqldeveloper.com + fake-job/finance lure apex domains, DNS)
+- **T1204.002 - Malicious File**: Wazuh 101574 (trojanized Zoom installer staging dir execution)
+
+### Execution / Defense Evasion
+- **T1574 - Hijack Execution Flow (AppDomain hijacking)**: Wazuh 101576 (uevmonitor/InitInstall/UpdateChecker DLL drop), 101577 (.exe.config staging)
+- **T1036.005 - Match Legitimate Name or Location**: SID 2000594 (azurewebsites.net business-service masquerade labels); Wazuh 101574 (Zoom\bin\update path)
+- **T1059.003 - Windows Command Shell**: Wazuh 101578 (cmd.exe /c from implant dir, opcode 0x04)
+
+### Persistence
+- **T1053.005 - Scheduled Task**: Wazuh 101575 (WindowsSecurityUpdate opcode 0xB1; hijacked ZoomUpdateTaskUser-<SID>)
+
+### Command and Control
+- **T1071.001 - Web Protocols**: SID 2000590 (/rg JSON handshake), 2000591 (/agent/init registration), 2000592 (/agent/poll beacon, 120s + jitter), 2000594 (C2 TLS SNI)

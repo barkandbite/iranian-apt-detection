@@ -1,7 +1,7 @@
 # Bark & Bite — Iranian APT Detection Rules (Consolidated)
 # File: iranian-apt-detection.rules
-# Version: 4.0.28
-# Last Updated: 2026-09-30
+# Version: 4.0.29
+# Last Updated: 2026-10-01
 # Credit: Bark & Bite Security
 # License: MIT
 # Repository: https://github.com/barkandbite/iranian-apt-detection
@@ -14,7 +14,7 @@
 # UNC1860, UNC1549, Handala/Void Manticore, APT42/RedKitten, Infy, and emerging groups.
 # Optimized for extremely high accuracy with minimal false positives.
 #
-# Total signatures: 466 rules (SID 1000039-2000589)
+# Total signatures: 471 rules (SID 1000039-2000594)
 # SID Allocation:
 #   1000039-2000030: Core CVE + behavioral detection (v3.1 legacy range)
 #   2000031-2000193: Extended behavioral + C2 patterns
@@ -33,6 +33,10 @@
 #                     PollCat Azure C2, reverse-SSH tunneler (Sept 2026)
 #   2000584-2000585: v4.0.27 MOIS CHOSEN BRICK/HEAVYGRAM proxy + cloud-exfil
 #                     observables (NCSC/FBI/AIVD advisory, Sept 2026)
+#   2000586-2000589: v4.0.28 MuddyWater Darkcomp TLS SNI + HEAVYGRAM TLS/correlation
+#                     companions (Sept 2026)
+#   2000590-2000594: v4.0.29 Nimbus Manticore MiniFast backdoor C2 protocol +
+#                     infrastructure (Check Point "Fast and Furious", Oct 2026)
 #
 # Requires: Suricata 7.0+
 # Recommended: Enable xbits for cross-flow correlation rules
@@ -2325,3 +2329,24 @@ alert tls $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Muddy
 alert tls $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MOIS CHOSEN BRICK HEAVYGRAM Cloud Object-Storage Exfil SNI 2026"; flow:to_server,established; tls.sni; pcre:"/(?:vultrobjects\.com|storjshare\.io)$/i"; threshold:type both, track by_src, count 5, seconds 300; reference:url,ncsc.gov.uk/news/iranian-cyber-targeting-of-dissidents-activists-and-journalists; reference:url,attack.mitre.org/techniques/T1567/002/; classtype:trojan-activity; sid:2000587; rev:1; metadata:policy max-detect-ips drop, created_at 2026_09_27, updated_at 2026_09_27;)
 alert tls $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MOIS CHOSEN BRICK HEAVYGRAM Residential Proxy Provider SNI 2026"; flow:to_server,established; tls.sni; pcre:"/(?:iproyal\.com|lightningproxies\.net)$/i"; threshold:type both, track by_src, count 3, seconds 300; reference:url,ncsc.gov.uk/news/iranian-cyber-targeting-of-dissidents-activists-and-journalists; reference:url,attack.mitre.org/techniques/T1090/003/; classtype:trojan-activity; sid:2000588; rev:1; metadata:policy max-detect-ips drop, created_at 2026_09_27, updated_at 2026_09_27;)
 alert tls $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MOIS CHOSEN BRICK HEAVYGRAM Telegram+Cloud-Exfil Correlation 2026"; flow:to_server,established; xbits:isset,iranian.telegram,track ip_src; tls.sni; pcre:"/(?:vultrobjects\.com|storjshare\.io)$/i"; reference:url,ncsc.gov.uk/news/iranian-cyber-targeting-of-dissidents-activists-and-journalists; reference:url,attack.mitre.org/techniques/T1567/002/; classtype:trojan-activity; sid:2000589; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_09_27, updated_at 2026_09_27;)
+
+# --- October 2026 (1st): Nimbus Manticore (UNC1549) MiniFast backdoor - coverage gap closed from Check Point "Fast and Furious" (2026-05-22) ---
+# AI-assisted-development backdoor deployed during the Feb-Apr 2026 conflict
+# campaigns (fake Accenture job lures, trojanized Zoom installer, SEO-poisoned
+# getsqldeveloper.com impersonating Oracle SQL Developer). Delivery pivoted
+# from DLL sideloading to .NET AppDomain hijacking (trojanized <exe>.config).
+# C2 protocol: JSON handshake POST /rg ({"clientId":"<host>:<domain>\<user>",
+# "type":"poll"}), registration POST /agent/init, GET /agent/poll?token=
+# beacon (120s default + jitter), /agent/result, /upload/, /files/. Chrome/146
+# UA. Infrastructure: dedicated apexes + typo'd azurewebsites.net subdomains
+# (buisness-centeral*, licencemanagers, peerdistsvcmanagers...).
+# 2000590/2000591 body signatures survive infrastructure rotation; 2000592 is
+# the beacon URI (thresholded); 2000593/2000594 are the IOC companions.
+# Tuning: 2000594's azurewebsites alternation targets actor-registered labels
+# only, but Azure subdomains are reassignable - verify before blocking.
+# Host-side parity: Wazuh 101574-101578 (0930-iranian-apt-october2026-minifast.xml).
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Nimbus Manticore MiniFast C2 Initial Handshake POST /rg 2026"; flow:to_server,established; http.method; content:"POST"; http.uri; content:"/rg"; bsize:3; http.request_body; content:"|22|clientId|22 3a 22|"; fast_pattern; content:"|22|type|22 3a 22|poll|22|"; reference:url,research.checkpoint.com/2026/fast-and-furious-nimbus-manticore-operations-during-the-iranian-conflict/; reference:url,attack.mitre.org/techniques/T1071/001/; classtype:command-and-control; sid:2000590; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_10_01, updated_at 2026_10_01;)
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Nimbus Manticore MiniFast C2 Agent Registration POST /agent/init 2026"; flow:to_server,established; http.method; content:"POST"; http.uri; content:"/agent/init"; bsize:11; http.request_body; content:"|22|pcName|22 3a 22|"; fast_pattern; content:"|22|token|22 3a 22|"; content:"|22|isElevated|22 3a|"; reference:url,research.checkpoint.com/2026/fast-and-furious-nimbus-manticore-operations-during-the-iranian-conflict/; reference:url,attack.mitre.org/techniques/T1071/001/; classtype:command-and-control; sid:2000591; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_10_01, updated_at 2026_10_01;)
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Nimbus Manticore MiniFast C2 Task Poll Beacon /agent/poll 2026"; flow:to_server,established; http.method; content:"GET"; http.uri; content:"/agent/poll?token="; fast_pattern; startswith; threshold:type limit, track by_src, count 1, seconds 600; reference:url,research.checkpoint.com/2026/fast-and-furious-nimbus-manticore-operations-during-the-iranian-conflict/; reference:url,attack.mitre.org/techniques/T1071/001/; classtype:command-and-control; sid:2000592; rev:1; metadata:policy max-detect-ips drop, created_at 2026_10_01, updated_at 2026_10_01;)
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT Nimbus Manticore MiniFast C2/SEO-Poisoning Domain DNS Query 2026"; dns.query; pcre:"/(?:^|\.)(?:business-startup\.org|buisness-centeral-transportation\.com|ramiltonsfinance\.com|premierhealthadvisory\.com|getsqldeveloper\.com)$/i"; threshold:type limit, track by_src, count 1, seconds 3600; reference:url,research.checkpoint.com/2026/fast-and-furious-nimbus-manticore-operations-during-the-iranian-conflict/; reference:url,attack.mitre.org/techniques/T1566/002/; classtype:command-and-control; sid:2000593; rev:1; metadata:policy max-detect-ips drop, created_at 2026_10_01, updated_at 2026_10_01;)
+alert tls $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Nimbus Manticore MiniFast C2 TLS SNI Dedicated + azurewebsites Masquerade 2026"; flow:to_server,established; tls.sni; pcre:"/(?:^(?:buisness-centeral[a-z0-9-]*|business-?startup|licencemanagers|licencesupporting|peerdistsvcmanagers|nanomatrix|ramiltons-?finance|premier-?healthadvisory[a-z0-9-]*|global(?:-?it|-?check|business)[a-z0-9-]*)\.azurewebsites\.net$|(?:^|\.)(?:business-startup\.org|buisness-centeral-transportation\.com|ramiltonsfinance\.com|premierhealthadvisory\.com|getsqldeveloper\.com)$)/i"; threshold:type limit, track by_src, count 1, seconds 3600; reference:url,research.checkpoint.com/2026/fast-and-furious-nimbus-manticore-operations-during-the-iranian-conflict/; reference:url,attack.mitre.org/techniques/T1071/001/; classtype:command-and-control; sid:2000594; rev:1; metadata:policy max-detect-ips drop, created_at 2026_10_01, updated_at 2026_10_01;)
