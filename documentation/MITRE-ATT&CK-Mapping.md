@@ -234,3 +234,82 @@
 ### Defense Evasion
 - **T1574.002 - DLL Side-Loading**: Wazuh 101528 (WinDirStat.exe loading trojanized uxtheme.dll from non-system path)
 - **T1036.005 - Match Legitimate Name or Location**: Wazuh 101529 (execution from C:\ProgramData\WinDir\ masquerade directory), SID 2000553 (google.com.hospitalinstallation.com visual-obfuscation subdomain)
+
+---
+
+## September 2026 Additions — Mirage Kitten / UNC1549 NodeRabbit + PollCat (Kaspersky Securelist) and Nimbus Manticore Toolset Expansion (Group-IB)
+
+### Initial Access
+- **T1566.003 - Spearphishing via Service**: SIDs 2000576-2000578, Wazuh 101549 (fake-job "technical challenge" lures via recruitment platforms; oracle-challenge S3 staging; RankChallenge-react project)
+- **T1195.002 - Compromise Software Supply Chain**: Wazuh 101545, 101548 (trojanized npm packages colorized_terminal / pretty-log; postinstall lifecycle execution)
+
+### Execution / Defense Evasion
+- **T1059.007 - JavaScript**: Wazuh 101546, 101548 (Node.js implant launch from hidden cache directory)
+- **T1564.001 - Hidden Files and Directories**: Wazuh 101545, 101546 (node_modules/.cache/.<hex8>/ implant path)
+- **T1574.001 - DLL Search Order Hijacking**: Wazuh 101557, 101560 (wtsapi32.dll sideloaded / service ImagePath outside System32)
+- **T1036.005 - Match Legitimate Name or Location**: Wazuh 101557 (wtsapi32.dll masquerading as the Windows Terminal Server SDK DLL from a non-System32 path)
+
+### Persistence
+- **T1546 - Event Triggered Execution**: Wazuh 101547 (malicious Git hooks, NodeRabbit variant 3; VS Code extension persistence)
+- **T1543.003 - Windows Service**: Wazuh 101560 (service whose ImagePath resolves to a masqueraded wtsapi32.dll)
+
+### Command and Control
+- **T1071.001 - Web Protocols**: SIDs 2000580-2000581 (PollCat repeated-HTTP-400 check-in evasion against azurewebsites.net C2); Wazuh 101559 (confirmed C2 IP 172.86.98.113 on a process command line)
+- **T1572 - Protocol Tunneling**: SID 2000579 (Nimbus Manticore reverse SSH tunneler to 172.86.98.113:443, Check Point Aug 2026); SIDs 2000582-2000583 (SSH-tunnel C2 IP, both directions); Wazuh 101558 (reverse-SSH tunneler invoked with tunnel arguments)
+- **T1090 - Proxy**: Wazuh 101558 (reverse SSH tunnel establishing operator relay)
+
+## CHOSEN BRICK / HEAVYGRAM (MOIS surveillance spyware — Sept 2026)
+
+| Technique | ID | Detection |
+|-----------|----|-----------|
+| Spearphishing via Service | T1566.003 | WhatsApp/Telegram rapport-building delivery (advisory context) |
+| Proxy: External Proxy | T1090.002 | Suricata SID 2000584 (iproyal/lightningproxies DNS) |
+| Exfiltration to Cloud Storage | T1567.002 | Suricata SID 2000585 (vultrobjects/storjshare DNS); existing Telegram Bot API rules |
+| Registry Run Keys | T1547.001 | Wazuh 101561 (SMQDService/winappx) |
+| Masquerading: Match Legitimate Name or Location | T1036.005 | Wazuh 101562/101564 (trailing-space "Windows \SysWOW64") |
+| Impair Defenses: Disable or Modify Tools | T1562.001 | Wazuh 101563 (Defender exclusion for masquerade path) |
+| Proxy: Multi-hop Proxy | T1090.003 | Suricata SID 2000588 (iproyal/lightningproxies TLS SNI) |
+| Exfiltration to Cloud Storage (TLS) | T1567.002 | Suricata SID 2000587 (vultrobjects/storjshare TLS SNI), 2000589 (Telegram-xbit + cloud-exfil correlation, priority 1) |
+| Ingress Tool Transfer | T1105 | Wazuh 101565 (ProgramData/MicrosoftDistribution implant drop), 101566 (MsCache.exe/chromedriver.exe secondary from user-writable path) |
+| Execution Guardrails | T1480 | Wazuh 101567 (mutexes ytyjyujyu / noi672pp434awkc12f) |
+| Multi-stage correlation | — | Wazuh 101568 (persistence + implant/masquerade on one host, level 14) |
+
+---
+
+## September 2026 Additions — MuddyWater Darkcomp / Stagecomp (Lyrie Research / Rapid7)
+
+### Command and Control
+- **T1071.001 - Web Protocols**: SID 2000586 (Darkcomp Game.exe C2 TLS SNI moonzonet/uploadfiler/adm-pulse; ~60s beacon); DNS side covered by existing SID 2000524-2000526
+- **T1071.004 - DNS**: SID 2000524-2000526 (existing; moonzonet.com / uploadfiler.com / adm-pulse.com)
+
+### Initial Access / Execution
+- **T1204.002 - Malicious File**: Wazuh 101569 (ms_upd.exe/Game.exe launch from user-writable path); existing 101530 (ms_upd.exe stager)
+- **T1105 - Ingress Tool Transfer**: Wazuh 101569, 101571 (Stagecomp downloads Darkcomp triad; visualwincomp.txt config drop)
+
+### Defense Evasion
+- **T1036.005 - Match Legitimate Name or Location**: Wazuh 101570 (Game.exe carrying WebView2APISample original filename)
+- **T1574.002 - DLL Side-Loading**: Wazuh 101572 (WebView2Loader.dll dropped into user-writable path for side-load staging)
+- **T1027 - Obfuscated Files or Information**: Wazuh 101571 (encrypted visualwincomp.txt C2 config)
+
+### Persistence
+- **T1547.001 - Registry Run Keys / Startup Folder**: Wazuh 101573 (Run-key persistence for Game.exe via reg.exe)
+
+### Exfiltration
+- **T1041 - Exfiltration Over C2 Channel**: SID 2000586 (uploadfiler.com exfil endpoint over TLS/443); existing 2000525 (DNS)
+
+## October 2026 Additions — Nimbus Manticore MiniFast backdoor (Check Point "Fast and Furious")
+
+### Initial Access / Delivery
+- **T1566.002 - Spearphishing Link**: SID 2000593 (SEO-poisoned getsqldeveloper.com + fake-job/finance lure apex domains, DNS)
+- **T1204.002 - Malicious File**: Wazuh 101574 (trojanized Zoom installer staging dir execution)
+
+### Execution / Defense Evasion
+- **T1574 - Hijack Execution Flow (AppDomain hijacking)**: Wazuh 101576 (uevmonitor/InitInstall/UpdateChecker DLL drop), 101577 (.exe.config staging)
+- **T1036.005 - Match Legitimate Name or Location**: SID 2000594 (azurewebsites.net business-service masquerade labels); Wazuh 101574 (Zoom\bin\update path)
+- **T1059.003 - Windows Command Shell**: Wazuh 101578 (cmd.exe /c from implant dir, opcode 0x04)
+
+### Persistence
+- **T1053.005 - Scheduled Task**: Wazuh 101575 (WindowsSecurityUpdate opcode 0xB1; hijacked ZoomUpdateTaskUser-<SID>)
+
+### Command and Control
+- **T1071.001 - Web Protocols**: SID 2000590 (/rg JSON handshake), 2000591 (/agent/init registration), 2000592 (/agent/poll beacon, 120s + jitter), 2000594 (C2 TLS SNI)
