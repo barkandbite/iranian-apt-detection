@@ -19,6 +19,7 @@ iranian-apt-detection/
 │   ├── 0922-iranian-apt-august2026-ics-indicators.xml # August 2026 ICS host indicators (CyberAv3ngers)
 │   ├── 0923-iranian-apt-august2026-host-indicators.xml # August 2026 host indicators (Olalampo)
 │   ├── 0924-iranian-apt-august2026-rustywater.xml    # August 2026 RustyWater host indicators
+│   ├── 0931-iranian-apt-october2026-dindoor-teams.xml # October 2026 DinDoor Teams-vishing host indicators
 │   └── README.md                                     # Wazuh rules documentation
 │
 ├── configurations/
@@ -28,7 +29,7 @@ iranian-apt-detection/
 │   └── README.md                                     # Configuration guide
 │
 ├── suricata/
-│   ├── iranian-apt-detection.rules                  # Consolidated Suricata IDS signatures (v4.0.24, 449 rules)
+│   ├── iranian-apt-detection.rules                  # Consolidated Suricata IDS signatures (v4.0.30, 474 rules)
 │   └── README.md                                     # Suricata deployment guide
 │
 ├── documentation/
@@ -99,8 +100,9 @@ iranian-apt-detection/
 - **101534-101535**: CyberAv3ngers ICS host indicators — Schneider project-file access, Siemens S7 binary path (0922)
 - **101536-101539**: MuddyWater Olalampo host indicators — CHAR, GhostFetch, service masquerade, FMAPP.dll SOCKS5 (0923)
 - **101540-101544**: MuddyWater RustyWater host indicators — Rust agent binary drop, service persistence, Templates state artifacts (0924)
+- **101580-101582**: MuddyWater DinDoor Teams-vishing host indicators — DenoJSEnv staging dir, `patch08078.b` archive, Deno runtime exec (0931). IDs 101545-101578 are reserved for the September consolidation drafts (#52-#61) pending merge.
 
-### Suricata SID Ranges (1000039-2000561)
+### Suricata SID Ranges (1000039-2000597)
 - **1000039-2000014**: CVE exploitation signatures
 - **2000015-2000030**: C2 infrastructure, post-exploitation, exfiltration
 - **2000031-2000050**: Reconnaissance, web shells, ICS/SCADA, correlation

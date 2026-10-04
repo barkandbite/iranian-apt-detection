@@ -5,6 +5,55 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.30] - 2026-10-04
+
+### Added — MuddyWater DinDoor Teams-vishing / CloudFront WebSocket C2 (SID 2000595–2000597)
+
+Daylight.ai (2026-09-01) documented a new DinDoor (Deno RAT) delivery and C2
+path: a fake Microsoft 365 "IT support" tenant social-engineers the victim
+over Microsoft Teams into running a "patch" that unpacks the Deno-based
+DinDoor backdoor into `%AppData%\Roaming\DenoJSEnv` and tunnels C2 over a
+WebSocket to a CloudFront distribution. This is distinct from the
+`serialmenot.com` HTTP:80 `/health` beacon already covered (SID
+2000249/2000412/2000491/2000493).
+
+- **SID 2000595** — DinDoor CloudFront WebSocket C2 TLS SNI (exact FQDN
+  `d1mjrkjsk5qy13.cloudfront.net`; never the shared `cloudfront.net` parent).
+- **SID 2000596** — DNS resolution of the same CloudFront distribution.
+- **SID 2000597** — Teams-vishing campaign staging IP `51.120.77.97`
+  (behavioral IOC, perishable).
+
+Written in the private `barkbite-suricata-by-country` distribution this cycle
+and backported here in lockstep (Private→Public manual sync).
+
+### Added — Wazuh host-side parity (new `0931` file, IDs 101580–101582)
+
+`wazuh-rules/0931-iranian-apt-october2026-dindoor-teams.xml`:
+
+- **101580** — DinDoor Deno-runtime staging directory populated under
+  `%AppData%\Roaming\DenoJSEnv`.
+- **101581** — Teams-vishing payload archive (`patch08078.b`) written to disk.
+- **101582** — Deno runtime executed from the DinDoor staging directory.
+
+IDs 101580–101582 are allocated clear of the September consolidation drafts
+(Wazuh IDs 101545–101578) so this merges without renumbering.
+
+### Reconciled — full Iran Suricata parity with the private distribution (SID 2000576–2000594)
+
+The consolidated Suricata file on `main` was at SID 2000575 (452 rules) while
+the private by-country distribution had advanced to 2000594 — the NodeRabbit/
+UNC1549/Nimbus-Manticore/Darkcomp/HEAVYGRAM/MiniFast rules authored across
+this cycle's daily sessions, which live here only in the still-open draft PRs
+#52–#61. Those nineteen Suricata rules (2000576–2000594) were ported from the
+private file so **both Iran rulesets are once again byte-identical, now at 474
+rules (SID 1000039–2000597)**. This closes the standing "97 orphaned rules
+will be lost if the sync fires" risk on the Suricata side.
+
+> **Note:** the *Wazuh* host-side rules for 2000576–2000594 (files 0926–0930,
+> IDs 101545–101578) still live only in draft PRs #52–#61 (plus PR #54's
+> reserved 101550–101556). Host-side parity for those campaigns completes when
+> that draft backlog is consolidated; this release does not duplicate them.
+
 ## [4.0.25] - 2026-08-20
 
 ### Added — MuddyWater RustyWater behavioral rules (SID 2000573–2000575)

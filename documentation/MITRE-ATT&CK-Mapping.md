@@ -234,3 +234,18 @@
 ### Defense Evasion
 - **T1574.002 - DLL Side-Loading**: Wazuh 101528 (WinDirStat.exe loading trojanized uxtheme.dll from non-system path)
 - **T1036.005 - Match Legitimate Name or Location**: Wazuh 101529 (execution from C:\ProgramData\WinDir\ masquerade directory), SID 2000553 (google.com.hospitalinstallation.com visual-obfuscation subdomain)
+
+---
+
+## October 2026 Additions — MuddyWater DinDoor Teams-Vishing / CloudFront WebSocket C2 (Daylight.ai)
+
+### Initial Access / Execution
+- **T1566.004 - Phishing: Spearphishing Voice**: SIDs 2000595-2000597, Wazuh 101581 (fake M365 "IT support" tenant vishing over Microsoft Teams; patch08078.b payload archive)
+- **T1204.002 - User Execution: Malicious File**: Wazuh 101580 (DenoJSEnv staging directory populated)
+- **T1059.007 - Command and Scripting Interpreter: JavaScript**: Wazuh 101582 (Deno runtime executed from the DinDoor staging directory)
+
+### Command and Control
+- **T1095 - Non-Application Layer Protocol (WebSocket)**: SID 2000595 (wss C2 to d1mjrkjsk5qy13.cloudfront.net/api/connect, TLS SNI)
+- **T1071.004 - Application Layer Protocol: DNS**: SID 2000596 (CloudFront distribution DNS resolution)
+- **T1071.001 - Web Protocols**: SID 2000597 (Teams-vishing staging IP 51.120.77.97)
+- **T1105 - Ingress Tool Transfer**: Wazuh 101580-101581 (Deno runtime + payload archive staging)
