@@ -6,10 +6,10 @@ This directory contains Suricata IDS signatures for detecting Iranian APT networ
 ## Current Ruleset
 
 ### Canonical File: `iranian-apt-detection.rules`
-- **Version**: 4.0.24 (consolidated from v3.1, v3.2, v3.3 + ongoing updates)
+- **Version**: 4.0.30 (consolidated from v3.1, v3.2, v3.3 + ongoing updates)
 - **Last Updated**: 2026-08-14
-- **SID Range**: 1000039–2000572
-- **Total Rules**: 449 signatures
+- **SID Range**: 1000039–2000597
+- **Total Rules**: 474 signatures
 - **Zero duplicate SIDs**
 - **Requires**: Suricata 7.0+
 
@@ -41,6 +41,9 @@ This directory contains Suricata IDS signatures for detecting Iranian APT networ
 | 2000562–2000563 | 2 | Cavern HollowGraph M365 Graph-API C2 + DNS-tunnel credential refresh (cloudlanecdn.com) |
 | 2000564–2000566 | 3 | CyberAv3ngers Schneider UMAS + Siemens S7comm ICS tampering (CISA AA26-097A) |
 | 2000567–2000572 | 6 | MuddyWater Operation Olalampo: GhostBackDoor French-language API C2, HTTP_VIP, PatchAgent |
+| 2000573–2000575 | 3 | MuddyWater RustyWater Rust RAT behavioral (reqwest UA, /rw/beacon, X-Rw-Id, gzip exfil) |
+| 2000576–2000594 | 19 | Sept 2026 cycle: NodeRabbit/UNC1549, Nimbus Manticore SSH tunneler + MiniFast, Darkcomp/Stagecomp, MOIS CHOSEN BRICK/HEAVYGRAM (reconciled from private distribution) |
+| 2000595–2000597 | 3 | MuddyWater DinDoor Teams-vishing / CloudFront WebSocket C2 (Daylight.ai 2026-09-01) |
 
 ### Threat Group Coverage
 

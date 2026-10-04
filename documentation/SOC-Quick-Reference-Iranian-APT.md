@@ -36,7 +36,20 @@ girlsbags[.]shop
 onlinepettools[.]shop
 web14[.]info
 web27[.]info
+
+# MuddyWater DinDoor Teams-vishing C2 (October 2026, Daylight.ai)
+d1mjrkjsk5qy13[.]cloudfront[.]net   # wss C2 /api/connect (exact FQDN only)
+51.120.77[.]97                       # staging IP
 ```
+
+### MuddyWater DinDoor Teams-Vishing (October 2026) — Key Indicators
+- **Delivery**: fake M365 "IT support" tenant vishes the user over Microsoft Teams into running a "patch"
+- **C2**: WebSocket (`wss://`) to `d1mjrkjsk5qy13.cloudfront.net/api/connect` — detect by TLS SNI / DNS on the exact FQDN, never the shared `cloudfront.net` parent
+- **Staging dir**: `%AppData%\Roaming\DenoJSEnv\` (Deno runtime unpacked here)
+- **Payload archive**: `patch08078.b`
+- **Runtime**: `deno.exe` executed from the DenoJSEnv staging directory
+- **Loopback listeners (host)**: 127.0.0.1:10020/10021/10022
+- **Distinct from**: the older `serialmenot.com` HTTP:80 `/health` DinDoor beacon
 
 ### Dust Specter (April 2026) — Key Indicators
 - **TwinTalk C2**: HTTPS GET with `Authorization: Bearer eyJ...` to randomized hex URI paths
