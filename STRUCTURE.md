@@ -19,6 +19,11 @@ iranian-apt-detection/
 │   ├── 0922-iranian-apt-august2026-ics-indicators.xml # August 2026 ICS host indicators (CyberAv3ngers)
 │   ├── 0923-iranian-apt-august2026-host-indicators.xml # August 2026 host indicators (Olalampo)
 │   ├── 0924-iranian-apt-august2026-rustywater.xml    # August 2026 RustyWater host indicators
+│   ├── 0926-iranian-apt-september2026-noderabbit.xml # Sept 2026 NodeRabbit/PollCat npm campaign host indicators
+│   ├── 0927-iranian-apt-september2026-unc1549.xml    # Sept 2026 UNC1549 SSH-tunneler host indicators
+│   ├── 0928-iranian-apt-september2026-chosenbrick.xml # Sept 2026 MOIS CHOSEN BRICK/HEAVYGRAM host indicators
+│   ├── 0929-iranian-apt-september2026-darkcomp.xml   # Sept 2026 MuddyWater Darkcomp/Stagecomp host indicators
+│   ├── 0930-iranian-apt-october2026-minifast.xml     # Oct 2026 Nimbus Manticore MiniFast host indicators
 │   ├── 0931-iranian-apt-october2026-dindoor-teams.xml # October 2026 DinDoor Teams-vishing host indicators
 │   └── README.md                                     # Wazuh rules documentation
 │
@@ -78,7 +83,7 @@ iranian-apt-detection/
 
 ## Rule ID Allocation
 
-### Wazuh Rules (100900-101544)
+### Wazuh Rules (100900-101578)
 - **100900-100924**: CVE exploitation detection (0910)
 - **100925-100959**: Behavioral detection (0911)
 - **100940-100959**: Network detection (0912)
@@ -100,7 +105,10 @@ iranian-apt-detection/
 - **101534-101535**: CyberAv3ngers ICS host indicators — Schneider project-file access, Siemens S7 binary path (0922)
 - **101536-101539**: MuddyWater Olalampo host indicators — CHAR, GhostFetch, service masquerade, FMAPP.dll SOCKS5 (0923)
 - **101540-101544**: MuddyWater RustyWater host indicators — Rust agent binary drop, service persistence, Templates state artifacts (0924)
-- **101580-101582**: MuddyWater DinDoor Teams-vishing host indicators — DenoJSEnv staging dir, `patch08078.b` archive, Deno runtime exec (0931). IDs 101545-101578 are reserved for the September consolidation drafts (#52-#61) pending merge.
+- **101565-101568**: CHOSEN BRICK/HEAVYGRAM extended host indicators — implant drop paths, MsCache/chromedriver secondary, execution mutexes, multi-stage correlation (0928)
+- **101569-101573**: MuddyWater Darkcomp/Stagecomp host indicators — ms_upd.exe/Game.exe from user-writable path, WebView2APISample masquerade, visualwincomp.txt config, WebView2Loader.dll side-load, Run-key persistence (0929)
+- **101574-101578**: Nimbus Manticore MiniFast host indicators — Zoom\bin\update staging dir, WindowsSecurityUpdate/ZoomUpdateTaskUser scheduled tasks, AppDomain-manager DLLs, .exe.config hijack staging, cmd.exe from implant dir (0930)
+- **101580-101582**: MuddyWater DinDoor Teams-vishing host indicators — DenoJSEnv staging dir, `patch08078.b` archive, Deno runtime exec (0931). IDs 101550-101556 remain reserved for PR #54's planned `0925-ioc-list-matching.xml`.
 
 ### Suricata SID Ranges (1000039-2000597)
 - **1000039-2000014**: CVE exploitation signatures

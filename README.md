@@ -138,7 +138,7 @@ sudo chmod +x /var/ossec/active-response/bin/iranian-apt-active-response.sh
 - **Impact**: 14 techniques (+5)
 
 ### Rule Statistics
-- **Wazuh Rules**: 277 detection rules across 11 files
+- **Wazuh Rules**: 324 detection rules across 21 files
 - **Suricata Signatures**: 474 network signatures (1 consolidated rule file)
 - **CVEs Covered**: 40+ including 2025/2026 zero-days
 - **Known C2 IPs**: 37+
@@ -321,4 +321,4 @@ These rules are provided as-is for defensive purposes. Users are responsible for
 
 ---
 
-**Last Updated**: August 14, 2026 | **Version**: 4.0.24 | **Maintainer**: Bark&Bite Security Intelligence
+**Last Updated**: October 1, 2026 | **Version**: 4.0.29 | **Maintainer**: Bark&Bite Security Intelligence
