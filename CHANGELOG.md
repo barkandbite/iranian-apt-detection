@@ -5,6 +5,37 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.31] - 2026-10-05
+
+### Merged — September Wazuh host-indicator backlog consolidated (files 0926–0930, IDs 101545–101578)
+
+The v4.0.30 release restored full Iran *Suricata* parity but deliberately
+left the Wazuh host-side rules for SIDs 2000576–2000594 stranded in draft
+PRs #52–#61. This release merges that backlog (the PR #61 chain head) into
+the v4.0.30 line:
+
+- **0926** NodeRabbit/PollCat npm campaign (101545–101549)
+- **0927** UNC1549 SSH-tunneler (101557–101560)
+- **0928** MOIS CHOSEN BRICK/HEAVYGRAM + extensions (101561–101568)
+- **0929** MuddyWater Darkcomp/Stagecomp (101569–101573)
+- **0930** Nimbus Manticore MiniFast (101574–101578)
+
+Docs union-merged across both lines (CHANGELOG 4.0.26–4.0.30 history,
+STRUCTURE.md tree + ID map, MITRE Sept+Oct sections, SOC quick reference,
+suricata/README SID table). Suricata file unchanged: 474 rules, still
+byte-identical with the private distribution.
+
+PR #54 remains an independent unit — Wazuh IDs 101550–101556 stay reserved
+for its planned `0925-ioc-list-matching.xml`.
+
+No new Iranian threat intelligence required rule changes this cycle: the
+2026-08-20 → 2026-10-05 survey found no in-window Iranian campaign
+reporting beyond the DinDoor Teams-vishing wave already covered in 4.0.30.
+
+### Validation
+- `suricata -T` (7.0.3): 474 rules, zero errors
+- `xmllint --noout`: 21/21 Wazuh XML files clean; zero duplicate rule IDs (100900–101582)
+
 ## [4.0.30] - 2026-10-04
 
 ### Added — MuddyWater DinDoor Teams-vishing / CloudFront WebSocket C2 (SID 2000595–2000597)
