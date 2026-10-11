@@ -5,6 +5,24 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Verified — 2026-10-11 daily maintenance audit
+
+No Iranian-rule changes this cycle; audit-only entry.
+
+- Suricata parity with the private by-country distribution re-verified:
+  **byte-identical at 474 rules (SID 1000039-2000597)** on the Sept/Oct
+  consolidation chain tip (PR #63 line).
+- `suricata -T` (7.0.3) on `suricata/iranian-apt-detection.rules`: exit 0.
+- `xmllint --noout wazuh-rules/*.xml`: exit 0; zero duplicate Wazuh IDs.
+- Threat-intel window 2026-10-10 → 10-11 swept (CISA KEV, Unit 42,
+  Check Point, Huntress, Group-IB): no new Iranian-attributed tradecraft
+  beyond what v4.0.26–v4.0.31 already cover (MiniFast, DinDoor,
+  Darkcomp/Stagecomp, CHOSEN BRICK/HEAVYGRAM, NodeRabbit/PollCat).
+- PR #54 (independent P0 Wazuh-load fix, Wazuh IDs 101550-101556 reserved)
+  still awaiting human review — deliberately not absorbed into this line.
+
 ## [4.0.31] - 2026-10-05
 
 ### Merged — September Wazuh host-indicator backlog consolidated (files 0926–0930, IDs 101545–101578)
