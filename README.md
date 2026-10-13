@@ -1,6 +1,6 @@
 # Iranian APT Detection Rules
 
-[![Version](https://img.shields.io/badge/version-4.0.25-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.0.31-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![MITRE ATT&CK](https://img.shields.io/badge/MITRE%20ATT%26CK-v15-orange.svg)](documentation/MITRE-ATT&CK-Mapping.md)
 
@@ -16,8 +16,10 @@ Three concurrent Iranian campaigns targeting U.S. healthcare disclosed March 24:
 - **Pay2Key v3** (IRGC) hit unnamed U.S. healthcare org with **ChaCha20 + Curve25519** ransomware. Fake Avast AV bypass. **I2P C2** (not Tor). Purely destructive — no ransom demand.
 - **MuddyWater** exploiting **CVE-2025-59287** (Windows WSUS Deserialization RCE, CVSS 9.8) to pre-position on healthcare networks.
 
-## Recent Threats (v4.0.25)
+## Recent Threats (v4.0.30)
 
+- **NEW (v4.0.30)**: **MuddyWater DinDoor Teams-vishing / CloudFront WebSocket C2** (SID 2000595-2000597, Daylight.ai 2026-09-01) — fake M365 "IT support" tenant vishes the victim over Microsoft Teams into running a "patch" that unpacks the Deno-based DinDoor RAT into `%AppData%\Roaming\DenoJSEnv` and tunnels C2 over a WebSocket to `d1mjrkjsk5qy13.cloudfront.net/api/connect`. TLS SNI + DNS (exact FQDN) + staging IP `51.120.77.97`. 3 Wazuh host rules (101580-101582, new `0931` file): DenoJSEnv staging dir, `patch08078.b` archive, Deno runtime exec from staging. Distinct from the existing `serialmenot.com` HTTP:80 `/health` beacon coverage.
+- **RECONCILED (v4.0.30)**: Full Iran Suricata parity with the private by-country distribution — ported SID 2000576-2000594 (NodeRabbit/UNC1549, Nimbus Manticore SSH tunneler + MiniFast, Darkcomp/Stagecomp, MOIS CHOSEN BRICK/HEAVYGRAM) that had lived only in open draft PRs #52-#61. Both Iran rulesets are now byte-identical at **474 rules (SID 1000039-2000597)**. Host-side Wazuh rules for those campaigns remain in the draft backlog pending consolidation.
 - **NEW (v4.0.25)**: **MuddyWater RustyWater behavioral rules** (SID 2000573-2000575) — complements the v4.0.21 IOC-anchored coverage (SID 2000534-2000537) with signatures that survive C2 rotation: `POST /rw/beacon` + `reqwest/` UA + Base64 body, `GET /rw/task` + `X-Rw-Id` header, `POST /rw/upload` + gzip + `reqwest/` UA. 5 new Wazuh host rules (101540-101544) in new `0924` file cover agent-binary drop patterns, Windows service persistence, and Templates-dir state artifacts.
 
 ## Recent Threats (v4.0.24)
@@ -80,7 +82,7 @@ sudo systemctl restart wazuh-manager
 
 ### 2. Deploy Suricata Rules
 ```bash
-# Deploy consolidated rules (v4.0 — single file, 449 signatures)
+# Deploy consolidated rules (v4.0 — single file, 474 signatures)
 sudo cp suricata/iranian-apt-detection.rules /etc/suricata/rules/
 
 # Add to suricata.yaml rule-files section:
@@ -136,8 +138,8 @@ sudo chmod +x /var/ossec/active-response/bin/iranian-apt-active-response.sh
 - **Impact**: 14 techniques (+5)
 
 ### Rule Statistics
-- **Wazuh Rules**: 277 detection rules across 11 files
-- **Suricata Signatures**: 449 network signatures (1 consolidated rule file)
+- **Wazuh Rules**: 324 detection rules across 21 files
+- **Suricata Signatures**: 474 network signatures (1 consolidated rule file)
 - **CVEs Covered**: 40+ including 2025/2026 zero-days
 - **Known C2 IPs**: 37+
 - **Known C2 Domains**: 37+
@@ -201,7 +203,7 @@ iranian-apt-detection/
 │   ├── 0920-iranian-apt-june2026-host-indicators.xml
 │   └── README.md
 ├── suricata/                  # Network IDS signatures
-│   ├── iranian-apt-detection.rules  # Consolidated v4.0 (449 rules)
+│   ├── iranian-apt-detection.rules  # Consolidated v4.0 (474 rules)
 │   └── README.md
 ├── configurations/            # Agent and system configs
 │   ├── sysmon-config-iranian-apt.xml
@@ -319,4 +321,4 @@ These rules are provided as-is for defensive purposes. Users are responsible for
 
 ---
 
-**Last Updated**: August 14, 2026 | **Version**: 4.0.24 | **Maintainer**: Bark&Bite Security Intelligence
+**Last Updated**: October 1, 2026 | **Version**: 4.0.29 | **Maintainer**: Bark&Bite Security Intelligence
