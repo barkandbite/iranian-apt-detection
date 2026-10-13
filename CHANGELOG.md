@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Verified — 2026-10-13 daily maintenance audit
+
+No Iranian-rule changes this cycle; audit-only entry.
+
+- Suricata parity with the private by-country distribution re-verified:
+  **byte-identical at 474 rules (SID 1000039-2000597)** on the chain tip
+  (PR #64 line, adopted verbatim).
+- `suricata -T` (7.0.3) on `suricata/iranian-apt-detection.rules`: exit 0.
+- `xmllint --noout wazuh-rules/*.xml`: exit 0; zero duplicate Wazuh IDs.
+- Threat-intel window 2026-10-11 → 10-13 swept (CISA KEV official feed,
+  Unit 42, Kaspersky, vendor PSIRTs): no new Iranian-attributed tradecraft.
+  Unit 42's Oct-6 Screening Serpens tracker update (new RAT variants,
+  AppDomainManager hijacking) maps to existing MiniFast coverage
+  (SID 2000590-2000594, Wazuh 0930). Microsoft October Patch Tuesday lands
+  after this cycle's cutoff — next session sweeps it.
+- Non-Iranian findings from the window (AA26-281A Flax Typhoon IOC annex,
+  NightEagle dev-tunnels C2, NetScaler OOB-callback IOCs) were ruled in the
+  by-country repo — see its paired PR.
+- PR #54 (independent P0 Wazuh-load fix, Wazuh IDs 101550-101556 reserved)
+  still awaiting human review — deliberately not absorbed into this line.
+
 ### Verified — 2026-10-11 daily maintenance audit
 
 No Iranian-rule changes this cycle; audit-only entry.
