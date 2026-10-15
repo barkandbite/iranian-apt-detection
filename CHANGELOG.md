@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Verified — 2026-10-15 daily maintenance audit
+
+No Iranian-rule changes this cycle; audit-only entry.
+
+- Suricata parity with the private by-country distribution re-verified:
+  **byte-identical at 474 rules (SID 1000039-2000597)** on the chain tip
+  (PR #65 line, adopted verbatim).
+- `suricata -T` (7.0.3) on `suricata/iranian-apt-detection.rules`: exit 0.
+- `xmllint --noout wazuh-rules/*.xml`: 21/21 exit 0; zero duplicate Wazuh IDs.
+- Threat-intel window 2026-10-13 → 10-15 swept (CISA KEV official catalog,
+  Volexity, Horizon3, Cisco PSIRT, Palo Alto PSIRT, Group-IB secondary):
+  **no new Iranian-attributed tradecraft.** Group-IB's Nimbus Manticore
+  infrastructure reporting maps to existing UNC1549 SSH-tunnel and MiniFast
+  coverage (SID 2000576-2000583, 2000590-2000594).
+- Non-Iranian findings from the window (Oct-14 KEV batch: PAN-OS
+  CVE-2026-0322, AhsayCBS CVE-2026-105133/105134, Cisco SEG CVE-2026-76519;
+  Ivanti Connect Secure CVE-2026-104935 zero-day chain; APT28 HOOKEDGE)
+  were ruled in the by-country repo — see its paired PR.
+- PR #54 (Wazuh-loadability P0) remains independent and unabsorbed; Wazuh
+  IDs 101550-101556 stay reserved for it.
+
 ### Verified — 2026-10-13 daily maintenance audit
 
 No Iranian-rule changes this cycle; audit-only entry.
