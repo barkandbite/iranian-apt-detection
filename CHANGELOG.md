@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Verified — 2026-10-17 daily maintenance audit
+
+No Iranian-rule changes this cycle; audit-only entry.
+
+- Suricata parity with the private by-country distribution re-verified:
+  **byte-identical at 474 rules (SID 1000039-2000597)** on the chain tip
+  (adopted verbatim onto the maintenance branch).
+- `suricata -T` (7.0.3) on `suricata/iranian-apt-detection.rules`: exit 0.
+- `xmllint --noout wazuh-rules/*.xml`: 21/21 exit 0; zero duplicate Wazuh IDs.
+- Threat-intel window 2026-08-20 → 10-17 swept across four parallel passes
+  (CISA KEV official catalog — 75 additions triaged; edge-appliance,
+  app/server and network-device CVE research; nation-state APT survey):
+  **no new Iranian-attributed tradecraft requiring a rule.** MuddyWater
+  Dindoor/FakeSet (Symantec, continued coverage) maps to existing Deno-runtime
+  C2 and "Amy Cherne"/"Donald Gay" cert-pivot coverage; CyberAv3ngers/IOCONTROL
+  latest verifiable activity (Minnesota water utilities, Jul-26) predates the
+  window and is already covered. MuddyWater "MuddyViper" (ESET Dec-2025) and
+  "RustyWater" (Aug-2026) remain covered from prior cycles.
+- Non-Iranian findings from the window (WordPress CVE-2026-87902, Zimbra
+  CVE-2026-73570, Star Blizzard RedFlick, the Flax Typhoon legacy-CVE cluster,
+  and the full Sep/Oct NetScaler/FortiMail/Ivanti/AhsayCBS/Atlassian/SharePoint
+  KEV sweep) were ruled in the by-country repo — see its paired PR.
+- PR #54 (Wazuh-loadability P0) remains independent and unabsorbed; Wazuh
+  IDs 101550-101556 stay reserved for it.
+
 ### Verified — 2026-10-15 daily maintenance audit
 
 No Iranian-rule changes this cycle; audit-only entry.
