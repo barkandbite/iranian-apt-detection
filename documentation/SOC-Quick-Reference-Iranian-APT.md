@@ -38,6 +38,16 @@ web14[.]info
 web27[.]info
 ```
 
+### HEAVYGRAM / CHOSEN BRICK (October 2026) — Key Indicators
+- **Attribution**: MOIS (FBI/NCSC/AIVD joint advisory 2026-09-15, CSA 260915). Targets dissidents, journalists, activists — treat hits on personal/BYOD segments seriously
+- **C2**: Per-victim Telegram bot; newer builds proxy Telegram through residential proxies (`iproyal.com`, `lightningproxies.net` lookups — SIDs 2000576-2000577)
+- **Exfil**: Vultr object storage (`*.vultrobjects.com`), Storj (`*.storjshare.io`), Backblaze B2 — SIDs 2000578-2000579 (telemetry-grade; confirm against asset's normal behavior)
+- **Registry**: Run keys `SMQDService` or `winappx` (Wazuh 101545)
+- **File path**: trailing-space directory `C:\Windows \SysWOW64` — no legitimate software uses this (Wazuh 101546-101547)
+- **Defender tampering**: path exclusions added, event 5007 (Wazuh 101548)
+- **Lures**: fake Pictory / KeePass / Telegram / RunwayML / Norton / Flash installers; "MRI scan results" documents
+- **Mutexes**: `ytyjyujyu`, `noi672pp434awkc12f`
+
 ### Dust Specter (April 2026) — Key Indicators
 - **TwinTalk C2**: HTTPS GET with `Authorization: Bearer eyJ...` to randomized hex URI paths
 - **File artifacts**: `C:\ProgramData\PolGuid\in.txt` and `out.txt` (TwinTask polling)

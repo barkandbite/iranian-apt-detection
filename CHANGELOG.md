@@ -5,6 +5,53 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.26] - 2026-10-21
+
+### Added — HEAVYGRAM / CHOSEN BRICK network telemetry (SID 2000576–2000579)
+
+Joint FBI / NCSC / AIVD advisory of 2026-09-15 (CSA 260915) details a
+Telegram-controlled Windows implant the FBI attributes to Iran's MOIS and
+calls HEAVYGRAM (NCSC: CHOSEN BRICK), used against dissidents, journalists
+and activists since at least 2025. Each victim gets a dedicated Telegram
+bot; newer builds proxy the Telegram traffic through residential proxy
+providers, and exfiltration also rides commercial object storage.
+
+Four telemetry-grade Suricata rules (classtype `policy-violation`,
+threshold limit 1/hour — all four services have legitimate uses, tune
+per-host):
+
+- **SID 2000576** — DNS lookup of `iproyal.com` (residential proxy provider)
+- **SID 2000577** — DNS lookup of `lightningproxies.net`
+- **SID 2000578** — TLS SNI `*.vultrobjects.com` (Vultr object storage exfil)
+- **SID 2000579** — TLS SNI `*.storjshare.io` (Storj exfil)
+
+Backblaze B2 exfil was already covered by SIDs 2000146–2000148 / 2000191.
+
+### Added — Wazuh host-side parity rules (101545–101548)
+
+New file `wazuh-rules/0925-iranian-apt-october2026-heavygram.xml`:
+
+- **101545** — Run key persistence named `SMQDService` / `winappx`
+- **101546** — File written under the trailing-space directory
+  `C:\Windows \SysWOW64` (masquerading path unique to this implant)
+- **101547** — Process execution from that trailing-space directory
+- **101548** — Microsoft Defender path exclusion added (event 5007) for
+  AppData or the trailing-space path
+
+### Backport direction
+
+Originated in the private `barkbite-suricata-by-country` repo during the
+2026-10-21 maintenance session; backported here per the standing rule that
+both repos stay in sync on Iran content. Iran SID parity verified — both
+repos at 456 rules, SIDs 1000039–2000579.
+
+### Validation
+
+- `suricata -T` on `suricata/iranian-apt-detection.rules`: OK, 456 rules load
+- `xmllint --noout wazuh-rules/*.xml`: all 16 XML files pass
+- Wazuh rule IDs 100900–101548: zero duplicates
+- Suricata SID parity vs `bb-iran-suricata.rules`: **identical**
+
 ## [4.0.25] - 2026-08-20
 
 ### Added — MuddyWater RustyWater behavioral rules (SID 2000573–2000575)

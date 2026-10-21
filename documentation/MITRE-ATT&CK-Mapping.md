@@ -234,3 +234,24 @@
 ### Defense Evasion
 - **T1574.002 - DLL Side-Loading**: Wazuh 101528 (WinDirStat.exe loading trojanized uxtheme.dll from non-system path)
 - **T1036.005 - Match Legitimate Name or Location**: Wazuh 101529 (execution from C:\ProgramData\WinDir\ masquerade directory), SID 2000553 (google.com.hospitalinstallation.com visual-obfuscation subdomain)
+
+---
+
+## October 2026 Additions — HEAVYGRAM / CHOSEN BRICK (FBI/NCSC/AIVD CSA 260915)
+
+MOIS-attributed Telegram-controlled Windows implant targeting dissidents,
+journalists and activists (FBI: HEAVYGRAM; NCSC: CHOSEN BRICK).
+
+### Command and Control
+- **T1090.002 - External Proxy**: SIDs 2000576-2000577 (residential proxy providers iproyal.com / lightningproxies.net used to launder per-victim Telegram bot C2)
+- **T1102.002 - Bidirectional Communication**: Telegram Bot API C2 (per-victim bot; detection is host-side — network path is covered via the proxy-provider telemetry above)
+
+### Exfiltration
+- **T1567.002 - Exfiltration to Cloud Storage**: SIDs 2000578-2000579 (Vultr object storage, Storj; Backblaze B2 covered by existing SIDs 2000146-2000148, 2000191)
+
+### Persistence
+- **T1547.001 - Registry Run Keys**: Wazuh 101545 (Run keys "SMQDService" / "winappx")
+
+### Defense Evasion
+- **T1036.005 - Match Legitimate Name or Location**: Wazuh 101546-101547 (trailing-space directory "C:\Windows \SysWOW64")
+- **T1562.001 - Disable or Modify Tools**: Wazuh 101548 (Defender path exclusions added, event 5007)
