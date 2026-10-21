@@ -1,0 +1,52 @@
+<!--
+  Wazuh rules for HEAVYGRAM / CHOSEN BRICK (October 2026).
+  Telegram-controlled Windows implant attributed by the FBI to Iran's
+  Ministry of Intelligence and Security (MOIS); the UK NCSC tracks it as
+  CHOSEN BRICK. Joint FBI / NCSC / AIVD advisory 2026-09-15
+  (ic3.gov/CSA/2026/260915-2.pdf). Targets dissidents, journalists and
+  activists. Host indicators: Run-key persistence as "SMQDService" or
+  "winappx", staging under the trailing-space directory
+  "C:\Windows \SysWOW64" (note the space), and Microsoft Defender folder
+  exclusions added for its install path.
+-->
+<group name="iranian_apt,mois,heavygram,chosen_brick,october2026,">
+
+  <rule id="101545" level="14">
+    <if_group>sysmon_event_13</if_group>
+    <field name="win.eventdata.targetObject" type="pcre2">(?i)\\CurrentVersion\\Run\\(SMQDService|winappx)$</field>
+    <description>HEAVYGRAM/CHOSEN BRICK persistence: Run key named SMQDService or winappx (MOIS implant, FBI/NCSC/AIVD CSA 260915).</description>
+    <mitre>
+      <id>T1547.001</id>
+    </mitre>
+  </rule>
+
+  <rule id="101546" level="14">
+    <if_group>sysmon_event_11</if_group>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?i)\\Windows \\SysWOW64\\</field>
+    <description>File written under the trailing-space directory "C:\Windows \SysWOW64" - HEAVYGRAM masquerading path (no legitimate software uses this directory).</description>
+    <mitre>
+      <id>T1036.005</id>
+    </mitre>
+  </rule>
+
+  <rule id="101547" level="14">
+    <if_group>sysmon_event1</if_group>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\Windows \\SysWOW64\\</field>
+    <description>Process executed from the trailing-space directory "C:\Windows \SysWOW64" - HEAVYGRAM implant execution.</description>
+    <mitre>
+      <id>T1036.005</id>
+      <id>T1204.002</id>
+    </mitre>
+  </rule>
+
+  <rule id="101548" level="12">
+    <if_sid>62100</if_sid>
+    <field name="win.system.eventID">^5007$</field>
+    <field name="win.system.message" type="pcre2">(?i)Exclusions\\\\Paths.*\\\\(AppData|Windows \\\\SysWOW64)</field>
+    <description>Microsoft Defender path exclusion added for an AppData or trailing-space SysWOW64 path - HEAVYGRAM defense evasion (Defender event 5007).</description>
+    <mitre>
+      <id>T1562.001</id>
+    </mitre>
+  </rule>
+
+</group>

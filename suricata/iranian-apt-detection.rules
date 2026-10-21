@@ -2292,3 +2292,24 @@ alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Mudd
 alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater RustyWater X-Rw-Id Task Poll 2026"; flow:to_server,established; http.method; content:"GET"; http.uri; content:"/rw/task"; fast_pattern; nocase; http.header_names; content:"X-Rw-Id"; nocase; threshold:type limit, track by_src, count 1, seconds 600; reference:url,rescana.com/post/rustywater-iranian-muddywater-apt; reference:url,attack.mitre.org/techniques/T1071/001/; classtype:command-and-control; sid:2000574; rev:1; metadata:policy max-detect-ips drop, created_at 2026_08_20, updated_at 2026_08_20;)
 
 alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater RustyWater Gzipped Exfil /rw/upload 2026"; flow:to_server,established; http.method; content:"POST"; http.uri; content:"/rw/upload"; fast_pattern; nocase; http.header; content:"Content-Encoding: gzip"; nocase; http.user_agent; content:"reqwest/"; nocase; threshold:type limit, track by_src, count 1, seconds 900; reference:url,rescana.com/post/rustywater-iranian-muddywater-apt; reference:url,attack.mitre.org/techniques/T1041/; classtype:trojan-activity; sid:2000575; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_08_20, updated_at 2026_08_20;)
+
+# ==========================================================================
+# 2026-10-21: HEAVYGRAM / CHOSEN BRICK - MOIS Telegram-controlled implant
+# Joint FBI / NCSC / AIVD advisory 2026-09-15 (ic3.gov/CSA/2026/260915-2.pdf).
+# Targets dissidents, journalists and activists worldwide; per-victim
+# Telegram bot C2, newer builds proxy Telegram traffic through residential
+# proxy providers; exfil via Vultr object storage and Storj (Backblaze B2
+# exfil is already covered by SID 2000146-2000148/2000191).
+# TUNING: all four rules fire on services with legitimate uses. They are
+# telemetry-grade (classtype policy-violation, threshold limit 1/hour) -
+# suppress per-host where a business use of the service is known.
+# Backported from barkbite-suricata-by-country (SID 2000576-2000579).
+# ==========================================================================
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT MOIS HEAVYGRAM Residential Proxy Provider iproyal.com DNS Lookup 2026"; dns.query; content:"iproyal.com"; nocase; endswith; threshold:type limit, track by_src, count 1, seconds 3600; reference:url,ic3.gov/CSA/2026/260915-2.pdf; reference:url,attack.mitre.org/techniques/T1090/002/; classtype:policy-violation; sid:2000576; rev:1; metadata:policy max-detect-ips drop, created_at 2026_10_21, updated_at 2026_10_21;)
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT MOIS HEAVYGRAM Residential Proxy Provider lightningproxies.net DNS Lookup 2026"; dns.query; content:"lightningproxies.net"; nocase; endswith; threshold:type limit, track by_src, count 1, seconds 3600; reference:url,ic3.gov/CSA/2026/260915-2.pdf; reference:url,attack.mitre.org/techniques/T1090/002/; classtype:policy-violation; sid:2000577; rev:1; metadata:policy max-detect-ips drop, created_at 2026_10_21, updated_at 2026_10_21;)
+
+alert tls $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MOIS HEAVYGRAM Vultr Object Storage Exfiltration Channel 2026"; flow:established,to_server; tls.sni; content:"vultrobjects.com"; nocase; endswith; threshold:type limit, track by_src, count 1, seconds 3600; reference:url,ic3.gov/CSA/2026/260915-2.pdf; reference:url,attack.mitre.org/techniques/T1567/002/; classtype:policy-violation; sid:2000578; rev:1; metadata:policy max-detect-ips drop, created_at 2026_10_21, updated_at 2026_10_21;)
+
+alert tls $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MOIS HEAVYGRAM Storj Object Storage Exfiltration Channel 2026"; flow:established,to_server; tls.sni; content:"storjshare.io"; nocase; endswith; threshold:type limit, track by_src, count 1, seconds 3600; reference:url,ic3.gov/CSA/2026/260915-2.pdf; reference:url,attack.mitre.org/techniques/T1567/002/; classtype:policy-violation; sid:2000579; rev:1; metadata:policy max-detect-ips drop, created_at 2026_10_21, updated_at 2026_10_21;)
