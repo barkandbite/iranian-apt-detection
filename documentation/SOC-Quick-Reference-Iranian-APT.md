@@ -202,6 +202,23 @@ grep "Iranian APT" /var/log/suricata/fast.log | cut -d'"' -f2 | sort | uniq -c
 - Exchange server compromise
 - Mass credential theft suspected
 
+## October 2026 IOC Quick List (v4.0.26)
+
+**Mirage Kitten (UNC1549 cluster) — NodeRabbit/PollCat:**
+- C2 URIs: `POST /api/rabbit/{checkin,task,result}`, `POST /sdk/v2/{ready,config,events}`, `/gate/{hello,submit,track}`, `GET /gate/fetch?token=`, `PUT /vault/push/`
+- Handshake quirk: HTTP **400** response containing `socketId` + `pollInterval` JSON
+- C2 domains: visitfinancedentists[.]com, healthcomfsdpower[.]com, sahi-finance[.]com, lifespotify[.]com, msmanagementgrp[.]com, plus per-victim *.azurewebsites.net
+- Delivery: trojanized npm deps `colorized_terminal` / `pretty-log` (pinned 2.1.0), recruiter coding-challenge ZIPs
+- Host: `curl.exe --proxy-anyauth --proxy-user`, local listeners 127.0.0.1:48739 / 41984-46983
+
+**Nimbus Manticore — TWOSTROKE / reverse SSH tunneler:**
+- Both masquerade as `wtsapi32.dll` (search-order hijack; alert on this DLL outside System32)
+- Tunneler: reverse SSH to 172.86.98[.]113:443; artifacts `C:\windows\system32\openssh\ssh.exe`, `C:\Windows\System32\config\systemprofile\ssh`
+- C2/infra DNS: neexportfolio[.]com (+ azurewebsites/cloudapp mirrors), locat[.]sbs, tiktok-u[.]sbs (country-coded subdomains uae1-14, sau1-3, uk1-2)
+
+**CHOSEN BRICK / HEAVYGRAM (MOIS spyware, NCSC/FBI advisory 2026-09-15):**
+- Telegram-API C2 (TLS to api.telegram.org) — no network signature; watch for the advisory's host IOCs; targets dissidents/journalists via WhatsApp/Telegram social engineering
+
 ## Additional Resources
 
 - CISA Advisory: https://www.cisa.gov/news-events/cybersecurity-advisories/aa24-241a
