@@ -1,0 +1,62 @@
+<!--
+  Wazuh rules for October 2026 Iranian APT host indicators.
+  Covers Mirage Kitten (UNC1549 / Smoke Sandstorm cluster) NodeRabbit/PollCat
+  delivery and proxy fallback (Kaspersky Securelist, 2026-09-01) and the
+  Nimbus Manticore / Tortoiseshell wtsapi32.dll search-order hijack pair with
+  its reverse-SSH tunneler (Group-IB, 2026-08-26). Network-side parity lives
+  in suricata/iranian-apt-detection.rules SIDs 2000576-2000584.
+-->
+<group name="iranian_apt,mirage_kitten,nimbus_manticore,october2026,">
+
+  <rule id="101545" level="13">
+    <if_sid>592</if_sid>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?i)^(?!.*\\Windows\\(?:System32|SysWOW64)\\).*\\wtsapi32\.dll$</field>
+    <description>wtsapi32.dll written outside System32/SysWOW64 - Nimbus Manticore DLL search-order hijack staging (TWOSTROKE backdoor / reverse SSH tunneler).</description>
+    <mitre>
+      <id>T1574.001</id>
+      <id>T1105</id>
+    </mitre>
+  </rule>
+
+  <rule id="101546" level="12">
+    <if_sid>60103,60104</if_sid>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\openssh\\ssh\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">\s-[NR]\s</field>
+    <description>Windows OpenSSH client invoked with reverse-tunnel flags - Nimbus Manticore reverse SSH tunneler pattern (observed to 172.86.98.113:443).</description>
+    <mitre>
+      <id>T1572</id>
+    </mitre>
+  </rule>
+
+  <rule id="101547" level="10">
+    <if_sid>554,550</if_sid>
+    <field name="file" type="pcre2">(?i)\\Windows\\System32\\config\\systemprofile\\ssh\\</field>
+    <description>SSH client artifacts created under the systemprofile directory - Nimbus Manticore tunneler host artifact.</description>
+    <mitre>
+      <id>T1572</id>
+      <id>T1105</id>
+    </mitre>
+  </rule>
+
+  <rule id="101548" level="12">
+    <if_sid>60103,60104</if_sid>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)npm(\.cmd|\.exe)?\s+(?:install|i)\s+.*(?:colorized_terminal|pretty-log)</field>
+    <description>Installation of trojanized npm dependency (colorized_terminal / pretty-log) - Mirage Kitten coding-challenge lure delivery chain.</description>
+    <mitre>
+      <id>T1195.002</id>
+      <id>T1204.002</id>
+    </mitre>
+  </rule>
+
+  <rule id="101549" level="12">
+    <if_sid>60103,60104</if_sid>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\curl\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)--proxy-anyauth\s+--proxy-user</field>
+    <description>curl.exe launched with --proxy-anyauth --proxy-user - Mirage Kitten NodeRabbit/PollCat proxy-fallback C2 pattern.</description>
+    <mitre>
+      <id>T1071.001</id>
+      <id>T1090</id>
+    </mitre>
+  </rule>
+
+</group>

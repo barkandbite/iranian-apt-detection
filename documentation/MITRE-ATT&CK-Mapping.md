@@ -234,3 +234,23 @@
 ### Defense Evasion
 - **T1574.002 - DLL Side-Loading**: Wazuh 101528 (WinDirStat.exe loading trojanized uxtheme.dll from non-system path)
 - **T1036.005 - Match Legitimate Name or Location**: Wazuh 101529 (execution from C:\ProgramData\WinDir\ masquerade directory), SID 2000553 (google.com.hospitalinstallation.com visual-obfuscation subdomain)
+
+---
+
+## October 2026 Additions — Mirage Kitten NodeRabbit/PollCat + Nimbus Manticore (Kaspersky, Group-IB)
+
+### Initial Access
+- **T1195.002 - Compromise Software Supply Chain**: Wazuh 101548 (trojanized npm dependencies colorized_terminal / pretty-log in coding-challenge lures)
+- **T1566.003 - Spearphishing via Service**: delivery context for NodeRabbit/PollCat (LinkedIn recruiter lures) — covered by the C2 SIDs below once implanted
+
+### Command and Control
+- **T1071.001 - Web Protocols**: SIDs 2000576-2000578, 2000580 (NodeRabbit /api/rabbit/ and /sdk/v2/ POST C2; PollCat /gate/ URIs; HTTP-400 socketId handshake)
+- **T1071.004 - DNS**: SIDs 2000581-2000583 (health/finance-themed C2 domains; neexportfolio; locat.sbs / tiktok-u.sbs country-coded tunnel infra)
+- **T1572 - Protocol Tunneling**: SID 2000584, Wazuh 101546-101547 (reverse SSH to 172.86.98.113:443; OpenSSH reverse-tunnel flags and systemprofile ssh artifacts)
+- **T1090 - Proxy**: Wazuh 101549 (PollCat curl --proxy-anyauth fallback)
+
+### Exfiltration
+- **T1041 - Exfiltration Over C2 Channel**: SID 2000579 (PollCat PUT /vault/push/)
+
+### Defense Evasion / Persistence
+- **T1574.001 - DLL Search Order Hijacking**: Wazuh 101545 (wtsapi32.dll masquerade outside System32)

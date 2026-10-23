@@ -5,6 +5,65 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.26] - 2026-10-23
+
+### Added — Mirage Kitten NodeRabbit + PollCat RATs (SID 2000576-2000581)
+
+Kaspersky Securelist (2026-09-01) profiled Mirage Kitten (UNC1549 / Smoke
+Sandstorm cluster) delivering two new RATs through fake LinkedIn recruiter
+coding-challenge lures (trojanized challenge ZIPs and npm dependencies
+`colorized_terminal` / `pretty-log` pinned to 2.1.0) against fintech,
+aviation and aerospace targets in the Middle East and Africa:
+
+- **SID 2000576** — NodeRabbit C2: `POST /api/rabbit/checkin|task|result`.
+- **SID 2000577** — NodeRabbit variant 3: `POST /sdk/v2/ready|config|events`
+  (thresholded — the path family is less distinctive).
+- **SID 2000578** — PollCat C2: `/gate/hello`, `GET /gate/fetch?token=`,
+  `/gate/submit`, `/gate/track`.
+- **SID 2000579** — PollCat exfil: `PUT /vault/push/`.
+- **SID 2000580** — PollCat handshake quirk: server replies **HTTP 400**
+  with JSON carrying `socketId`/`pollInterval`/`jitterTime` — a clean
+  behavioral artifact that survives domain rotation.
+- **SID 2000581** — DNS lookups for the health/finance-themed C2 domain set
+  (visitfinancedentists.com, healthcomfsdpower.com, sahi-finance.com,
+  lifespotify.com, msmanagementgrp.com).
+
+### Added — Nimbus Manticore TWOSTROKE + reverse SSH tunneler (SID 2000582-2000584)
+
+Group-IB (2026-08-26) documented a TWOSTROKE-like HTTPS backdoor and a
+reverse-SSH tunneler, both masquerading as `wtsapi32.dll`:
+
+- **SID 2000582** — DNS for `neexportfolio` C2 (covers .com plus
+  azurewebsites/cloudapp mirrors).
+- **SID 2000583** — DNS for `locat.sbs` / `tiktok-u.sbs` country-coded
+  tunnel infrastructure.
+- **SID 2000584** — SSH banner to 172.86.98.113:443 (reverse tunnel over
+  HTTPS port).
+
+### Added — Wazuh host-side parity rules (101545-101549)
+
+New file `wazuh-rules/0925-iranian-apt-october2026-host-indicators.xml`:
+
+- **101545** — `wtsapi32.dll` written outside System32/SysWOW64 (Nimbus
+  Manticore DLL search-order hijack staging).
+- **101546** — Windows OpenSSH client invoked with reverse-tunnel flags.
+- **101547** — SSH artifacts under `systemprofile\ssh`.
+- **101548** — Installation of trojanized npm deps `colorized_terminal` /
+  `pretty-log` (Mirage Kitten delivery chain).
+- **101549** — `curl.exe --proxy-anyauth --proxy-user` (PollCat proxy
+  fallback).
+
+### Notes
+
+- CHOSEN BRICK / HEAVYGRAM (NCSC/FBI/AIVD joint advisory, 2026-09-15):
+  Telegram-API C2 spyware targeting Iranian dissidents. No network rule —
+  C2 is TLS to api.telegram.org; the advisory IOC appendix (PDF) should be
+  mined for host indicators in a follow-up session.
+- Validation: `suricata -T` clean on Suricata 7.0.3 (461 rules, zero
+  errors); all 9 new SIDs verified firing against crafted PCAPs, zero
+  false positives on benign lookalike traffic; Wazuh XML well-formed,
+  zero duplicate IDs (100900-101549).
+
 ## [4.0.25] - 2026-08-20
 
 ### Added — MuddyWater RustyWater behavioral rules (SID 2000573–2000575)
