@@ -1,0 +1,73 @@
+<!--
+  Wazuh rules for Nimbus Manticore (UNC1549) MiniFast backdoor (coverage gap
+  closed 2026-10-01 from Check Point "Fast and Furious", 2026-05-22).
+  MiniFast is deployed via .NET AppDomain hijacking: a trojanized
+  <exe>.config pointing appDomainManager at a malicious DLL (uevmonitor.dll,
+  InitInstall.dll, UpdateChecker.dll; export CheckForUpdates), staged under
+  AppData\Local\Packages and AppData\Local\Zoom\bin\update (trojanized Zoom
+  installer campaign). Persistence: scheduled tasks "WindowsSecurityUpdate"
+  (opcode 0xB1) and hijacked "ZoomUpdateTaskUser-<SID>". Command execution
+  opcode 0x04 spawns cmd.exe /c from the implant directory. Network-side
+  parity: Suricata SID 2000590-2000594.
+  Note: the generic "Updater.dll" filename from the report is deliberately
+  excluded from 101576 - alone it is a false-positive factory; the implant
+  directory and .config rules cover that variant.
+  Ref: Check Point Research, "Fast and Furious - Nimbus Manticore Operations
+  During the Iranian Conflict", 2026-05-22.
+-->
+<group name="iranian_apt,nimbus_manticore,minifast,october2026,">
+
+  <rule id="101574" level="12">
+    <if_sid>60103,60104</if_sid>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\AppData\\Local\\Zoom\\bin\\update\\</field>
+    <description>Process launched from the MiniFast second-stage directory (AppData\Local\Zoom\bin\update) - trojanized Zoom installer deployment path.</description>
+    <mitre>
+      <id>T1036.005</id>
+      <id>T1204.002</id>
+    </mitre>
+  </rule>
+
+  <rule id="101575" level="12">
+    <if_sid>60103,60104</if_sid>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\schtasks\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)\/create.{0,200}(WindowsSecurityUpdate|ZoomUpdateTaskUser-)</field>
+    <description>Scheduled-task persistence using MiniFast task names (WindowsSecurityUpdate / ZoomUpdateTaskUser-*).</description>
+    <mitre>
+      <id>T1053.005</id>
+    </mitre>
+  </rule>
+
+  <rule id="101576" level="12">
+    <if_sid>592</if_sid>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?i)\\(uevmonitor|InitInstall|UpdateChecker)\.dll$</field>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?i)\\(AppData\\(Local|Roaming)|Temp|Downloads|ProgramData)\\</field>
+    <description>Known MiniFast AppDomain-manager DLL (uevmonitor/InitInstall/UpdateChecker) written to a user-writable path.</description>
+    <mitre>
+      <id>T1574</id>
+      <id>T1105</id>
+    </mitre>
+  </rule>
+
+  <rule id="101577" level="10">
+    <if_sid>592</if_sid>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?i)\\[^\\]+\.exe\.config$</field>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?i)\\(AppData\\(Local|Roaming)|Temp|Downloads|ProgramData)\\</field>
+    <description>.exe.config file written beside an executable in a user-writable path - .NET AppDomain hijacking staging (MiniFast delivery technique).</description>
+    <mitre>
+      <id>T1574</id>
+      <id>T1036.005</id>
+    </mitre>
+  </rule>
+
+  <rule id="101578" level="13">
+    <if_sid>60103,60104</if_sid>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\cmd\.exe$</field>
+    <field name="win.eventdata.parentImage" type="pcre2">(?i)\\AppData\\Local\\(Zoom\\bin\\update|Packages)\\</field>
+    <description>cmd.exe spawned by a process in a MiniFast staging directory - backdoor command-execution opcode (0x04) pattern.</description>
+    <mitre>
+      <id>T1059.003</id>
+      <id>T1071.001</id>
+    </mitre>
+  </rule>
+
+</group>
