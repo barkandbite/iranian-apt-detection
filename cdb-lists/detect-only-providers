@@ -4,6 +4,7 @@
 atera.com:abused_legitimate_service
 azurewebsites.net:abused_legitimate_service
 cloudflare-dns.com:abused_legitimate_service
+cloudfront.net:abused_legitimate_service
 ddnsking.com:abused_legitimate_service
 dns.google:abused_legitimate_service
 duckdns.org:abused_legitimate_service
@@ -16,6 +17,7 @@ ngrok.io:abused_legitimate_service
 onlyoffice.com:abused_legitimate_service
 pdq.com:abused_legitimate_service
 privatedns.org:abused_legitimate_service
+s3.amazonaws.com:abused_legitimate_service
 screenconnect.com:abused_legitimate_service
 somee.com:abused_legitimate_service
 syncromsp.com:abused_legitimate_service

@@ -65,6 +65,8 @@ LEGIT_PROVIDERS = {
     "onlyoffice.com",    # Screening Serpens staged payloads on OnlyOffice
     "privatedns.org",    # shared dynamic-DNS parent (Infy DGA lives under it)
     "it.com",            # shared registry
+    "cloudfront.net",    # shared CDN parent (DinDoor C2 rides one distribution;
+                         # block the exact d*.cloudfront.net FQDN only, T2)
 }
 
 IP_EXCLUDE = {

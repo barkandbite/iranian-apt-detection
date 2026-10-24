@@ -1,6 +1,7 @@
 # GENERATED FILE -- do not edit by hand.
 # Regenerate:  python3 tools/extract-iocs.py
 # Source:      suricata/*.rules
+d1mjrkjsk5qy13.cloudfront.net:iranian_apt_c2_shared_host
 datadrift.somee.com:iranian_apt_c2_shared_host
 f13.ddnsking.com:iranian_apt_c2_shared_host
 line.completely.workers.dev:iranian_apt_c2_shared_host

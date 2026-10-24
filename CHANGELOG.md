@@ -5,6 +5,49 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.2.0] - 2026-10-24
+
+### Added -- Sept/Oct 2026 campaign coverage, consolidated from draft PRs #51-#69
+
+30 new Suricata rules (SID 2000576-2000605), msg fields in the v5.1.0
+standardized format:
+
+- **UNC1549 / Mirage Kitten NodeRabbit + PollCat** -- oracle-challenge S3
+  staging bucket, fake-job lure archive, PollCat Azure flow marker and
+  repeated HTTP-400 check-in, plus behavioral C2 endpoints salvaged from
+  draft #69: `/api/rabbit/` checkin-task-result, `/sdk/v2/` variant,
+  `/gate/` hello-fetch-submit-track, `PUT /vault/push/` exfil, HTTP 400
+  handshake with socketId/pollInterval JSON, health/finance-themed C2
+  domains (2000576-2000578, 2000580-2000581, 2000598-2000603)
+- **Nimbus Manticore** -- SSH tunneler C2 172.86.98.113:443 in/outbound,
+  MiniFast backdoor (`POST /rg`, `/agent/init`, `/agent/poll`,
+  SEO-poisoning domains, azurewebsites TLS masquerade), TWOSTROKE
+  neexportfolio domain, locat.sbs/tiktok-u.sbs tunnel infrastructure
+  (2000579, 2000582-2000583, 2000590-2000594, 2000604-2000605)
+- **MOIS CHOSEN BRICK HEAVYGRAM** -- residential-proxy providers
+  (iproyal, lightningproxies), Storj/Vultr object-storage exfil,
+  Telegram+cloud-exfil correlation (2000584-2000585, 2000587-2000589)
+- **MuddyWater Darkcomp/Stagecomp** TLS SNI (2000586) and **DinDoor**
+  Teams-vishing CloudFront WebSocket C2 (2000595-2000597)
+
+7 new Wazuh files (0926-0931 plus the v5.1.0 0925), 101545-101582: host
+indicators for NodeRabbit, Nimbus Manticore SSH tunneler, CHOSEN BRICK
+HEAVYGRAM, Darkcomp, MiniFast, and DinDoor Teams-vishing. All pass
+`tools/lint-rules.py` with 0 errors.
+
+### Fixed
+
+- `tools/extract-iocs.py`: `cloudfront.net` added to the shared-provider
+  set -- the DinDoor distribution FQDN now tiers as T2 (block the exact
+  FQDN) instead of T1, and the parent can never enter a blockable list.
+
+### Notes
+
+- Totals: **482 Suricata / 331 Wazuh** rules. Zero duplicate SIDs or rule IDs.
+- This release folds in the content of draft PRs #51-#53 and #55-#69 on top
+  of the v5.1.0 Wazuh load-fix line (PR #54). The drafts' own version tags
+  (v4.0.26-v4.0.31) are superseded by this entry.
+
 ## [5.1.0] - 2026-09-19
 
 ### Fixed -- P0: the Wazuh ruleset did not load at all

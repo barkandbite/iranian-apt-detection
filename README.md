@@ -1,6 +1,6 @@
 # Iranian APT Detection Rules
 
-[![Version](https://img.shields.io/badge/version-5.1.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-5.2.0-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![MITRE ATT&CK](https://img.shields.io/badge/MITRE%20ATT%26CK-v13-orange.svg)](documentation/MITRE-ATT&CK-Mapping.md)
 
@@ -36,7 +36,7 @@ You only need the section that matches the software you already run. Skip the re
 
 You need **one file**: `suricata/iranian-apt-detection.rules`
 
-This single file contains all 452 network detection signatures.
+This single file contains all 482 network detection signatures.
 
 ```bash
 # Copy the rules file into your Suricata rules directory
@@ -129,11 +129,11 @@ configurations/ossec-agent-iranian-apt.conf
 iranian-apt-detection/
 |
 |-- suricata/                       <-- SURICATA USERS: start here
-|   |-- iranian-apt-detection.rules     One file, 452 network signatures
+|   |-- iranian-apt-detection.rules     One file, 482 network signatures
 |   `-- README.md                       Suricata-specific docs
 |
 |-- wazuh-rules/                    <-- WAZUH USERS: start here
-|   |-- 0910 through 0925 .xml files   301 SIEM detection rules
+|   |-- 0910 through 0931 .xml files   331 SIEM detection rules
 |   `-- README.md                       Wazuh-specific docs
 |
 |-- configurations/                 <-- OPTIONAL: endpoint configs
@@ -324,4 +324,4 @@ These rules are provided as-is for defensive purposes only. No offensive capabil
 
 ---
 
-**Last Updated**: September 19, 2026 | **Version**: 5.1.0 | **Maintainer**: Bark&Bite Security Intelligence
+**Last Updated**: October 24, 2026 | **Version**: 5.2.0 | **Maintainer**: Bark&Bite Security Intelligence
