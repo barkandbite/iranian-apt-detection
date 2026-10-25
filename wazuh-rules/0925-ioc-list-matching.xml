@@ -1,0 +1,116 @@
+<!--
+  Iranian APT - CDB list IOC matching
+  Rule IDs: 101550-101556
+
+  These rules consume the generated CDB lists in cdb-lists/. They do nothing
+  until the lists are installed and declared in ossec.conf:
+
+    <ruleset>
+      <list>etc/lists/malicious-ip</list>
+      <list>etc/lists/malicious-domains-t1</list>
+      <list>etc/lists/malicious-fqdn-t2</list>
+      <list>etc/lists/detect-only-providers</list>
+      <list>etc/lists/rfc1918</list>
+    </ruleset>
+
+  Copy the files from cdb-lists/ to /var/ossec/etc/lists/ and restart the
+  manager; Wazuh compiles them on start.
+
+  DIRECTION MATTERS. On a NAT'd network the high-value signal is EGRESS, an
+  internal host reaching out to actor infrastructure. Inbound source-IP
+  reputation is largely inert because external source IPs are translated or
+  absent. The egress rules below are rated above the inbound one.
+
+  See cdb-lists/README.md for the T1/T2/T3 tiering and what is safe to block.
+-->
+<group name="iranian_apt,ioc_match,">
+
+  <!-- ================= EGRESS: highest-value direction ================= -->
+
+  <rule id="101550" level="15">
+    <if_group>firewall|ids|web</if_group>
+    <list field="dstip" lookup="address_match_key">etc/lists/malicious-ip</list>
+    <description>Iranian APT: outbound connection to known actor C2 IP $(dstip)</description>
+    <mitre>
+      <id>T1071</id>
+    </mitre>
+    <group>attack,command_control,egress,ioc_match,</group>
+  </rule>
+
+  <rule id="101551" level="15">
+    <if_group>sysmon_event_22</if_group>
+    <list field="win.eventdata.queryName" lookup="match_key">etc/lists/malicious-domains-t1</list>
+    <description>Iranian APT: DNS resolution of dedicated actor C2 domain $(win.eventdata.queryName)</description>
+    <mitre>
+      <id>T1071.004</id>
+    </mitre>
+    <group>attack,command_control,egress,ioc_match,</group>
+  </rule>
+
+  <!-- T2: the exact FQDN is malicious, the parent provider is not.
+       Block this FQDN only; never the parent. -->
+  <rule id="101552" level="15">
+    <if_group>sysmon_event_22</if_group>
+    <list field="win.eventdata.queryName" lookup="match_key">etc/lists/malicious-fqdn-t2</list>
+    <description>Iranian APT: DNS resolution of actor FQDN on a shared provider $(win.eventdata.queryName)</description>
+    <mitre>
+      <id>T1071.004</id>
+      <id>T1102</id>
+    </mitre>
+    <group>attack,command_control,egress,ioc_match,</group>
+  </rule>
+
+  <rule id="101553" level="15">
+    <if_group>web|proxy</if_group>
+    <list field="url" lookup="match_key">etc/lists/malicious-domains-t1</list>
+    <description>Iranian APT: HTTP request to known actor C2 domain</description>
+    <mitre>
+      <id>T1071.001</id>
+    </mitre>
+    <group>attack,command_control,egress,ioc_match,</group>
+  </rule>
+
+  <!-- ================= INBOUND: weaker signal behind NAT ================= -->
+
+  <!-- Rated below the egress equivalents on purpose: behind NAT the external
+       source IP is frequently translated or absent, so this fires rarely and
+       is easy to spoof when it does. -->
+  <rule id="101554" level="12">
+    <if_group>firewall|ids</if_group>
+    <list field="srcip" lookup="address_match_key">etc/lists/malicious-ip</list>
+    <description>Iranian APT: inbound connection from known actor C2 IP $(srcip)</description>
+    <mitre>
+      <id>T1190</id>
+    </mitre>
+    <group>attack,ioc_match,</group>
+  </rule>
+
+  <!-- ================= ENRICHMENT: abused legitimate services ============ -->
+
+  <!-- T3: legitimate services that Iranian actors abuse (GitHub, Telegram,
+       Cloudflare Workers, dynamic DNS, RMM vendors). Resolution is normal on
+       most networks, so this is level 4, enrichment only. NEVER block these.
+       Escalates only via 101556 when correlated on the same host. -->
+  <rule id="101555" level="4">
+    <if_group>sysmon_event_22</if_group>
+    <list field="win.eventdata.queryName" lookup="match_key">etc/lists/detect-only-providers</list>
+    <description>Iranian APT: resolution of a commonly-abused legitimate service $(win.eventdata.queryName)</description>
+    <mitre>
+      <id>T1102</id>
+    </mitre>
+    <group>abused_service,enrichment,ioc_match,</group>
+  </rule>
+
+  <!-- Abused-service contact on a host that already hit a confirmed actor
+       IOC is meaningfully different from routine use. -->
+  <rule id="101556" level="14" frequency="2" timeframe="3600">
+    <if_matched_group>ioc_match</if_matched_group>
+    <same_location />
+    <description>Iranian APT: multiple IOC matches on the same host within one hour</description>
+    <mitre>
+      <id>T1071</id>
+    </mitre>
+    <group>attack,correlation,ioc_match,</group>
+  </rule>
+
+</group>
