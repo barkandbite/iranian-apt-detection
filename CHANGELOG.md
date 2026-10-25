@@ -5,6 +5,21 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### 2026-10-25 daily maintenance audit (no rule changes)
+
+- Validation on the v5.2.0 line: `suricata -T` exit 0 on
+  `suricata/iranian-apt-detection.rules` (482 rules, Suricata 7.0.3);
+  `tools/lint-rules.py` 0 errors; `xmllint --noout` clean on all 22
+  Wazuh XML files; zero duplicate Wazuh rule IDs.
+- Cross-repo parity verified byte-identical with
+  `bb-iran-suricata.rules` (482 rules, SID 1000039-2000605).
+- No Iranian-attributed intelligence in the 2026-10-24 → 10-25 window.
+  The day's actively-exploited KEV item (CVE-2026-114625 Arista
+  VeloCloud Orchestrator SQLi) is unattributed mass exploitation and
+  was covered in the by-country repo's cross-country file.
+
 ## [5.2.0] - 2026-10-24
 
 ### Added -- Sept/Oct 2026 campaign coverage, consolidated from draft PRs #51-#69
