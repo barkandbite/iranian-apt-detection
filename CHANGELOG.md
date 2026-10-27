@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 2026-10-27 daily maintenance audit (no rule changes)
+
+- Validation on the v5.2.0 line: `suricata -T` exit 0 on
+  `suricata/iranian-apt-detection.rules` (482 rules, Suricata 7.0.3);
+  `tools/lint-rules.py` 0 errors; `xmllint --noout` clean on all 22
+  Wazuh XML files; zero duplicate Wazuh rule IDs.
+- Cross-repo parity verified byte-identical with
+  `bb-iran-suricata.rules` (482 rules, SID 1000039-2000605).
+- No Iranian-attributed intelligence in the 2026-10-25 → 10-27 window
+  (CISA KEV Oct-26 = PHP2Shell, unattributed; Check Point weekly Oct-26
+  items are DPRK/criminal). The session's rule work (BRONZE SANDCASTLE
+  China C2, two by-country defect fixes) lives in the by-country repo.
+- C2 IOC spot-check carried from the 2026-10-26 session: 194.11.246.101
+  still cited as MuddyWater C2; no reassignment or seizure evidence for
+  157.20.182.75 / 157.20.182.49 / 45.80.148.195 — all four rules stay
+  enabled. Full VT/AbuseIPDB/Shodan Tier-2 rotation still due.
+
 ### 2026-10-25 daily maintenance audit (no rule changes)
 
 - Validation on the v5.2.0 line: `suricata -T` exit 0 on
