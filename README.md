@@ -1,6 +1,6 @@
 # Iranian APT Detection Rules
 
-[![Version](https://img.shields.io/badge/version-4.0.25-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.0.26-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![MITRE ATT&CK](https://img.shields.io/badge/MITRE%20ATT%26CK-v15-orange.svg)](documentation/MITRE-ATT&CK-Mapping.md)
 
@@ -16,7 +16,9 @@ Three concurrent Iranian campaigns targeting U.S. healthcare disclosed March 24:
 - **Pay2Key v3** (IRGC) hit unnamed U.S. healthcare org with **ChaCha20 + Curve25519** ransomware. Fake Avast AV bypass. **I2P C2** (not Tor). Purely destructive — no ransom demand.
 - **MuddyWater** exploiting **CVE-2025-59287** (Windows WSUS Deserialization RCE, CVSS 9.8) to pre-position on healthcare networks.
 
-## Recent Threats (v4.0.25)
+## Recent Threats (v4.0.26)
+
+- **NEW (v4.0.26)**: **Operation Olalampo full-report delta** — Group-IB's October 2026 full technical report audited against existing coverage; two gaps closed: HTTP_VIP newer-variant output endpoints `/ecmd` `/esend` `/erecv` (SID 2000576) and `159.198.43.141` (real IP behind miniquest.org) added to the Olalampo C2 IP set (SID 2000375 rev:2). 3 new Wazuh delta rules (101545-101547) in new `0925` file: implant file-writes under `C:\Users\Public`, `DailyUpdate` scheduled task, `pic.LOG`/`cobe-notes.txt` exfil staging.
 
 - **NEW (v4.0.25)**: **MuddyWater RustyWater behavioral rules** (SID 2000573-2000575) — complements the v4.0.21 IOC-anchored coverage (SID 2000534-2000537) with signatures that survive C2 rotation: `POST /rw/beacon` + `reqwest/` UA + Base64 body, `GET /rw/task` + `X-Rw-Id` header, `POST /rw/upload` + gzip + `reqwest/` UA. 5 new Wazuh host rules (101540-101544) in new `0924` file cover agent-binary drop patterns, Windows service persistence, and Templates-dir state artifacts.
 
@@ -319,4 +321,4 @@ These rules are provided as-is for defensive purposes. Users are responsible for
 
 ---
 
-**Last Updated**: August 14, 2026 | **Version**: 4.0.24 | **Maintainer**: Bark&Bite Security Intelligence
+**Last Updated**: October 28, 2026 | **Version**: 4.0.26 | **Maintainer**: Bark&Bite Security Intelligence

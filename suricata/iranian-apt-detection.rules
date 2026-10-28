@@ -1287,7 +1287,7 @@ alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT MuddyWater HTTP
 alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT MuddyWater HTTP_VIP jerusalemsolutions.com 2026"; dns.query; content:"jerusalemsolutions.com"; nocase; classtype:command-and-control; sid:2000373; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_24, updated_at 2026_03_24;)
 alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT MuddyWater HTTP_VIP netvigil.org 2026"; dns.query; content:"netvigil.org"; nocase; classtype:command-and-control; sid:2000374; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_24, updated_at 2026_03_24;)
 # HTTP_VIP - Known C2 IPs
-alert ip $HOME_NET any -> [162.0.230.185,209.74.87.100,143.198.5.41,209.74.87.67] any (msg:"Bark&Bite - Iranian APT MuddyWater Olalampo C2 IPs 2026"; classtype:command-and-control; sid:2000375; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_24, updated_at 2026_03_24;)
+alert ip $HOME_NET any -> [162.0.230.185,209.74.87.100,143.198.5.41,209.74.87.67,159.198.43.141] any (msg:"Bark&Bite - Iranian APT MuddyWater Olalampo C2 IPs 2026"; classtype:command-and-control; sid:2000375; rev:2; metadata:policy max-detect-ips drop, created_at 2026_03_24, updated_at 2026_10_28;)
 # MuddyWater - Service name MicrosoftVersionUpdater (persistence)
 # Network correlation: detect DNS/HTTP from hosts where this service exists
 # Primarily a Wazuh/endpoint detection
@@ -2292,3 +2292,16 @@ alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Mudd
 alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater RustyWater X-Rw-Id Task Poll 2026"; flow:to_server,established; http.method; content:"GET"; http.uri; content:"/rw/task"; fast_pattern; nocase; http.header_names; content:"X-Rw-Id"; nocase; threshold:type limit, track by_src, count 1, seconds 600; reference:url,rescana.com/post/rustywater-iranian-muddywater-apt; reference:url,attack.mitre.org/techniques/T1071/001/; classtype:command-and-control; sid:2000574; rev:1; metadata:policy max-detect-ips drop, created_at 2026_08_20, updated_at 2026_08_20;)
 
 alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater RustyWater Gzipped Exfil /rw/upload 2026"; flow:to_server,established; http.method; content:"POST"; http.uri; content:"/rw/upload"; fast_pattern; nocase; http.header; content:"Content-Encoding: gzip"; nocase; http.user_agent; content:"reqwest/"; nocase; threshold:type limit, track by_src, count 1, seconds 900; reference:url,rescana.com/post/rustywater-iranian-muddywater-apt; reference:url,attack.mitre.org/techniques/T1041/; classtype:trojan-activity; sid:2000575; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_08_20, updated_at 2026_08_20;)
+
+
+# OPERATION OLALAMPO DELTA (Group-IB full technical report, October 2026)
+# Olalampo is already covered in Sections 15/23 and the August 2026 backlog
+# block (GhostBackDoor French API, HTTP_VIP /postinfo header set, X-ChunkId,
+# C2 domain rotation, C2 IP set - see SID 2000243-2000252, 2000374-2000375,
+# 2000562-2000566). This delta adds the one uncovered artifact from the full
+# report: the newer HTTP_VIP variant's bare output endpoints. 159.198.43.141
+# (real IP behind miniquest.org) was also folded into SID 2000375 rev:2.
+# ==========================================================================
+
+# HTTP_VIP newer-variant output endpoints: bare /ecmd /esend /erecv URIs.
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater Olalampo HTTP_VIP Output Endpoint Poll 2026"; flow:to_server,established; http.uri; pcre:"/^\/e(?:cmd|send|recv)$/"; threshold:type both, track by_src, count 3, seconds 600; reference:url,group-ib.com/blog/muddywater-operation-olalampo/; reference:url,attack.mitre.org/techniques/T1071/001/; classtype:command-and-control; sid:2000576; rev:1; metadata:policy max-detect-ips drop, created_at 2026_10_28, updated_at 2026_10_28;)
