@@ -5,6 +5,34 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.26] - 2026-10-28
+
+### Added — Operation Olalampo full-report delta (SID 2000576, SID 2000375 rev:2)
+
+Group-IB published the full Operation Olalampo technical report (October
+2026). Nearly all of its indicators were already covered by the March and
+August 2026 rule waves (GhostBackDoor French REST API, HTTP_VIP /postinfo
+pseudo-header set, X-ChunkId chunked transfer, the C2 domain rotation, and
+the C2 IP set). Two gaps remained and are closed here:
+
+- **SID 2000576** — HTTP_VIP newer-variant bare output endpoints
+  (`/ecmd`, `/esend`, `/erecv`), threshold 3/600s per source.
+- **SID 2000375 rev:2** — `159.198.43.141` (the real IP behind
+  `miniquest.org`, recovered by Group-IB via TLS-certificate pivot) folded
+  into the existing Olalampo C2 IP set.
+
+### Added — Wazuh host-side delta rules (101545–101547)
+
+New file `wazuh-rules/0925-iranian-apt-october2026-olalampo.xml` covering
+only the artifacts 0919/0923 do not already see:
+
+- **101545** — Olalampo implant binaries being *written* under
+  `C:\Users\Public` (MicrosoftExcelUser.exe / MicrosoftWordUser.exe /
+  novaservice.exe) — complements 0923's execution-stage rule.
+- **101546** — `DailyUpdate` scheduled task pointing at novaservice.exe.
+- **101547** — Exfil staging artifacts `pic.LOG` / `cobe-notes.txt` in a
+  Downloads directory.
+
 ## [4.0.25] - 2026-08-20
 
 ### Added — MuddyWater RustyWater behavioral rules (SID 2000573–2000575)

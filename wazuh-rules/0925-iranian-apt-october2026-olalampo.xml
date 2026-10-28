@@ -1,0 +1,44 @@
+<!--
+  Wazuh rules for MuddyWater Operation Olalampo - delta from Group-IB's full
+  technical report (October 2026). Olalampo host coverage already exists in
+  0919 (MicrosoftVersionUpdater service, FMAPP execution) and 0923
+  (novaservice.exe execution, burnutill\burn.exe, FMAPP.dll sideload).
+  This file adds only the artifacts those rules do not see:
+  - the implant binaries being WRITTEN to disk (file-creation, not execution)
+  - the DailyUpdate scheduled-task persistence command line
+  - the pic.LOG / cobe-notes.txt exfil-staging files
+  Network-side parity: Suricata SIDs 2000243-2000252, 2000374-2000375 rev:2,
+  2000562-2000566, 2000576.
+-->
+<group name="iranian_apt,muddywater,olalampo,october2026,">
+
+  <rule id="101545" level="12">
+    <if_sid>592</if_sid>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?i)\\Users\\Public\\(Documents\\(MicrosoftExcelUser|MicrosoftWordUser)|Downloads\\novaservice)\.exe$</field>
+    <description>MuddyWater Olalampo implant written under C:\Users\Public (GhostFetch/HTTP_VIP/CHAR naming pattern) - file-creation stage, complements execution rule in 0923.</description>
+    <mitre>
+      <id>T1105</id>
+      <id>T1036.005</id>
+    </mitre>
+  </rule>
+
+  <rule id="101546" level="13">
+    <if_sid>60103,60104</if_sid>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)schtasks.+/tn\s+"?DailyUpdate"?.+novaservice\.exe</field>
+    <description>MuddyWater Olalampo CHAR persistence: DailyUpdate scheduled task pointing at novaservice.exe.</description>
+    <mitre>
+      <id>T1053.005</id>
+    </mitre>
+  </rule>
+
+  <rule id="101547" level="10">
+    <if_sid>592</if_sid>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?i)\\Downloads\\(pic\.log|cobe-notes\.txt)$</field>
+    <description>MuddyWater Olalampo exfiltration staging artifact (pic.LOG keylog container / cobe-notes.txt) in a Downloads directory.</description>
+    <mitre>
+      <id>T1074.001</id>
+      <id>T1056.001</id>
+    </mitre>
+  </rule>
+
+</group>
