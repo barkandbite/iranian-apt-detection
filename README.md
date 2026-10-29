@@ -16,6 +16,10 @@ Three concurrent Iranian campaigns targeting U.S. healthcare disclosed March 24:
 - **Pay2Key v3** (IRGC) hit unnamed U.S. healthcare org with **ChaCha20 + Curve25519** ransomware. Fake Avast AV bypass. **I2P C2** (not Tor). Purely destructive — no ransom demand.
 - **MuddyWater** exploiting **CVE-2025-59287** (Windows WSUS Deserialization RCE, CVSS 9.8) to pre-position on healthcare networks.
 
+## Recent Threats (v4.0.26)
+
+- **NEW (v4.0.26)**: **Blinder Tunnel / CL-STA-1178** (Unit 42 Oct 2026) — Iranian-nexus campaign against Iraqi critical infrastructure; weaponized `.csproj` MSBuild execution, ShelbyLoader V2/ShelbyC2 V2 GitHub-contents C2, Blackwood Chisel loader, fake Dubai Airport careers portal + Google-themed `.cam` phishing. 6 Suricata rules (SID 2000576-2000581) incl. a rotation-resistant behavioral signature for the `api.github.com /contents/{16-hex}/Lic|Inf.txt` tasking poll; 5 Wazuh host rules (101545-101549) in new `0925` file.
+
 ## Recent Threats (v4.0.25)
 
 - **NEW (v4.0.25)**: **MuddyWater RustyWater behavioral rules** (SID 2000573-2000575) — complements the v4.0.21 IOC-anchored coverage (SID 2000534-2000537) with signatures that survive C2 rotation: `POST /rw/beacon` + `reqwest/` UA + Base64 body, `GET /rw/task` + `X-Rw-Id` header, `POST /rw/upload` + gzip + `reqwest/` UA. 5 new Wazuh host rules (101540-101544) in new `0924` file cover agent-binary drop patterns, Windows service persistence, and Templates-dir state artifacts.

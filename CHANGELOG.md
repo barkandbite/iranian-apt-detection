@@ -5,6 +5,55 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.26] - 2026-10-29
+
+### Added — Blinder Tunnel / CL-STA-1178 campaign (SID 2000576–2000581)
+
+Unit 42 (2026-10-06) attributed the **Blinder Tunnel** campaign (cluster
+CL-STA-1178) to an Iranian-nexus actor with low-confidence overlap with
+Screening Serpens / Agent Serpens (Elastic: "The Shelby Strategy").
+Targets: Iraqi critical infrastructure, via a fake "Dubai Airport Careers"
+portal and a weaponized `.csproj` that executes on project open in Visual
+Studio (MSBuild `GetFrameworkPaths` override). The chain sideloads
+**ShelbyLoader V2** as `RuntimeBroker.exe`, runs **ShelbyC2 V2** over
+GitHub-based C2, and loads Chisel through the **Blackwood** loader.
+
+- **SID 2000576** — DNS query for the campaign's Google-themed `.cam`
+  phishing cluster (`g-drive` / `googeldrive` / `drivegoogel` / `meetonline`).
+- **SID 2000577** — DNS query for `googelmeet.online` / `asdfafadafg.online`.
+- **SID 2000578** — outbound traffic to Chisel/Blackwood infrastructure
+  (91.107.156.29, 65.109.214.145, 87.248.129.239, 38.180.136.127).
+- **SID 2000579** — `/peakyblinders-tm/` GitHub repo path (account IOC;
+  visible on plaintext HTTP or TLS-inspecting proxies).
+- **SID 2000580** — behavioral: `api.github.com` contents-API poll for
+  `/{16-hex machineId}/Lic.txt|Inf.txt` — the ShelbyC2 tasking pattern,
+  survives C2 account rotation. Threshold 2/600s, priority 1.
+- **SID 2000581** — lure archive download
+  (`DubaiAirport_Carrers_IT_Test.zip`, `WarUnPublishedDocuments.zip`).
+
+### Added — Wazuh host-side parity rules (101545–101549)
+
+New file `wazuh-rules/0925-iranian-apt-october2026-blindertunnel.xml`:
+
+- **101545** — `RuntimeBroker.exe` executing from
+  `%LOCALAPPDATA%\Microsoft\RuntimeBrokers\` (legit copy runs from System32).
+- **101546** — HKCU Run value `MicrosoftRuntime` set (ShelbyLoader persistence).
+- **101547** — `vshost.exe` / `vshost32.exe` outside a Visual Studio install path.
+- **101548** — FIM: `Blackwood.dll.conf`, `Blackwood.Cheese.xml`, or the
+  ETW-disabling `RuntimeBroker.exe.config` written.
+- **101549** — `msbuild.exe` spawning an executable from AppData
+  (weaponized `.csproj` initial-access pattern).
+
+### Notes
+
+- All 458 Suricata rules validate on Suricata 7.0.3 (zero errors); SID parity
+  with `barkbite-suricata-by-country/rules/bb-iran-suricata.rules` verified
+  identical the same session.
+- ShelbyC2's GitHub *fallback* channel (`/search/issues` + AES blob in issue
+  comments) is deliberately not covered yet: Unit 42 published no UA/header
+  artifacts, and a rule on the URI alone would false-positive on legitimate
+  API clients. Revisit when sandbox HTTP detail is public.
+
 ## [4.0.25] - 2026-08-20
 
 ### Added — MuddyWater RustyWater behavioral rules (SID 2000573–2000575)

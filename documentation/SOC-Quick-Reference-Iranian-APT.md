@@ -191,6 +191,23 @@ grep "Iranian APT" /var/log/suricata/fast.log | cut -d'"' -f2 | sort | uniq -c
 6. **Review**: Exchange OWA/ECP logs daily
 7. **Check**: Outlook rules for suspicious forwarding
 
+## Blinder Tunnel / CL-STA-1178 IOCs (October 2026, Unit 42)
+
+**Network (Suricata 2000576-2000581):**
+- Phishing domains: cloud.g-drive[.]cam, googeldrive[.]cam, drivegoogel[.]cam, googelmeet[.]online, meetonline[.]cam, asdfafadafg[.]online
+- C2/tunnel IPs: 91.107.156[.]29 (Chisel endpoint), 65.109.214[.]145 (Blackwood backend :8080 + credential harvest), 87.248.129[.]239 (initial Blackwood C2, Iranian ISP), 38.180.136[.]127 (staging)
+- GitHub C2: github.com/peakyblinders-tm (myLic, pubs repos), api.github.com /contents/{16-hex}/Lic.txt|Inf.txt polls every ~63s
+- Lure archives: DubaiAirport_Carrers_IT_Test.zip (note "Carrers" typo), WarUnPublishedDocuments.zip
+
+**Host (Wazuh 101545-101549):**
+- %LOCALAPPDATA%\Microsoft\RuntimeBrokers\RuntimeBroker.exe (legit RuntimeBroker runs from System32)
+- HKCU\...\CurrentVersion\Run\MicrosoftRuntime
+- vshost.exe / vshost32.exe outside Visual Studio paths
+- Blackwood.dll.conf, Blackwood.Cheese.xml, RuntimeBroker.exe.config (etwEnable=false)
+- msbuild.exe spawning from a user-opened .csproj ("Dubai Airport Careers" / "FlightManager" project)
+
+**Triage:** a RuntimeBrokers-path alert plus any api.github.com contents poll with a 16-hex path segment is high-confidence ShelbyC2 — isolate and capture the GitHub PAT from process memory for infrastructure takedown reporting.
+
 ## Escalation
 
 **Escalate to IR team when:**
