@@ -1,0 +1,65 @@
+<!--
+  Wazuh rules for the Blinder Tunnel campaign (CL-STA-1178), Unit 42,
+  published 2026-10-06. Iranian-nexus actor with low-confidence overlap
+  with Screening Serpens / Agent Serpens; Elastic tracks related activity
+  as "The Shelby Strategy". Infection chain: weaponised .csproj
+  (MSBuild GetFrameworkPaths override) -> ShelbyLoader V2 sideloaded as
+  RuntimeBroker.exe (renamed vshost.exe) from
+  %LOCALAPPDATA%\Microsoft\RuntimeBrokers\ -> ShelbyC2 V2 (GitHub-based
+  C2) -> Blackwood loader (vshost32.exe) running Chisel reverse SOCKS.
+  Rule IDs 101545-101549.
+-->
+<group name="iranian_apt,cl_sta_1178,blinder_tunnel,shelbyloader,october2026,">
+
+  <rule id="101545" level="13">
+    <if_group>sysmon_event_1</if_group>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\Microsoft\\RuntimeBrokers\\RuntimeBroker\.exe$</field>
+    <description>ShelbyLoader V2: RuntimeBroker.exe executing from %LOCALAPPDATA%\Microsoft\RuntimeBrokers\ (legitimate RuntimeBroker runs from System32) - Blinder Tunnel (CL-STA-1178).</description>
+    <mitre>
+      <id>T1574.001</id>
+      <id>T1036.005</id>
+    </mitre>
+  </rule>
+
+  <rule id="101546" level="13">
+    <if_group>sysmon_event_13</if_group>
+    <field name="win.eventdata.targetObject" type="pcre2">(?i)\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\MicrosoftRuntime$</field>
+    <description>ShelbyLoader V2 persistence: HKCU Run value "MicrosoftRuntime" set - Blinder Tunnel (CL-STA-1178).</description>
+    <mitre>
+      <id>T1547.001</id>
+    </mitre>
+  </rule>
+
+  <rule id="101547" level="12">
+    <if_group>sysmon_event_1</if_group>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\vshost(32)?\.exe$</field>
+    <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)\\Microsoft Visual Studio\\</field>
+    <description>Visual Studio hosting process vshost.exe/vshost32.exe running outside a Visual Studio install path - ShelbyLoader/Blackwood sideload host (Blinder Tunnel, CL-STA-1178).</description>
+    <mitre>
+      <id>T1574.001</id>
+      <id>T1036.005</id>
+    </mitre>
+  </rule>
+
+  <rule id="101548" level="12">
+    <if_sid>550,553,554</if_sid>
+    <field name="file" type="pcre2">(?i)(\\Blackwood\.dll\.conf|\\Microsoft\\RuntimeBrokers\\RuntimeBroker\.exe\.config|\\Blackwood\.Cheese\.xml)$</field>
+    <description>Blinder Tunnel artifact written: Blackwood Chisel loader config or ShelbyLoader ETW-disabling RuntimeBroker.exe.config (CL-STA-1178).</description>
+    <mitre>
+      <id>T1562.006</id>
+      <id>T1090</id>
+    </mitre>
+  </rule>
+
+  <rule id="101549" level="12">
+    <if_group>sysmon_event_1</if_group>
+    <field name="win.eventdata.parentImage" type="pcre2">(?i)\\msbuild\.exe$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\(AppData\\Local|Users\\[^\\]+\\AppData)\\.*\.exe$</field>
+    <description>MSBuild spawning an executable from AppData - weaponised .csproj GetFrameworkPaths override pattern (Blinder Tunnel initial access, CL-STA-1178).</description>
+    <mitre>
+      <id>T1127.001</id>
+      <id>T1204.002</id>
+    </mitre>
+  </rule>
+
+</group>

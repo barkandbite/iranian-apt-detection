@@ -234,3 +234,25 @@
 ### Defense Evasion
 - **T1574.002 - DLL Side-Loading**: Wazuh 101528 (WinDirStat.exe loading trojanized uxtheme.dll from non-system path)
 - **T1036.005 - Match Legitimate Name or Location**: Wazuh 101529 (execution from C:\ProgramData\WinDir\ masquerade directory), SID 2000553 (google.com.hospitalinstallation.com visual-obfuscation subdomain)
+
+## October 2026 Additions — Blinder Tunnel / CL-STA-1178 (Unit 42)
+
+### Initial Access
+- **T1566.001 - Spearphishing Attachment**: Suricata 2000581 (DubaiAirport_Carrers_IT_Test.zip / WarUnPublishedDocuments.zip lure archives)
+- **T1566.002 - Spearphishing Link**: Suricata 2000576, 2000577 (Google-themed .cam/.online phishing domain DNS)
+
+### Execution
+- **T1127.001 - Trusted Developer Utilities: MSBuild**: Wazuh 101549 (msbuild.exe spawning executables from AppData — weaponized .csproj GetFrameworkPaths override)
+- **T1204.002 - Malicious File**: Wazuh 101549
+
+### Persistence
+- **T1547.001 - Registry Run Keys**: Wazuh 101546 (HKCU Run "MicrosoftRuntime")
+
+### Defense Evasion
+- **T1574.001 - DLL Search Order Hijacking**: Wazuh 101545, 101547 (RuntimeBroker.exe / vshost(32).exe sideload hosts)
+- **T1036.005 - Masquerading: Match Legitimate Name or Location**: Wazuh 101545, 101547
+- **T1562.006 - Impair Defenses: Indicator Blocking**: Wazuh 101548 (RuntimeBroker.exe.config with etwEnable=false)
+
+### Command and Control
+- **T1102 - Web Service (GitHub C2)**: Suricata 2000579, 2000580 (peakyblinders-tm repo path; contents-API /{16-hex machineId}/Lic|Inf.txt tasking poll)
+- **T1090 - Proxy (Chisel reverse SOCKS)**: Suricata 2000578; Wazuh 101548 (Blackwood.dll.conf / Blackwood.Cheese.xml)

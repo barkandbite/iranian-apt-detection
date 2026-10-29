@@ -2292,3 +2292,29 @@ alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Mudd
 alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater RustyWater X-Rw-Id Task Poll 2026"; flow:to_server,established; http.method; content:"GET"; http.uri; content:"/rw/task"; fast_pattern; nocase; http.header_names; content:"X-Rw-Id"; nocase; threshold:type limit, track by_src, count 1, seconds 600; reference:url,rescana.com/post/rustywater-iranian-muddywater-apt; reference:url,attack.mitre.org/techniques/T1071/001/; classtype:command-and-control; sid:2000574; rev:1; metadata:policy max-detect-ips drop, created_at 2026_08_20, updated_at 2026_08_20;)
 
 alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater RustyWater Gzipped Exfil /rw/upload 2026"; flow:to_server,established; http.method; content:"POST"; http.uri; content:"/rw/upload"; fast_pattern; nocase; http.header; content:"Content-Encoding: gzip"; nocase; http.user_agent; content:"reqwest/"; nocase; threshold:type limit, track by_src, count 1, seconds 900; reference:url,rescana.com/post/rustywater-iranian-muddywater-apt; reference:url,attack.mitre.org/techniques/T1041/; classtype:trojan-activity; sid:2000575; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_08_20, updated_at 2026_08_20;)
+
+# ==========================================================================
+# 2026-10-29 - Blinder Tunnel campaign (CL-STA-1178, Unit 42, 2026-10-06)
+# Iranian-nexus actor, low-confidence overlap with Screening Serpens /
+# Agent Serpens; Elastic tracks related activity as "The Shelby Strategy".
+# ShelbyLoader V2 / ShelbyC2 V2 (GitHub-based C2), Blackwood Chisel loader.
+# Targeted Iraqi critical infrastructure via fake Dubai Airport careers
+# lure (weaponised .csproj MSBuild execution) and Google-themed .cam/.online
+# phishing. SIDs 2000576-2000581. MITRE: T1127, T1574.014, T1102, T1090.
+# ==========================================================================
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT CL-STA-1178 Blinder Tunnel Google-Themed .cam Phishing Domain DNS Query 2026"; dns.query; content:".cam"; nocase; pcre:"/(?:^|\.)(?:g-drive|googeldrive|drivegoogel|meetonline)\.cam$/i"; threshold:type limit, track by_src, count 1, seconds 3600; reference:url,unit42.paloaltonetworks.com/blinder-tunnel-targets-critical-infrastructure/; reference:url,attack.mitre.org/techniques/T1566/002/; classtype:social-engineering; sid:2000576; rev:1; metadata:policy max-detect-ips drop, created_at 2026_10_29, updated_at 2026_10_29;)
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT CL-STA-1178 Blinder Tunnel Meet-Themed .online Phishing Domain DNS Query 2026"; dns.query; content:".online"; nocase; pcre:"/(?:^|\.)(?:googelmeet|asdfafadafg)\.online$/i"; threshold:type limit, track by_src, count 1, seconds 3600; reference:url,unit42.paloaltonetworks.com/blinder-tunnel-targets-critical-infrastructure/; reference:url,attack.mitre.org/techniques/T1566/002/; classtype:social-engineering; sid:2000577; rev:1; metadata:policy max-detect-ips drop, created_at 2026_10_29, updated_at 2026_10_29;)
+
+alert ip $HOME_NET any -> [91.107.156.29,65.109.214.145,87.248.129.239,38.180.136.127] any (msg:"Bark&Bite - Iranian APT CL-STA-1178 Blinder Tunnel Chisel/Blackwood C2 Infrastructure Outbound 2026"; threshold:type limit, track by_src, count 1, seconds 600; reference:url,unit42.paloaltonetworks.com/blinder-tunnel-targets-critical-infrastructure/; reference:url,attack.mitre.org/techniques/T1090/; classtype:command-and-control; sid:2000578; rev:1; metadata:policy max-detect-ips drop, created_at 2026_10_29, updated_at 2026_10_29;)
+
+# GitHub-hosted C2: account-specific IOC. Visible on plaintext HTTP or at
+# TLS-inspecting proxies only - pair with 2000580 behavioral variant.
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT CL-STA-1178 ShelbyC2 GitHub peakyblinders-tm Repo Path 2026"; flow:to_server,established; http.uri; content:"/peakyblinders-tm/"; fast_pattern; nocase; reference:url,unit42.paloaltonetworks.com/blinder-tunnel-targets-critical-infrastructure/; reference:url,attack.mitre.org/techniques/T1102/; classtype:command-and-control; sid:2000579; rev:1; metadata:policy max-detect-ips drop, created_at 2026_10_29, updated_at 2026_10_29;)
+
+# Behavioral: ShelbyC2 tasking polls api.github.com contents API for
+# /{16-hex machineId}/Lic.txt|Inf.txt - survives C2 account rotation.
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT CL-STA-1178 ShelbyC2 GitHub Contents API MachineId Lic/Inf Tasking Poll 2026"; flow:to_server,established; http.host; content:"api.github.com"; http.uri; content:"/contents/"; fast_pattern; http.uri; pcre:"/\/contents\/[0-9a-f]{16}\/(?:Lic|Inf)\.txt$/"; threshold:type both, track by_src, count 2, seconds 600; reference:url,unit42.paloaltonetworks.com/blinder-tunnel-targets-critical-infrastructure/; reference:url,attack.mitre.org/techniques/T1102/; classtype:command-and-control; sid:2000580; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_10_29, updated_at 2026_10_29;)
+
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT CL-STA-1178 Blinder Tunnel Lure Archive Download DubaiAirport/WarUnPublishedDocuments 2026"; flow:to_server,established; http.uri; content:".zip"; nocase; http.uri; pcre:"/(?:DubaiAirport_Carrers_IT_Test|WarUnPublishedDocuments)\.zip/i"; threshold:type limit, track by_src, count 1, seconds 3600; reference:url,unit42.paloaltonetworks.com/blinder-tunnel-targets-critical-infrastructure/; reference:url,attack.mitre.org/techniques/T1566/001/; classtype:trojan-activity; sid:2000581; rev:1; metadata:policy max-detect-ips drop, created_at 2026_10_29, updated_at 2026_10_29;)
