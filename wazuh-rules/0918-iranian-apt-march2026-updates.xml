@@ -17,9 +17,9 @@
   <!-- ========== CVE EXPLOITATION (101200-101210) ========== -->
 
   <!-- CVE-2026-1281: Ivanti EPMM RCE via bash arithmetic expansion -->
-  <rule id="101200" level="15">
+  <rule id="101200" level="13">
     <if_sid>31101</if_sid>
-    <field name="url" type="pcre2">/mifs/rs/api/v2/</field>
+    <url>/mifs/rs/api/v2/</url>
     <field name="request" type="pcre2">\$\(\(</field>
     <description>Iranian APT: MuddyWater CVE-2026-1281 Ivanti EPMM RCE attempt detected</description>
     <mitre>
@@ -29,9 +29,9 @@
   </rule>
 
   <!-- CVE-2025-59718: FortiOS SAML Auth Bypass -->
-  <rule id="101201" level="15">
+  <rule id="101201" level="13">
     <if_sid>31101</if_sid>
-    <field name="url" type="pcre2">/api/v2/authentication</field>
+    <url>/api/v2/authentication</url>
     <field name="request" type="pcre2">SAMLResponse</field>
     <description>Iranian APT: CVE-2025-59718 FortiOS SAML Authentication Bypass attempt</description>
     <mitre>
@@ -42,9 +42,9 @@
   </rule>
 
   <!-- CVE-2024-55591: FortiOS Auth Bypass (FortiSetup admin account) -->
-  <rule id="101202" level="15">
-    <if_sid>4701,4702</if_sid>
-    <field name="win.system.eventID">^4720$|^4732$</field>
+  <rule id="101202" level="13">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^4720$|^4732$</field>
     <field name="win.eventdata.targetUserName" type="pcre2">(?i)FortiSetup</field>
     <description>Iranian APT: Suspicious administrator account "FortiSetup" created - possible MuddyWater CVE-2024-55591</description>
     <mitre>
@@ -57,10 +57,10 @@
   <!-- ========== MUDDYWATER MALWARE (101211-101230) ========== -->
 
   <!-- UDPGangster: UDP 1269 C2 activity -->
-  <rule id="101211" level="12">
-    <if_group>sysmon_event_3</if_group>
-    <field name="win.eventdata.destinationPort">^1269$</field>
-    <field name="win.eventdata.protocol">udp</field>
+  <rule id="101211" level="13">
+    <if_group>sysmon_event3</if_group>
+    <field name="win.eventdata.destinationPort" type="pcre2">^1269$</field>
+    <field name="win.eventdata.protocol" type="pcre2">udp</field>
     <description>Iranian APT: MuddyWater UDPGangster C2 network activity detected (UDP:1269)</description>
     <mitre>
       <id>T1095</id>
@@ -71,7 +71,7 @@
 
   <!-- UDPGangster: SystemProc.exe process creation -->
   <rule id="101212" level="13">
-    <if_group>sysmon_event_1</if_group>
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.image" type="pcre2">(?i)RoamingLow\SystemProc\.exe</field>
     <description>Iranian APT: MuddyWater UDPGangster malware execution detected - SystemProc.exe</description>
     <mitre>
@@ -82,7 +82,7 @@
 
   <!-- Dindoor: Deno runtime and Wasabi exfiltration -->
   <rule id="101213" level="14">
-    <if_group>sysmon_event_3</if_group>
+    <if_group>sysmon_event3</if_group>
     <field name="win.eventdata.destinationHostname" type="pcre2">\.wasabisys\.com$</field>
     <description>Iranian APT: MuddyWater Dindoor malware - Wasabi cloud exfiltration detected</description>
     <mitre>
@@ -92,8 +92,8 @@
   </rule>
 
   <!-- Fakeset: Backblaze B2 exfiltration -->
-  <rule id="101214" level="14">
-    <if_group>sysmon_event_3</if_group>
+  <rule id="101214" level="11">
+    <if_group>sysmon_event3</if_group>
     <field name="win.eventdata.destinationHostname" type="pcre2">\.backblazeb2\.com$</field>
     <description>Iranian APT: MuddyWater Fakeset malware - Backblaze B2 network activity detected</description>
     <mitre>
@@ -103,8 +103,8 @@
   </rule>
 
   <!-- CHAR/Olalampo: Telegram Bot API C2 -->
-  <rule id="101215" level="12">
-    <if_group>sysmon_event_3</if_group>
+  <rule id="101215" level="13">
+    <if_group>sysmon_event3</if_group>
     <field name="win.eventdata.destinationHostname" type="pcre2">api\.telegram\.org$</field>
     <description>Iranian APT: MuddyWater CHAR/Olalampo - Telegram Bot API C2 detected</description>
     <mitre>
@@ -116,8 +116,8 @@
   <!-- ========== CYBERAV3NGERS OT MALWARE (101231-101240) ========== -->
 
   <!-- IOCONTROL: OT Cyberweapon Binary -->
-  <rule id="101231" level="15">
-    <if_group>sysmon_event_1</if_group>
+  <rule id="101231" level="13">
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.image" type="pcre2">/usr/bin/iocontrol|iocontrol\.exe</field>
     <description>Iranian APT: CyberAv3ngers IOCONTROL OT malware execution detected</description>
     <mitre>
@@ -128,9 +128,9 @@
   </rule>
 
   <!-- IOCONTROL: MQTT C2 traffic -->
-  <rule id="101232" level="14">
-    <if_group>sysmon_event_3</if_group>
-    <field name="win.eventdata.destinationPort">^8883$|^1883$</field>
+  <rule id="101232" level="13">
+    <if_group>sysmon_event3</if_group>
+    <field name="win.eventdata.destinationPort" type="pcre2">^8883$|^1883$</field>
     <description>Iranian APT: CyberAv3ngers IOCONTROL MQTT C2 network activity detected</description>
     <mitre>
       <id>T1071.001</id>

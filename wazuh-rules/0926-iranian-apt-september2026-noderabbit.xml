@@ -1,0 +1,62 @@
+<!--
+  Wazuh rules for Mirage Kitten / UNC1549 NodeRabbit + PollCat implants
+  (Kaspersky Securelist, 2026-09-01). Fake-job "technical challenge"
+  campaign delivering trojanized npm packages (colorized_terminal,
+  pretty-log 2.1.0) whose postinstall script launches a Node.js implant
+  from a hidden cache directory. Variant 3 persists via VS Code
+  extensions and malicious Git hooks. Network-side pairing: Suricata
+  SIDs 2000576-2000581.
+-->
+<group name="iranian_apt,unc1549,mirage_kitten,noderabbit,pollcat,september2026,">
+
+  <rule id="101545" level="12">
+    <if_sid>554,550</if_sid>
+    <field name="file" type="pcre2">(?i)node_modules[\/\\]\.cache[\/\\]\.[0-9a-f]{8}[\/\\]index\.js$</field>
+    <description>NodeRabbit implant dropped under a hidden hex-named node_modules/.cache directory.</description>
+    <mitre>
+      <id>T1195.002</id>
+      <id>T1564.001</id>
+    </mitre>
+  </rule>
+
+  <rule id="101546" level="12">
+    <if_sid>60103,60104</if_sid>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\node\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)node_modules[\/\\]\.cache[\/\\]\.[0-9a-f]{8}</field>
+    <description>Node.js executing a script from a hidden node_modules/.cache directory - NodeRabbit implant launch.</description>
+    <mitre>
+      <id>T1059.007</id>
+      <id>T1564.001</id>
+    </mitre>
+  </rule>
+
+  <rule id="101547" level="10">
+    <if_sid>554,550</if_sid>
+    <field name="file" type="pcre2">(?i)[\/\\]\.git[\/\\]hooks[\/\\](post-checkout|post-merge|post-commit)$</field>
+    <description>Git hook created or modified - NodeRabbit variant 3 persistence vector. Verify hook contents on developer hosts.</description>
+    <mitre>
+      <id>T1546</id>
+    </mitre>
+  </rule>
+
+  <rule id="101548" level="10">
+    <if_sid>60103,60104</if_sid>
+    <field name="win.eventdata.parentCommandLine" type="pcre2">(?i)npm(\.cmd)?.{0,120}(install|postinstall)</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)node_modules[\/\\]\.cache</field>
+    <description>npm install lifecycle spawning a process out of node_modules/.cache - trojanized package postinstall execution.</description>
+    <mitre>
+      <id>T1195.002</id>
+      <id>T1059.007</id>
+    </mitre>
+  </rule>
+
+  <rule id="101549" level="9">
+    <if_sid>554,550</if_sid>
+    <field name="file" type="pcre2">(?i)RankChallenge-react</field>
+    <description>PollCat lure project artifact (RankChallenge-react) written to disk.</description>
+    <mitre>
+      <id>T1566.003</id>
+    </mitre>
+  </rule>
+
+</group>

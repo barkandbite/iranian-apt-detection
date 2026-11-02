@@ -1,0 +1,98 @@
+<!--
+  Wazuh rules for MOIS CHOSEN BRICK / HEAVYGRAM Windows surveillance
+  spyware (NCSC + FBI + AIVD joint advisory, 2026-09-15). Targets Iranian
+  dissidents, activists and journalists; delivered via WhatsApp/Telegram
+  rapport-building as fake installers (Pictory, RunwayML, Norton, KeePass)
+  or "MRI scan results". C2/exfil rides per-victim Telegram Bot IDs and
+  cloud object storage (see Suricata SID 2000584-2000585). Host artifacts
+  below are from the advisory: Run-key value names, the deliberate
+  trailing-space install directory "C:\Windows \SysWOW64", and Defender
+  exclusions for it.
+-->
+<group name="iranian_apt,mois,chosenbrick,heavygram,september2026,">
+
+  <rule id="101561" level="13">
+    <if_group>sysmon_event_13</if_group>
+    <field name="win.eventdata.targetObject" type="pcre2">(?i)\\CurrentVersion\\Run\\(SMQDService|winappx)$</field>
+    <description>Iranian MOIS CHOSEN BRICK/HEAVYGRAM: SMQDService/winappx Run-key persistence created</description>
+    <mitre>
+      <id>T1547.001</id>
+    </mitre>
+    <group>attack,persistence,</group>
+  </rule>
+
+  <rule id="101562" level="13">
+    <if_sid>592</if_sid>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\Windows \\SysWOW64\\</field>
+    <description>Iranian MOIS CHOSEN BRICK/HEAVYGRAM: file written under masquerading "Windows \SysWOW64" directory (trailing space)</description>
+    <mitre>
+      <id>T1036.005</id>
+    </mitre>
+    <group>attack,defense_evasion,</group>
+  </rule>
+
+  <rule id="101563" level="14">
+    <if_group>sysmon_event_13</if_group>
+    <field name="win.eventdata.targetObject" type="pcre2">(?i)\\Windows Defender\\Exclusions\\</field>
+    <field name="win.eventdata.details" type="pcre2">(?i)Windows \\SysWOW64</field>
+    <description>Iranian MOIS CHOSEN BRICK/HEAVYGRAM: Microsoft Defender exclusion added for the trailing-space SysWOW64 masquerade path</description>
+    <mitre>
+      <id>T1562.001</id>
+    </mitre>
+    <group>attack,defense_evasion,</group>
+  </rule>
+
+  <rule id="101564" level="14">
+    <if_group>sysmon_event1</if_group>
+    <field name="win.eventdata.image" type="pcre2">(?i)^[a-z]:\\Windows \\SysWOW64\\</field>
+    <description>Iranian MOIS CHOSEN BRICK/HEAVYGRAM: process executed from masquerading "Windows \SysWOW64" directory</description>
+    <mitre>
+      <id>T1036.005</id>
+      <id>T1204.002</id>
+    </mitre>
+    <group>attack,execution,</group>
+  </rule>
+
+
+  <rule id="101565" level="13">
+    <if_sid>592</if_sid>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?i)(\\ProgramData\\SMQDServicePackages\\|\\MicrosoftDistribution\\sysmain\\winappx\.exe|\\sm[dq]{2}service\.exe)</field>
+    <description>Iranian MOIS CHOSEN BRICK/HEAVYGRAM: implant binary dropped under a known ProgramData/MicrosoftDistribution path</description>
+    <mitre>
+      <id>T1105</id>
+      <id>T1036.005</id>
+    </mitre>
+  </rule>
+
+  <rule id="101566" level="12">
+    <if_sid>60103,60104</if_sid>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\(MsCache|chromedriver)\.exe$</field>
+    <field name="win.eventdata.parentImage" type="pcre2">(?i)\\(ProgramData|Users\\All Users|AppData)\\</field>
+    <description>Iranian MOIS CHOSEN BRICK/HEAVYGRAM: secondary component (MsCache.exe/chromedriver.exe) executed from a user-writable path</description>
+    <mitre>
+      <id>T1105</id>
+      <id>T1059</id>
+    </mitre>
+  </rule>
+
+  <rule id="101567" level="10">
+    <if_sid>61600,61613</if_sid>
+    <field name="win.eventdata.image" type="pcre2">(?i)(ytyjyujyu|noi672pp434awkc12f)</field>
+    <description>Iranian MOIS CHOSEN BRICK/HEAVYGRAM: execution mutex (ytyjyujyu / noi672pp434awkc12f) observed - single-instance marker</description>
+    <mitre>
+      <id>T1480</id>
+    </mitre>
+  </rule>
+
+  <rule id="101568" level="14" frequency="2" timeframe="600">
+    <if_matched_sid>101561</if_matched_sid>
+    <if_sid>101562,101564,101565,101566</if_sid>
+    <same_source_ip />
+    <description>Iranian MOIS CHOSEN BRICK/HEAVYGRAM: multi-stage host activity (persistence + implant/masquerade) on one host - high-confidence infection</description>
+    <mitre>
+      <id>T1547.001</id>
+      <id>T1105</id>
+    </mitre>
+  </rule>
+
+</group>
