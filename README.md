@@ -36,7 +36,7 @@ You only need the section that matches the software you already run. Skip the re
 
 You need **one file**: `suricata/iranian-apt-detection.rules`
 
-This single file contains all 482 network detection signatures.
+This single file contains all 489 network detection signatures.
 
 ```bash
 # Copy the rules file into your Suricata rules directory
@@ -59,7 +59,7 @@ That is it. Suricata will now alert on Iranian APT traffic patterns.
 
 ### I use Wazuh (SIEM)
 
-You need the XML files from the `wazuh-rules/` folder. There are 16 rule files, organized by category so you can deploy all of them or only the ones relevant to your environment:
+You need the XML files from the `wazuh-rules/` folder. There are 24 rule files, organized by category so you can deploy all of them or only the ones relevant to your environment:
 
 | File | What It Detects |
 |------|----------------|
@@ -129,11 +129,11 @@ configurations/ossec-agent-iranian-apt.conf
 iranian-apt-detection/
 |
 |-- suricata/                       <-- SURICATA USERS: start here
-|   |-- iranian-apt-detection.rules     One file, 482 network signatures
+|   |-- iranian-apt-detection.rules     One file, 489 network signatures
 |   `-- README.md                       Suricata-specific docs
 |
 |-- wazuh-rules/                    <-- WAZUH USERS: start here
-|   |-- 0910 through 0931 .xml files   331 SIEM detection rules
+|   |-- 0910 through 0933 .xml files   339 SIEM detection rules
 |   `-- README.md                       Wazuh-specific docs
 |
 |-- configurations/                 <-- OPTIONAL: endpoint configs

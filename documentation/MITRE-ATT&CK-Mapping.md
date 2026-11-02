@@ -234,3 +234,27 @@
 ### Defense Evasion
 - **T1574.002 - DLL Side-Loading**: Wazuh 101528 (WinDirStat.exe loading trojanized uxtheme.dll from non-system path)
 - **T1036.005 - Match Legitimate Name or Location**: Wazuh 101529 (execution from C:\ProgramData\WinDir\ masquerade directory), SID 2000553 (google.com.hospitalinstallation.com visual-obfuscation subdomain)
+
+---
+
+## November 2026 Additions (v5.3.0) — Olalampo Delta + Blinder Tunnel (CL-STA-1178)
+
+### Initial Access
+- **T1566.001 - Spearphishing Attachment**: SID 2000612 (Blinder Tunnel lure archives DubaiAirport_Carrers_IT_Test.zip / WarUnPublishedDocuments.zip)
+- **T1566.002 - Spearphishing Link**: SIDs 2000607-2000608 (Google Drive/Meet-themed .cam and .online phishing domains)
+- **T1127.001 - Trusted Developer Utilities: MSBuild**: Wazuh 101590 (weaponised .csproj GetFrameworkPaths override - MSBuild spawning from AppData)
+
+### Persistence / Defense Evasion
+- **T1547.001 - Registry Run Keys**: Wazuh 101587 (HKCU Run value "MicrosoftRuntime")
+- **T1574.001 - DLL Search Order Hijacking**: Wazuh 101586, 101588 (RuntimeBroker.exe from %LOCALAPPDATA%\Microsoft\RuntimeBrokers\; vshost.exe/vshost32.exe outside Visual Studio paths)
+- **T1562.006 - Indicator Blocking (ETW)**: Wazuh 101589 (RuntimeBroker.exe.config ETW-disabling artifact)
+- **T1053.005 - Scheduled Task**: Wazuh 101584 (Olalampo "DailyUpdate" task pointing at novaservice.exe)
+- **T1036.005 - Match Legitimate Name or Location**: Wazuh 101583 (Olalampo implants written under C:\Users\Public)
+
+### Command and Control
+- **T1102 - Web Service (GitHub)**: SIDs 2000610-2000611 (ShelbyC2 V2 GitHub contents-API MachineId Lic/Inf tasking poll; peakyblinders-tm repo path)
+- **T1090 - Proxy**: SID 2000609 (Chisel/Blackwood tunnel infrastructure IPs)
+- **T1071.001 - Web Protocols**: SID 2000606 (Olalampo HTTP_VIP output endpoints /ecmd /esend /erecv); SID 2000375 rev:2 (miniquest C2 IP 159.198.43.141)
+
+### Collection / Exfiltration
+- **T1074.001 / T1056.001 - Local Data Staging / Keylogging**: Wazuh 101585 (pic.LOG keylog container, cobe-notes.txt staging)

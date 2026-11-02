@@ -608,7 +608,7 @@ def test_msg_format():
 def test_rule_count():
     with open(RULES_FILE) as f:
         count = len(re.findall(r"^alert\s", f.read(), re.MULTILINE))
-    assert count == 354, f"Expected 354, got {count}"
+    assert count == 489, f"Expected 489, got {count}"
 
 
 # ============================================================

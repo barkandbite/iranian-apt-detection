@@ -37,6 +37,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   VeloCloud Orchestrator SQLi) is unattributed mass exploitation and
   was covered in the by-country repo's cross-country file.
 
+## [5.3.0] - 2026-11-02
+
+### Added
+- **Blinder Tunnel / CL-STA-1178** (Unit 42, 2026-10-06; salvaged from draft
+  PR #74, renumbered onto the v5.2.0 line): Suricata SIDs 2000607-2000612 —
+  Google/Meet-themed .cam/.online phishing domain DNS, Chisel/Blackwood C2
+  infrastructure IPs, ShelbyC2 V2 GitHub contents-API MachineId Lic/Inf
+  tasking poll (priority 1) and peakyblinders-tm repo path, lure archive
+  downloads. Wazuh 101586-101590 in new
+  `0933-iranian-apt-october2026-blindertunnel.xml` — ShelbyLoader V2
+  RuntimeBroker.exe sideload path, HKCU Run "MicrosoftRuntime", vshost
+  outside Visual Studio, Blackwood/ETW-config artifacts, MSBuild-from-AppData.
+- **Operation Olalampo full-report delta** (Group-IB full technical report,
+  October 2026; salvaged from draft PR #73, renumbered): Suricata SID
+  2000606 — HTTP_VIP output endpoints /ecmd /esend /erecv. Wazuh
+  101583-101585 in new `0932-iranian-apt-october2026-olalampo.xml` —
+  Users\Public implant writes, DailyUpdate scheduled task, pic.LOG /
+  cobe-notes.txt staging.
+
+### Changed
+- SID 2000375 (Olalampo C2 IPs) rev:2 — added miniquest real IP
+  159.198.43.141 from the Group-IB full report.
+- `tests/test_suricata_rules.py` rule-count guard updated 354 → 489 (was
+  stale since the v5.2.0 consolidation; it now matches the shipped file).
+- Fixed `sysmon_event_1` → `sysmon_event1` group names in the salvaged
+  Blinder Wazuh rules before commit (caught by `tools/lint-rules.py`; the
+  draft-PR originals would have loaded but never fired).
+
+### Notes
+- Draft PRs #73 and #74 are superseded by this release. Original SIDs
+  2000576-2000581 / Wazuh 101545-101549 collided with the v5.2.0
+  consolidation's allocations and were renumbered as above.
+- Cross-repo parity: `bb-iran-suricata.rules` in the by-country repo is
+  byte-identical at 489 rules (SID 1000039-2000612).
+
 ## [5.2.0] - 2026-10-24
 
 ### Added -- Sept/Oct 2026 campaign coverage, consolidated from draft PRs #51-#69

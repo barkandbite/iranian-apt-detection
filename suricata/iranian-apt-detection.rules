@@ -1,7 +1,7 @@
  # Bark & Bite — Iranian APT Detection Rules (Consolidated)
 # File: iranian-apt-detection.rules
-# Version: 5.2.0
-# Last Updated: 2026-10-24
+# Version: 5.3.0
+# Last Updated: 2026-11-02
 # Credit: Bark & Bite Security
 # License: MIT
 # Repository: https://github.com/barkandbite/iranian-apt-detection
@@ -14,7 +14,7 @@
 # UNC1860, UNC1549, Handala/Void Manticore, APT42/RedKitten, Infy, and emerging groups.
 # Optimized for extremely high accuracy with minimal false positives.
 #
-# Total signatures: 482 rules (SID 1000039-2000605)
+# Total signatures: 489 rules (SID 1000039-2000612)
 # SID Allocation:
 #   1000039-2000030: Core CVE + behavioral detection (v3.1 legacy range)
 #   2000031-2000193: Extended behavioral + C2 patterns
@@ -28,6 +28,11 @@
 #                     MuddyWater Teams false flag, CyberAv3ngers Rockwell)
 #   2000562-2000572: v4.0.24 August 2026 backlog consolidation (Cavern HollowGraph,
 #                     CyberAv3ngers Schneider/Siemens ICS, MuddyWater Olalampo)
+#   2000573-2000605: Aug-Oct 2026 additions (RustyWater, NodeRabbit/PollCat,
+#                     Nimbus Manticore MiniFast, CHOSEN BRICK/HEAVYGRAM,
+#                     Darkcomp/Stagecomp, DinDoor Teams-vishing)
+#   2000606-2000612: v5.3.0 Oct 2026 draft salvage (Olalampo HTTP_VIP delta,
+#                     Blinder Tunnel CL-STA-1178 / ShelbyC2 V2)
 #
 # Requires: Suricata 7.0+
 # Recommended: Enable xbits for cross-flow correlation rules
@@ -1287,7 +1292,7 @@ alert dns $HOME_NET any -> any any (msg:"Bark&Bite IRANIAN-APT MuddyWater - HTTP
 alert dns $HOME_NET any -> any any (msg:"Bark&Bite IRANIAN-APT MuddyWater - HTTP_VIP jerusalemsolutions.com"; dns.query; content:"jerusalemsolutions.com"; nocase; classtype:command-and-control; sid:2000373; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_24, updated_at 2026_03_24;)
 alert dns $HOME_NET any -> any any (msg:"Bark&Bite IRANIAN-APT MuddyWater - HTTP_VIP netvigil.org"; dns.query; content:"netvigil.org"; nocase; classtype:command-and-control; sid:2000374; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_24, updated_at 2026_03_24;)
 # HTTP_VIP - Known C2 IPs
-alert ip $HOME_NET any -> [162.0.230.185,209.74.87.100,143.198.5.41,209.74.87.67] any (msg:"Bark&Bite IRANIAN-APT MuddyWater - Olalampo C2 IPs"; classtype:command-and-control; sid:2000375; rev:1; metadata:policy max-detect-ips drop, created_at 2026_03_24, updated_at 2026_03_24;)
+alert ip $HOME_NET any -> [162.0.230.185,209.74.87.100,143.198.5.41,209.74.87.67,159.198.43.141] any (msg:"Bark&Bite IRANIAN-APT MuddyWater - Olalampo C2 IPs"; classtype:command-and-control; sid:2000375; rev:2; metadata:policy max-detect-ips drop, created_at 2026_03_24, updated_at 2026_11_02;)
 # MuddyWater - Service name MicrosoftVersionUpdater (persistence)
 # Network correlation: detect DNS/HTTP from hosts where this service exists
 # Primarily a Wazuh/endpoint detection
@@ -2334,3 +2339,26 @@ alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"Bark&Bite IRANIAN-APT Mirage
 alert dns $HOME_NET any -> any any (msg:"Bark&Bite IRANIAN-APT Mirage Kitten - Health/Finance-Themed C2 Domain DNS Lookup"; dns.query; pcre:"/(?:^|\.)(?:visitfinancedentists|healthcomfsdpower|sahi-finance|lifespotify|msmanagementgrp)\.com$/i"; reference:url,securelist.com/mirage-kitten-new-backdoors-noderabbit-pollcat/121244/; reference:url,attack.mitre.org/techniques/T1071/004/; classtype:trojan-activity; sid:2000603; rev:1; metadata:policy max-detect-ips drop, created_at 2026_10_23, updated_at 2026_10_23;)
 alert dns $HOME_NET any -> any any (msg:"Bark&Bite IRANIAN-APT Nimbus Manticore - TWOSTROKE C2 Domain neexportfolio DNS Lookup"; dns.query; content:"neexportfolio"; fast_pattern; nocase; reference:url,group-ib.com/blog/tortoiseshell-apt-toolset-infrastructure/; reference:url,attack.mitre.org/techniques/T1071/004/; classtype:trojan-activity; sid:2000604; rev:1; metadata:policy max-detect-ips drop, created_at 2026_10_23, updated_at 2026_10_23;)
 alert dns $HOME_NET any -> any any (msg:"Bark&Bite IRANIAN-APT Nimbus Manticore - Tunnel Infrastructure locat.sbs/tiktok-u.sbs DNS Lookup"; dns.query; content:".sbs"; nocase; endswith; pcre:"/(?:^|\.)(?:locat|tiktok-u)\.sbs$/i"; reference:url,group-ib.com/blog/tortoiseshell-apt-toolset-infrastructure/; reference:url,attack.mitre.org/techniques/T1071/004/; classtype:trojan-activity; sid:2000605; rev:1; metadata:policy max-detect-ips drop, created_at 2026_10_23, updated_at 2026_10_23;)
+
+# ---------------------------------------------------------------------------
+# Operation Olalampo full-report delta (Group-IB full technical report,
+# October 2026). HTTP_VIP output-channel endpoints /ecmd /esend /erecv;
+# miniquest C2 real IP 159.198.43.141 added to SID 2000375 rev:2 above.
+# Salvaged 2026-11-02 from draft PR (orig SID 2000576, renumbered).
+# ---------------------------------------------------------------------------
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite IRANIAN-APT MuddyWater - Olalampo HTTP_VIP Output Endpoint Poll 2026"; flow:to_server,established; http.uri; pcre:"/^\/e(?:cmd|send|recv)$/"; threshold:type both, track by_src, count 3, seconds 600; reference:url,group-ib.com/blog/muddywater-operation-olalampo/; reference:url,attack.mitre.org/techniques/T1071/001/; classtype:command-and-control; sid:2000606; rev:1; metadata:policy max-detect-ips drop, created_at 2026_10_28, updated_at 2026_11_02;)
+
+# ---------------------------------------------------------------------------
+# Blinder Tunnel campaign — CL-STA-1178 (Unit 42, 2026-10-06). Iranian-nexus
+# actor, low-confidence overlap with Screening Serpens; Elastic tracks related
+# activity as "The Shelby Strategy". Weaponised .csproj -> ShelbyLoader V2 ->
+# ShelbyC2 V2 (GitHub contents-API C2) -> Blackwood/Chisel reverse SOCKS.
+# Salvaged 2026-11-02 from draft PR (orig SID 2000576-2000581, renumbered).
+# Host-side parity: Wazuh 101586-101590 (0933).
+# ---------------------------------------------------------------------------
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite IRANIAN-APT CL-STA-1178 - Blinder Tunnel Google-Themed .cam Phishing Domain DNS Query 2026"; dns.query; content:".cam"; nocase; pcre:"/(?:^|\.)(?:g-drive|googeldrive|drivegoogel|meetonline)\.cam$/i"; threshold:type limit, track by_src, count 1, seconds 3600; reference:url,unit42.paloaltonetworks.com/blinder-tunnel-targets-critical-infrastructure/; reference:url,attack.mitre.org/techniques/T1566/002/; classtype:social-engineering; sid:2000607; rev:1; metadata:policy max-detect-ips drop, created_at 2026_10_29, updated_at 2026_10_29;)
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite IRANIAN-APT CL-STA-1178 - Blinder Tunnel Meet-Themed .online Phishing Domain DNS Query 2026"; dns.query; content:".online"; nocase; pcre:"/(?:^|\.)(?:googelmeet|asdfafadafg)\.online$/i"; threshold:type limit, track by_src, count 1, seconds 3600; reference:url,unit42.paloaltonetworks.com/blinder-tunnel-targets-critical-infrastructure/; reference:url,attack.mitre.org/techniques/T1566/002/; classtype:social-engineering; sid:2000608; rev:1; metadata:policy max-detect-ips drop, created_at 2026_10_29, updated_at 2026_10_29;)
+alert ip $HOME_NET any -> [91.107.156.29,65.109.214.145,87.248.129.239,38.180.136.127] any (msg:"Bark&Bite IRANIAN-APT CL-STA-1178 - Blinder Tunnel Chisel/Blackwood C2 Infrastructure Outbound 2026"; threshold:type limit, track by_src, count 1, seconds 600; reference:url,unit42.paloaltonetworks.com/blinder-tunnel-targets-critical-infrastructure/; reference:url,attack.mitre.org/techniques/T1090/; classtype:command-and-control; sid:2000609; rev:1; metadata:policy max-detect-ips drop, created_at 2026_10_29, updated_at 2026_10_29;)
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite IRANIAN-APT CL-STA-1178 - ShelbyC2 GitHub peakyblinders-tm Repo Path 2026"; flow:to_server,established; http.uri; content:"/peakyblinders-tm/"; fast_pattern; nocase; reference:url,unit42.paloaltonetworks.com/blinder-tunnel-targets-critical-infrastructure/; reference:url,attack.mitre.org/techniques/T1102/; classtype:command-and-control; sid:2000610; rev:1; metadata:policy max-detect-ips drop, created_at 2026_10_29, updated_at 2026_10_29;)
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite IRANIAN-APT CL-STA-1178 - ShelbyC2 GitHub Contents API MachineId Lic/Inf Tasking Poll 2026"; flow:to_server,established; http.host; content:"api.github.com"; http.uri; content:"/contents/"; fast_pattern; http.uri; pcre:"/\/contents\/[0-9a-f]{16}\/(?:Lic|Inf)\.txt$/"; threshold:type both, track by_src, count 2, seconds 600; reference:url,unit42.paloaltonetworks.com/blinder-tunnel-targets-critical-infrastructure/; reference:url,attack.mitre.org/techniques/T1102/; classtype:command-and-control; sid:2000611; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_10_29, updated_at 2026_10_29;)
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite IRANIAN-APT CL-STA-1178 - Blinder Tunnel Lure Archive Download DubaiAirport/WarUnPublishedDocuments 2026"; flow:to_server,established; http.uri; content:".zip"; nocase; http.uri; pcre:"/(?:DubaiAirport_Carrers_IT_Test|WarUnPublishedDocuments)\.zip/i"; threshold:type limit, track by_src, count 1, seconds 3600; reference:url,unit42.paloaltonetworks.com/blinder-tunnel-targets-critical-infrastructure/; reference:url,attack.mitre.org/techniques/T1566/001/; classtype:trojan-activity; sid:2000612; rev:1; metadata:policy max-detect-ips drop, created_at 2026_10_29, updated_at 2026_10_29;)
