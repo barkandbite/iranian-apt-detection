@@ -36,6 +36,9 @@ girlsbags[.]shop
 onlinepettools[.]shop
 web14[.]info
 web27[.]info
+
+# FilthyFeline (OilRig subgroup) Europe campaign, Mar-Jul 2026 (ESET Q2-Q3 2026)
+micsinfy[.]eu
 ```
 
 ### Dust Specter (April 2026) — Key Indicators

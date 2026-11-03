@@ -2292,3 +2292,19 @@ alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Mudd
 alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater RustyWater X-Rw-Id Task Poll 2026"; flow:to_server,established; http.method; content:"GET"; http.uri; content:"/rw/task"; fast_pattern; nocase; http.header_names; content:"X-Rw-Id"; nocase; threshold:type limit, track by_src, count 1, seconds 600; reference:url,rescana.com/post/rustywater-iranian-muddywater-apt; reference:url,attack.mitre.org/techniques/T1071/001/; classtype:command-and-control; sid:2000574; rev:1; metadata:policy max-detect-ips drop, created_at 2026_08_20, updated_at 2026_08_20;)
 
 alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater RustyWater Gzipped Exfil /rw/upload 2026"; flow:to_server,established; http.method; content:"POST"; http.uri; content:"/rw/upload"; fast_pattern; nocase; http.header; content:"Content-Encoding: gzip"; nocase; http.user_agent; content:"reqwest/"; nocase; threshold:type limit, track by_src, count 1, seconds 900; reference:url,rescana.com/post/rustywater-iranian-muddywater-apt; reference:url,attack.mitre.org/techniques/T1041/; classtype:trojan-activity; sid:2000575; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_08_20, updated_at 2026_08_20;)
+
+# ==========================================================================
+# 2026-11-03 session — FilthyFeline (OilRig subgroup) Europe-facing campaign
+# (ESET APT Activity Report Q2-Q3 2026). FilthyFeline is linked to MOIS,
+# shares TTPs with Lyceum and MuddyWater, and took over BladedFeline's 2023
+# Uzbekistan cellular-provider target set. Campaign domain micsinfy[.]eu ran
+# 2026-03-19 through 2026-07-09 (Let's Encrypt cert issued 2026-03-18, expired
+# 2026-06-16). Campaign has tapered off, but any contact with the domain still
+# indicates a compromised or phished host - keep alerting (IOC-currency note
+# recorded in TODO.md). MuddyWater's parallel ScreenConnect-via-IT-vendor
+# activity is already covered by the existing RMM abuse rules.
+# ==========================================================================
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT FilthyFeline OilRig Subgroup Campaign Domain micsinfy.eu DNS 2026"; dns.query; content:"micsinfy.eu"; nocase; fast_pattern; reference:url,web-assets.esetstatic.com/wls/en/papers/threat-reports/eset-apt-activity-report-q2-2026-q3-2026.pdf; reference:url,attack.mitre.org/techniques/T1071/001/; classtype:command-and-control; sid:2000576; rev:1; metadata:policy max-detect-ips drop, created_at 2026_11_03, updated_at 2026_11_03;)
+
+alert tls $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT FilthyFeline OilRig Subgroup Campaign Domain micsinfy.eu TLS SNI 2026"; flow:established,to_server; tls.sni; content:"micsinfy.eu"; nocase; fast_pattern; reference:url,web-assets.esetstatic.com/wls/en/papers/threat-reports/eset-apt-activity-report-q2-2026-q3-2026.pdf; reference:url,attack.mitre.org/techniques/T1071/001/; classtype:command-and-control; sid:2000577; rev:1; metadata:policy max-detect-ips drop, created_at 2026_11_03, updated_at 2026_11_03;)

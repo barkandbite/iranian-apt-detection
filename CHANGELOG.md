@@ -5,6 +5,37 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.26] - 2026-11-03
+
+### Added — FilthyFeline campaign-domain rules (SID 2000576–2000577)
+
+ESET's APT Activity Report Q2–Q3 2026 (published 2026-10-28) documents a
+resurgence of Iran-aligned activity after the outbreak of the US/Israel war
+on Iran, including **FilthyFeline**, an OilRig subgroup linked to MOIS that
+shares TTPs with Lyceum and MuddyWater. FilthyFeline took over the
+Uzbekistan cellular-provider target previously worked by BladedFeline and ran
+a Europe-facing campaign on `micsinfy[.]eu` from 2026-03-19 to 2026-07-09
+(Let's Encrypt certificate issued 2026-03-18, expired 2026-06-16).
+
+- **SID 2000576** — `micsinfy.eu` DNS resolution.
+- **SID 2000577** — `micsinfy.eu` TLS SNI.
+
+The campaign has tapered off, but contact with the domain still indicates a
+compromised or phished host, so the rules alert at normal priority.
+IOC-currency note: re-verify attribution of this domain by 2027-02-01.
+
+### Notes
+
+- MuddyWater's parallel return to spearphishing + ScreenConnect delivery via
+  a compromised Israeli IT vendor (same report) is already covered by the
+  existing ScreenConnect RMM-abuse rules — no new rule needed.
+- BladedFeline's **SharpShareIT** backdoor (Aug 2026) deliberately uses the
+  stock Microsoft Edge/Windows 10 User-Agent; no reliable network-only
+  signature is possible from public reporting. Host-side hunting guidance
+  tracked in TODO; revisit when hashes/C2 publish.
+- TortoiseShell's updated IMAPLoader successor (May 2026) adds only
+  host-side anti-analysis changes; existing IMAP C2 coverage stands.
+
 ## [4.0.25] - 2026-08-20
 
 ### Added — MuddyWater RustyWater behavioral rules (SID 2000573–2000575)

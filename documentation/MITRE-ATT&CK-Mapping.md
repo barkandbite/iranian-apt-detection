@@ -234,3 +234,14 @@
 ### Defense Evasion
 - **T1574.002 - DLL Side-Loading**: Wazuh 101528 (WinDirStat.exe loading trojanized uxtheme.dll from non-system path)
 - **T1036.005 - Match Legitimate Name or Location**: Wazuh 101529 (execution from C:\ProgramData\WinDir\ masquerade directory), SID 2000553 (google.com.hospitalinstallation.com visual-obfuscation subdomain)
+
+---
+
+## November 2026 Additions — FilthyFeline Campaign Domain (ESET APT Activity Report Q2–Q3 2026)
+
+### Command and Control
+- **T1071.001 - Web Protocols**: SID 2000577 (micsinfy.eu TLS SNI — OilRig subgroup FilthyFeline, Europe-facing campaign 2026-03-19 → 2026-07-09)
+- **T1071.004 - DNS**: SID 2000576 (micsinfy.eu resolution)
+
+### Initial Access
+- **T1566.002 - Spearphishing Link**: covered by SIDs 2000576-2000577 (micsinfy.eu served as the campaign's phishing/C2 touchpoint; ESET reports spearphishing links as the dominant Iran-aligned initial-access technique this period at 75%)

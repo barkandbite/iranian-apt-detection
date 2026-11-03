@@ -1,6 +1,6 @@
 # Iranian APT Detection Rules
 
-[![Version](https://img.shields.io/badge/version-4.0.25-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.0.26-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![MITRE ATT&CK](https://img.shields.io/badge/MITRE%20ATT%26CK-v15-orange.svg)](documentation/MITRE-ATT&CK-Mapping.md)
 
@@ -15,6 +15,10 @@ Three concurrent Iranian campaigns targeting U.S. healthcare disclosed March 24:
 - **Handala/Void Manticore** wiped 200K+ Stryker devices via **Microsoft Intune MDM** abuse — no malware needed. Maryland EKG transmission went dark statewide. DOJ attributed; $10M reward.
 - **Pay2Key v3** (IRGC) hit unnamed U.S. healthcare org with **ChaCha20 + Curve25519** ransomware. Fake Avast AV bypass. **I2P C2** (not Tor). Purely destructive — no ransom demand.
 - **MuddyWater** exploiting **CVE-2025-59287** (Windows WSUS Deserialization RCE, CVSS 9.8) to pre-position on healthcare networks.
+
+## Recent Threats (v4.0.26)
+
+- **NEW (v4.0.26)**: **FilthyFeline campaign domain** (SID 2000576-2000577) — OilRig/MOIS subgroup's Europe-facing `micsinfy[.]eu` campaign (2026-03-19 → 2026-07-09, ESET APT Activity Report Q2-Q3 2026). DNS + TLS SNI rules; domain contact still indicates infection post-campaign. MuddyWater's ScreenConnect-via-IT-vendor return (same report) is covered by existing RMM rules.
 
 ## Recent Threats (v4.0.25)
 
