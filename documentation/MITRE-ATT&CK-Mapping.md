@@ -258,3 +258,14 @@
 
 ### Collection / Exfiltration
 - **T1074.001 / T1056.001 - Local Data Staging / Keylogging**: Wazuh 101585 (pic.LOG keylog container, cobe-notes.txt staging)
+
+---
+
+## November 2026 Additions (v5.4.0) — FilthyFeline Campaign Domain (ESET APT Activity Report Q2–Q3 2026)
+
+### Command and Control
+- **T1071.001 - Web Protocols**: SID 2000614 (micsinfy.eu TLS SNI — OilRig subgroup FilthyFeline, Europe-facing campaign 2026-03-19 → 2026-07-09)
+- **T1071.004 - DNS**: SID 2000613 (micsinfy.eu resolution)
+
+### Initial Access
+- **T1566.002 - Spearphishing Link**: covered by SIDs 2000613-2000614 (micsinfy.eu served as the campaign's phishing/C2 touchpoint; ESET reports spearphishing links as the dominant Iran-aligned initial-access technique this period at 75%)

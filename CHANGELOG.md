@@ -37,6 +37,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   VeloCloud Orchestrator SQLi) is unattributed mass exploitation and
   was covered in the by-country repo's cross-country file.
 
+## [5.4.0] - 2026-11-06
+
+### Added
+- **FilthyFeline (OilRig subgroup) Europe campaign domain** — SIDs 2000613-2000614:
+  micsinfy[.]eu DNS resolution and TLS SNI. Europe-facing campaign 2026-03-19 ->
+  2026-07-09 per ESET APT Activity Report Q2-Q3 2026. Salvaged from draft PR #76
+  (originally numbered 2000576-2000577, renumbered to avoid collision with the
+  v5.2.0 consolidation allocations).
+
+### Fixed
+- SIDs 2000611-2000612 (Blinder Tunnel): removed redundant duplicate `http.uri`
+  sticky-buffer declarations that produced Suricata 7 "duplicate instance"
+  load warnings (rev 2). Ruleset now loads with zero warnings.
+
+### Maintenance (2026-11-06 session)
+- Adopted the v5.3.0 consolidation line and salvaged stray draft PR #76 onto it;
+  this session's PR supersedes draft PRs #51-#76.
+- Validation: `suricata -T` exit 0, zero warnings (491 rules, Suricata 7.0.3);
+  `xmllint --noout` clean on all 24 Wazuh XML files.
+- Cross-repo parity with `bb-iran-suricata.rules` verified: identical 491-SID set.
+- New (2026-11-03/04) KEV items CVE-2026-119977 (WordPress) and CVE-2026-111357
+  (Ivanti ICS chain) are unattributed/non-Iranian - covered in the by-country repo.
+
 ## [5.3.0] - 2026-11-02
 
 ### Added

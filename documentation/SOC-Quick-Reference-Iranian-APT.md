@@ -52,6 +52,9 @@ web27[.]info
 - **Lure archives**: `DubaiAirport_Carrers_IT_Test.zip`, `WarUnPublishedDocuments.zip` (SID 2000612)
 - **Host artifacts**: `RuntimeBroker.exe` under `%LOCALAPPDATA%\Microsoft\RuntimeBrokers\`, `vshost.exe`/`vshost32.exe` outside Visual Studio paths, HKCU Run value `MicrosoftRuntime`, MSBuild spawning from AppData (Wazuh 101586-101590)
 
+### FilthyFeline / OilRig subgroup Europe campaign (added November 2026) — Key Indicators
+- **Campaign domain**: `micsinfy[.]eu` — phishing/C2 touchpoint, campaign window 2026-03-19 → 2026-07-09 (SIDs 2000613-2000614, DNS + TLS SNI; ESET APT Activity Report Q2–Q3 2026)
+
 ### Olalampo full-report delta (October 2026)
 - **HTTP_VIP output endpoints**: URI exactly `/ecmd`, `/esend`, or `/erecv` (SID 2000606)
 - **miniquest C2 real IP**: 159.198.43[.]141 added to SID 2000375 (rev 2)
