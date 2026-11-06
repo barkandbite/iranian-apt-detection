@@ -33,7 +33,7 @@
        outside a change window or from a non-engineer account it matches the
        AA26-097A project-file exfil pattern. (T0873 / T1005) -->
   <rule id="101534" level="10">
-    <if_group>sysmon_event_1</if_group>
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.image" type="pcre2">(?i)\\(unity ?pro|control ?expert|ecostruxure)[^\\]*\.exe$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)\.(stu|sta|xef|zef)\b</field>
     <description>Iranian APT: CyberAv3ngers - Schneider PLC project file accessed by engineering software (CISA AA26-097A ICS exfil)</description>
@@ -50,7 +50,7 @@
        logic; a portable/relocated copy of the S7 programming binary is the
        host tell for that. (T0843 program download / T1036.005) -->
   <rule id="101535" level="12">
-    <if_group>sysmon_event_1</if_group>
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.image" type="pcre2">(?i)\\(s7[a-z0-9]+|siemens\.automation\.[^\\]+)\.exe$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)^(?!.*\\Program Files).*</field>
     <description>Iranian APT: CyberAv3ngers - Siemens S7 programming binary executing from non-standard path (CISA AA26-097A ladder-logic tampering)</description>
