@@ -5,6 +5,57 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.26] - 2026-11-08
+
+### Added — Suspected MuddyWater Israel Tax Authority SimpleHelp campaign (SID 2000576–2000584)
+
+Cato CTRL (Nov 3, 2026) documented phishing impersonating the Israel Tax
+Authority, active against Israeli organizations since September 2026.
+Lookalike "govil" domains (mimicking the official gov.il namespace) serve a
+CAPTCHA-gated page (archive password `123123`) delivering ZIPs that contain
+a legitimate SimpleHelp remote-access client disguised as a tax document
+(`Israel_Tax_Authority.zip` / `document.zip` → `document.exe` /
+`רשות המסים בישראל.exe`). All four delivery domains resolve to one host
+(129.121.120[.]121, pivoted via FOFA ETag values). No SimpleHelp
+vulnerability is involved. Attribution to MuddyWater/TA450 is **suspected,
+not confirmed** (documented SimpleHelp abuse per Group-IB/HarfangLab;
+Israeli payroll-lure precedent per Proofpoint).
+
+- **SID 2000576/2000577** — behavioral: DNS lookup / TLS SNI for any
+  hyphenated `-govil.` lookalike label. The legitimate namespace is the
+  dotted `gov.il`, which these content matches cannot hit; survives
+  domain rotation.
+- **SID 2000578–2000581** — IOC: the four observed delivery domains
+  (`doc-taxes-govil[.]org`, `document-govil[.]com`, `doc26-govil[.]org`,
+  `document-govil[.]online`).
+- **SID 2000582** — ZIP download from a `-govil.` host (priority 1).
+- **SID 2000583** — `Israel_Tax_Authority.zip` transfer on any host
+  (`file.name`).
+- **SID 2000584** — campaign infrastructure 129.121.120[.]121 (IP IOC —
+  perishable, verify quarterly).
+
+Generic SimpleHelp RMM abuse detection remains SID 2000257/2000350.
+
+### Added — Wazuh host-side parity rules (101545–101549)
+
+New file `wazuh-rules/0925-iranian-apt-november2026-simplehelp-campaign.xml`:
+
+- **101545** — tax-lure executable (`document.exe` / Hebrew-named
+  `רשות המסים בישראל.exe`) launched from a Downloads/Temp path.
+- **101546** — lure archive/executable dropped (Sysmon 11).
+- **101547** — SimpleHelp client executed from a `JWrapper-Remote Access`
+  path (tune/suppress where SimpleHelp is sanctioned).
+- **101548** — SimpleHelp remote-access service installed.
+- **101549** — any process connecting to 129.121.120[.]121 (Sysmon 3).
+
+### Changed
+
+- `suricata/iranian-apt-detection.rules` header: version 4.0.26,
+  461 rules, SID range 1000039–2000584.
+- `STRUCTURE.md`, `documentation/MITRE-ATT&CK-Mapping.md`,
+  `documentation/SOC-Quick-Reference-Iranian-APT.md` updated for the new
+  campaign and the 0925 Wazuh file.
+
 ## [4.0.25] - 2026-08-20
 
 ### Added — MuddyWater RustyWater behavioral rules (SID 2000573–2000575)

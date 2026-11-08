@@ -1,0 +1,101 @@
+<!--
+  Wazuh Rules for Iranian APT Detection - November 2026 SimpleHelp Campaign
+  Version: 1.0
+  Last Updated: 2026-11-08
+
+  Host-side detections complementing the Suricata network signatures
+  (SID 2000576-2000584) for the suspected MuddyWater (TA450) Israel Tax
+  Authority phishing campaign (Cato CTRL, Nov 3 2026; active since
+  September 2026).
+
+  Phishing emails impersonating the Israel Tax Authority lead to lookalike
+  "-govil." domains serving a CAPTCHA-gated ZIP (password 123123) that
+  contains a SimpleHelp remote-access client disguised as a tax document:
+  "Israel_Tax_Authority.zip" / "document.zip" containing "document.exe" or
+  the Hebrew-named executable "רשות המסים בישראל.exe" ("Israel Tax
+  Authority"). SimpleHelp itself is legitimate software; these rules key on
+  the lure artifact names, SimpleHelp appearing on hosts where no RMM is
+  sanctioned, and connections to the campaign delivery host.
+
+  Attribution is suspected, not confirmed (Cato: documented MuddyWater
+  SimpleHelp abuse per Group-IB/HarfangLab, Israeli payroll-lure precedent
+  per Proofpoint TA450).
+
+  Rule ID Range: 101545-101549 (next available after 0924's 101544)
+
+  Tuning: 101547/101548 fire on ANY SimpleHelp client artifact. If your
+  organization legitimately deploys SimpleHelp, suppress them for the
+  sanctioned server fingerprint instead of disabling.
+
+  References:
+    - Cato CTRL: "Suspected Iranian MuddyWater Activity Using Israel Tax
+      Authority Lures and SimpleHelp" (Nov 3, 2026)
+-->
+
+<group name="iranian_apt,muddywater,simplehelp,november2026,">
+
+  <!-- Lure executable: Hebrew "Israel Tax Authority" .exe, or document.exe
+       launched from a Downloads/Temp/extracted-archive path (Sysmon Event 1). -->
+  <rule id="101545" level="13">
+    <if_group>sysmon_event_1</if_group>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\(?:רשות המסים בישראל\.exe$|document\.exe$)</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\(?:Downloads|Temp|AppData\\Local\\Temp)\\</field>
+    <description>Suspected MuddyWater tax-lure executable launched from a download/temp path (Israel Tax Authority SimpleHelp campaign, Nov 2026).</description>
+    <mitre>
+      <id>T1204.002</id>
+      <id>T1036.008</id>
+    </mitre>
+    <group>attack,execution,masquerading,</group>
+  </rule>
+
+  <!-- Lure archive written to disk (Sysmon Event 11 / FIM). -->
+  <rule id="101546" level="12">
+    <if_group>sysmon_event_11</if_group>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?i)\\(?:Israel_Tax_Authority\.zip|רשות המסים בישראל\.exe)$</field>
+    <description>Suspected MuddyWater tax-lure archive/executable dropped (Israel Tax Authority SimpleHelp campaign, Nov 2026).</description>
+    <mitre>
+      <id>T1566.002</id>
+      <id>T1105</id>
+    </mitre>
+    <group>attack,initial_access,</group>
+  </rule>
+
+  <!-- SimpleHelp client artifacts appearing on a host. The SimpleHelp/
+       JWrapper remote-access client unpacks under "JWrapper-Remote Access".
+       High-value on fleets where SimpleHelp is not sanctioned. -->
+  <rule id="101547" level="10">
+    <if_group>sysmon_event_1</if_group>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\JWrapper-Remote Access\\</field>
+    <description>SimpleHelp remote-access client executed (JWrapper-Remote Access path) - unsanctioned RMM / suspected MuddyWater tradecraft.</description>
+    <mitre>
+      <id>T1219</id>
+    </mitre>
+    <group>attack,command_and_control,rmm,</group>
+  </rule>
+
+  <!-- SimpleHelp remote-access service installed (Event 7045 family). -->
+  <rule id="101548" level="12">
+    <if_sid>18104,18106</if_sid>
+    <field name="win.eventdata.imagePath" type="pcre2">(?i)(JWrapper-Remote Access|SimpleHelp|Remote Access\.exe)</field>
+    <description>SimpleHelp remote-access service installed - unsanctioned RMM persistence / suspected MuddyWater tradecraft.</description>
+    <mitre>
+      <id>T1543.003</id>
+      <id>T1219</id>
+    </mitre>
+    <group>attack,persistence,rmm,</group>
+  </rule>
+
+  <!-- Any process connecting to the campaign delivery/C2 host
+       (Sysmon Event 3). IP IOC - perishable, verify quarterly. -->
+  <rule id="101549" level="13">
+    <if_group>sysmon_event_3</if_group>
+    <field name="win.eventdata.destinationIp">129.121.120.121</field>
+    <description>Connection to suspected MuddyWater SimpleHelp campaign infrastructure 129.121.120.121 (Cato CTRL, Nov 2026).</description>
+    <mitre>
+      <id>T1071.001</id>
+      <id>T1219</id>
+    </mitre>
+    <group>attack,command_and_control,</group>
+  </rule>
+
+</group>
