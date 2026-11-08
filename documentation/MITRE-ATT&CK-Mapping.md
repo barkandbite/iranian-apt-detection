@@ -234,3 +234,18 @@
 ### Defense Evasion
 - **T1574.002 - DLL Side-Loading**: Wazuh 101528 (WinDirStat.exe loading trojanized uxtheme.dll from non-system path)
 - **T1036.005 - Match Legitimate Name or Location**: Wazuh 101529 (execution from C:\ProgramData\WinDir\ masquerade directory), SID 2000553 (google.com.hospitalinstallation.com visual-obfuscation subdomain)
+
+## November 2026 Additions — Suspected MuddyWater Israel Tax Authority SimpleHelp Campaign (Cato CTRL)
+
+### Initial Access
+- **T1566.002 - Phishing: Spearphishing Link**: SIDs 2000576-2000577 (`-govil.` gov.il-lookalike DNS/TLS behavioral), 2000578-2000581 (observed delivery domains), Wazuh 101546 (lure archive drop)
+
+### Execution
+- **T1204.002 - User Execution: Malicious File**: SID 2000582 (ZIP fetch from lookalike host), Wazuh 101545 (tax-lure executable launched from download/temp path)
+
+### Defense Evasion
+- **T1036.008 - Masquerade File Type**: SID 2000583 (`Israel_Tax_Authority.zip` transfer), Wazuh 101545 (SimpleHelp client named as tax document)
+
+### Command and Control / Persistence
+- **T1219 - Remote Access Software**: Wazuh 101547 (JWrapper-Remote Access execution), 101548 (SimpleHelp service install); generic SimpleHelp SNI coverage remains SID 2000257/2000350
+- **T1071.001 - Web Protocols**: SID 2000584, Wazuh 101549 (campaign infrastructure 129.121.120[.]121)

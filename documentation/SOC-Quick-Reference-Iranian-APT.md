@@ -36,6 +36,13 @@ girlsbags[.]shop
 onlinepettools[.]shop
 web14[.]info
 web27[.]info
+
+# Suspected MuddyWater SimpleHelp campaign (Nov 2026) — gov.il lookalikes
+doc-taxes-govil[.]org
+document-govil[.]com
+doc26-govil[.]org
+document-govil[.]online
+129.121.120[.]121
 ```
 
 ### Dust Specter (April 2026) — Key Indicators
@@ -44,6 +51,15 @@ web27[.]info
 - **DLL sideloading**: Unsigned `libvlc.dll` (TwinTask) and `hostfxr.dll` (TwinTalk)
 - **Registry**: Run keys for `VLC` or `WingetUI` pointing to non-standard paths
 - **Lure**: Fake Webex installer from `meetingapp[.]site/webexdownload`
+
+### Suspected MuddyWater SimpleHelp Campaign (Nov 2026) — Key Indicators
+- **Lure**: Israel Tax Authority phishing → `-govil.` lookalike domain → CAPTCHA page → ZIP (password `123123`)
+- **Archives**: `Israel_Tax_Authority.zip`, `document.zip`
+- **Executables**: `document.exe`, `רשות המסים בישראל.exe` ("Israel Tax Authority")
+- **Payload**: legitimate SimpleHelp remote-access client configured for attacker infrastructure (no CVE involved)
+- **Host artifacts**: `JWrapper-Remote Access` directory/service on hosts with no sanctioned SimpleHelp
+- **Rules**: Suricata SID 2000576–2000584, Wazuh 101545–101549
+- **Attribution**: suspected MuddyWater/TA450 (Cato CTRL, Nov 3 2026) — unconfirmed
 
 ## Investigation Checklist
 
