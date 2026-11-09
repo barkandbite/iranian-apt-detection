@@ -2292,3 +2292,47 @@ alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Mudd
 alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater RustyWater X-Rw-Id Task Poll 2026"; flow:to_server,established; http.method; content:"GET"; http.uri; content:"/rw/task"; fast_pattern; nocase; http.header_names; content:"X-Rw-Id"; nocase; threshold:type limit, track by_src, count 1, seconds 600; reference:url,rescana.com/post/rustywater-iranian-muddywater-apt; reference:url,attack.mitre.org/techniques/T1071/001/; classtype:command-and-control; sid:2000574; rev:1; metadata:policy max-detect-ips drop, created_at 2026_08_20, updated_at 2026_08_20;)
 
 alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT MuddyWater RustyWater Gzipped Exfil /rw/upload 2026"; flow:to_server,established; http.method; content:"POST"; http.uri; content:"/rw/upload"; fast_pattern; nocase; http.header; content:"Content-Encoding: gzip"; nocase; http.user_agent; content:"reqwest/"; nocase; threshold:type limit, track by_src, count 1, seconds 900; reference:url,rescana.com/post/rustywater-iranian-muddywater-apt; reference:url,attack.mitre.org/techniques/T1041/; classtype:trojan-activity; sid:2000575; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_08_20, updated_at 2026_08_20;)
+
+# ============================================================
+# 2026-11-09: Mirage Kitten (UNC1549 / Nimbus Manticore /
+# Smoke Sandstorm) NodeRabbit + PollCat cross-platform RATs.
+# Kaspersky Securelist 2026-09-01: fake-recruiter lures with
+# trojanized npm coding assessments (colorized_terminal 2.1.0,
+# pretty-log 2.1.0) against fintech / aviation / aerospace in
+# MEA. First documented Node.js/JavaScript malware from this
+# actor. Behavioral rules on the C2 URI schemes + JSON body
+# shapes survive domain rotation; DNS IOC rules give high-
+# confidence attribution while the infrastructure lives.
+# ============================================================
+
+# NodeRabbit v1/v2 C2: POST /api/rabbit/{checkin,task,result} with JSON body
+# {"d":"<b64 IV||ct||tag>","_r":"<8hex>","_t":<epoch>} (AES-256-GCM envelope).
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Mirage Kitten NodeRabbit C2 /api/rabbit/ Beacon 2026"; flow:established,to_server; http.method; content:"POST"; http.uri; content:"/api/rabbit/"; fast_pattern; pcre:"/^\/api\/rabbit\/(?:checkin|task|result)$/"; http.request_body; content:"|22|d|22 3a 22|"; content:"|22|_r|22 3a 22|"; distance:0; reference:url,securelist.com/mirage-kitten-new-backdoors-noderabbit-pollcat/121244/; reference:url,attack.mitre.org/techniques/T1071/001/; classtype:command-and-control; sid:2000576; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_11_09, updated_at 2026_11_09;)
+
+# NodeRabbit v3 C2: same JSON envelope on the /sdk/v2/{ready,config,events}
+# scheme. Body-shape match keeps this alive when the URI scheme rotates again.
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Mirage Kitten NodeRabbit v3 C2 /sdk/v2/ Beacon 2026"; flow:established,to_server; http.method; content:"POST"; http.uri; content:"/sdk/v2/"; fast_pattern; pcre:"/^\/sdk\/v2\/(?:ready|config|events)$/"; http.request_body; content:"|22|d|22 3a 22|"; content:"|22|_r|22 3a 22|"; distance:0; reference:url,securelist.com/mirage-kitten-new-backdoors-noderabbit-pollcat/121244/; reference:url,attack.mitre.org/techniques/T1071/001/; classtype:command-and-control; sid:2000577; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_11_09, updated_at 2026_11_09;)
+
+# PollCat registration: POST /beacon with {"clientId":...,"type":"poll",...}.
+# The server's HTTP 400-as-success response convention makes the request side
+# the reliable match point.
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Mirage Kitten PollCat Registration POST /beacon type poll 2026"; flow:established,to_server; http.method; content:"POST"; http.uri; content:"/beacon"; http.request_body; content:"|22|type|22 3a 22|poll|22|"; fast_pattern; content:"|22|clientId|22|"; reference:url,securelist.com/mirage-kitten-new-backdoors-noderabbit-pollcat/121244/; reference:url,attack.mitre.org/techniques/T1071/001/; classtype:command-and-control; sid:2000578; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_11_09, updated_at 2026_11_09;)
+
+# PollCat task polling: GET /gate/fetch?token=<socketId>, default every 2
+# minutes with <=5s jitter. Threshold keeps one alert per source per 10 min.
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Mirage Kitten PollCat Task Poll /gate/fetch 2026"; flow:established,to_server; http.method; content:"GET"; http.uri; content:"/gate/fetch?token="; fast_pattern; threshold:type both, track by_src, count 3, seconds 600; reference:url,securelist.com/mirage-kitten-new-backdoors-noderabbit-pollcat/121244/; reference:url,attack.mitre.org/techniques/T1071/001/; classtype:command-and-control; sid:2000579; rev:1; metadata:policy max-detect-ips drop, created_at 2026_11_09, updated_at 2026_11_09;)
+
+# PollCat file exfiltration: PUT /vault/push/ chunked uploads with progress
+# tracked via POST /gate/track.
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite - Iranian APT Mirage Kitten PollCat File Exfil PUT /vault/push 2026"; flow:established,to_server; http.method; content:"PUT"; http.uri; content:"/vault/push/"; fast_pattern; reference:url,securelist.com/mirage-kitten-new-backdoors-noderabbit-pollcat/121244/; reference:url,attack.mitre.org/techniques/T1041/; classtype:trojan-activity; sid:2000580; rev:1; priority:1; metadata:policy max-detect-ips drop, created_at 2026_11_09, updated_at 2026_11_09;)
+
+# --- C2 domain IOCs (Kaspersky, 2026-09-01). Perishable; verify quarterly. ---
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT Mirage Kitten NodeRabbit C2 Domain visitfinancedentists.com 2026"; dns.query; content:"visitfinancedentists.com"; nocase; fast_pattern; reference:url,securelist.com/mirage-kitten-new-backdoors-noderabbit-pollcat/121244/; reference:url,attack.mitre.org/techniques/T1071/004/; classtype:command-and-control; sid:2000581; rev:1; metadata:policy max-detect-ips drop, created_at 2026_11_09, updated_at 2026_11_09;)
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT Mirage Kitten NodeRabbit C2 Domain healthcomfsdpower.com 2026"; dns.query; content:"healthcomfsdpower.com"; nocase; fast_pattern; reference:url,securelist.com/mirage-kitten-new-backdoors-noderabbit-pollcat/121244/; reference:url,attack.mitre.org/techniques/T1071/004/; classtype:command-and-control; sid:2000582; rev:1; metadata:policy max-detect-ips drop, created_at 2026_11_09, updated_at 2026_11_09;)
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT Mirage Kitten PollCat C2 Domain sahi-finance.com 2026"; dns.query; content:"sahi-finance.com"; nocase; fast_pattern; reference:url,securelist.com/mirage-kitten-new-backdoors-noderabbit-pollcat/121244/; reference:url,attack.mitre.org/techniques/T1071/004/; classtype:command-and-control; sid:2000583; rev:1; metadata:policy max-detect-ips drop, created_at 2026_11_09, updated_at 2026_11_09;)
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT Mirage Kitten PollCat OTP-Gate Domain lifespotify.com 2026"; dns.query; content:"lifespotify.com"; nocase; fast_pattern; reference:url,securelist.com/mirage-kitten-new-backdoors-noderabbit-pollcat/121244/; reference:url,attack.mitre.org/techniques/T1071/004/; classtype:command-and-control; sid:2000584; rev:1; metadata:policy max-detect-ips drop, created_at 2026_11_09, updated_at 2026_11_09;)
+
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite - Iranian APT Mirage Kitten Infrastructure Domain msmanagementgrp 2026"; dns.query; content:"msmanagementgrp"; nocase; fast_pattern; pcre:"/msmanagementgrp(?:media)?\.com$/i"; reference:url,securelist.com/mirage-kitten-new-backdoors-noderabbit-pollcat/121244/; reference:url,attack.mitre.org/techniques/T1071/004/; classtype:command-and-control; sid:2000585; rev:1; metadata:policy max-detect-ips drop, created_at 2026_11_09, updated_at 2026_11_09;)

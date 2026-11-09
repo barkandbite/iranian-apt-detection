@@ -234,3 +234,28 @@
 ### Defense Evasion
 - **T1574.002 - DLL Side-Loading**: Wazuh 101528 (WinDirStat.exe loading trojanized uxtheme.dll from non-system path)
 - **T1036.005 - Match Legitimate Name or Location**: Wazuh 101529 (execution from C:\ProgramData\WinDir\ masquerade directory), SID 2000553 (google.com.hospitalinstallation.com visual-obfuscation subdomain)
+
+## November 2026 — Mirage Kitten (UNC1549) NodeRabbit / PollCat
+
+### Initial Access
+- **T1566.003 - Phishing: Spearphishing via Service**: fake-recruiter approaches on LinkedIn/job platforms delivering trojanized coding assessments (delivery context for all November 2026 rules)
+- **T1195.002 - Supply Chain Compromise: Software Supply Chain**: trojanized npm packages `colorized_terminal 2.1.0` / `pretty-log 2.1.0`; Wazuh 101545 (npm cache implant path `node_modules/.cache/.320697f1/index.js`)
+
+### Execution
+- **T1059.007 - JavaScript**: Wazuh 101546 (renamed Node.js runtimes `nodew.exe` / `IntelDSA.exe` executing JS implants)
+
+### Persistence
+- **T1547.001 - Registry Run Keys**: Wazuh 101548 (`MicrosoftEdgeUpdate` Run key)
+- **T1053.005 - Scheduled Task**: Wazuh 101547 (`IntelDriverSupportUpdate`, `NetSync_<user>`)
+- **T1543.001 / T1053.003 - LaunchAgent / Cron**: Wazuh 101549 (macOS plists `com.microsoft.edgeupdate` / `com.intel.dsa.helper` / `com.harsh.requireobject`, Linux `@reboot` cron, `~/.node_packages`)
+
+### Defense Evasion
+- **T1036.005 - Match Legitimate Name or Location**: Wazuh 101545/101546 (fake Edge/Intel updater paths and binaries)
+- **T1202 / T1564 - Indirect Command Execution / Hide Artifacts (WSL)**: Wazuh 101550 (NodeRabbit v3 `wscript.exe` → `launcher.vbs` → `wsl.exe` chain)
+
+### Command and Control
+- **T1071.001 - Web Protocols**: SID 2000576 (NodeRabbit `/api/rabbit/{checkin,task,result}` AES-256-GCM JSON envelope), SID 2000577 (NodeRabbit v3 `/sdk/v2/{ready,config,events}`), SID 2000578 (PollCat `POST /beacon` registration), SID 2000579 (PollCat `GET /gate/fetch?token=` poll)
+- **T1071.004 / DNS IOC**: SID 2000581-2000585 (C2 domains `visitfinancedentists.com`, `healthcomfsdpower.com`, `sahi-finance.com`, `lifespotify.com`, `msmanagementgrp(media).com`)
+
+### Exfiltration
+- **T1041 - Exfiltration Over C2 Channel**: SID 2000580 (PollCat `PUT /vault/push/` chunked upload)

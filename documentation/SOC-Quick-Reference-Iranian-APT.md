@@ -14,6 +14,17 @@
 | 100915-100917 | CVE-2021-26855 | Exchange | ProxyLogon `/owa/auth/` SSRF |
 | 100918-100919 | CVE-2023-23397 | Outlook | NTLM relay via reminder sound |
 
+### Mirage Kitten NodeRabbit / PollCat (November 2026)
+| Rule ID | Type | Indicator |
+|---------|------|-----------|
+| SID 2000576-2000577 | Network | NodeRabbit beacons: `POST /api/rabbit/{checkin,task,result}` or `/sdk/v2/{ready,config,events}` with `{"d":…,"_r":…,"_t":…}` JSON body |
+| SID 2000578-2000579 | Network | PollCat: `POST /beacon` with `"type":"poll"`; `GET /gate/fetch?token=` every ~2 min |
+| SID 2000580 | Network | PollCat exfil: `PUT /vault/push/` |
+| SID 2000581-2000585 | DNS IOC | `visitfinancedentists.com`, `healthcomfsdpower.com`, `sahi-finance.com`, `lifespotify.com`, `msmanagementgrp(media).com` |
+| 101545-101550 | Host | `msedge_update.js` / `idriver_support.js` / `nodew.exe` / `IntelDSA.exe`, tasks `IntelDriverSupportUpdate` / `NetSync_*`, WSL `launcher.vbs` |
+
+**Context:** fake-recruiter coding assessments (trojanized npm packages `colorized_terminal` / `pretty-log`). Targets developers in fintech/aviation/aerospace. If one fires, pull the developer workstation's npm cache and shell history — the lure repo usually persists on disk.
+
 ### Known Malicious Tools
 - **Remote Access**: AnyDesk, Ngrok, Ligolo, MeshCentral, plink
 - **Backdoors**: Havoc, HanifNet, HXLibrary, NeoExpressRAT, SystemBC, Tickler
