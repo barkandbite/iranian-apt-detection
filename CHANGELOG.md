@@ -5,6 +5,41 @@ All notable changes to the Iranian APT Detection Rules project will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.26] - 2026-11-09
+
+### Added — Mirage Kitten (UNC1549) NodeRabbit + PollCat detection (SID 2000576–2000585)
+
+Kaspersky Securelist (2026-09-01) profiled Mirage Kitten (also tracked as
+UNC1549 / Nimbus Manticore / Smoke Sandstorm) delivering its first
+documented Node.js/JavaScript malware — the cross-platform **NodeRabbit**
+RAT and the **PollCat** JavaScript implant — through fake-recruiter coding
+assessments with trojanized npm packages (`colorized_terminal 2.1.0`,
+`pretty-log 2.1.0`). Victims in fintech, aviation and aerospace across MEA.
+
+Behavioral C2 rules (survive domain rotation):
+
+- **SID 2000576** — NodeRabbit v1/v2 beacon: `POST /api/rabbit/{checkin,task,result}`
+  with the `{"d":…,"_r":…,"_t":…}` AES-256-GCM JSON envelope.
+- **SID 2000577** — NodeRabbit v3 beacon: same envelope on `/sdk/v2/{ready,config,events}`.
+- **SID 2000578** — PollCat registration: `POST /beacon` with `"type":"poll"` + `clientId`.
+- **SID 2000579** — PollCat task poll: `GET /gate/fetch?token=<socketId>` (2-min cadence; thresholded).
+- **SID 2000580** — PollCat exfil: `PUT /vault/push/` chunked upload.
+
+IOC rules (perishable — re-verify by 2027-02):
+
+- **SID 2000581–2000584** — DNS queries for `visitfinancedentists.com`,
+  `healthcomfsdpower.com`, `sahi-finance.com`, `lifespotify.com`.
+- **SID 2000585** — `msmanagementgrp.com` / `msmanagementgrpmedia.com` infrastructure pair.
+
+### Added — Wazuh host-side parity rules (101545–101550)
+
+New file `wazuh-rules/0925-iranian-apt-november2026-miragekitten.xml`:
+implant script drops (`msedge_update.js`, `idriver_support.js`,
+`requireObject.js`, npm cache path), renamed Node runtimes (`nodew.exe`,
+`IntelDSA.exe`), scheduled tasks (`IntelDriverSupportUpdate`,
+`NetSync_<user>`), `MicrosoftEdgeUpdate` Run key, Linux/macOS
+cron/LaunchAgent artifacts, and the NodeRabbit v3 WSL `launcher.vbs` chain.
+
 ## [4.0.25] - 2026-08-20
 
 ### Added — MuddyWater RustyWater behavioral rules (SID 2000573–2000575)

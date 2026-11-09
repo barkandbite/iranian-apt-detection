@@ -1,0 +1,77 @@
+<!--
+  Wazuh rules for Mirage Kitten (UNC1549 / Nimbus Manticore / Smoke
+  Sandstorm) NodeRabbit and PollCat cross-platform RATs (Kaspersky
+  Securelist, 2026-09-01). Delivery: fake-recruiter coding assessments
+  with trojanized npm packages (colorized_terminal 2.1.0, pretty-log
+  2.1.0). Host indicators focus on the Node.js implant drop paths,
+  masquerading persistence (fake Edge/Intel updaters), scheduled tasks,
+  and the WSL launcher abuse used by NodeRabbit variant 3.
+  Network-side parity: Suricata SIDs 2000576-2000585.
+-->
+<group name="iranian_apt,mirage_kitten,unc1549,noderabbit,pollcat,november2026,">
+
+  <!-- NodeRabbit implant scripts dropped under masquerading paths -->
+  <rule id="101545" level="12">
+    <if_sid>554</if_sid>
+    <field name="file" type="pcre2">(?i)(msedge_update\.js|idriver_support\.js|requireObject\.js|node_modules[\\/]\.cache[\\/]\.320697f1[\\/]index\.js)</field>
+    <description>Mirage Kitten NodeRabbit/PollCat implant script dropped (fake Edge/Intel updater or npm cache path).</description>
+    <mitre>
+      <id>T1036.005</id>
+      <id>T1105</id>
+    </mitre>
+  </rule>
+
+  <!-- Renamed Node.js runtimes used to execute the implants -->
+  <rule id="101546" level="12">
+    <if_sid>592</if_sid>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\(nodew|IntelDSA)\.exe$</field>
+    <description>Mirage Kitten renamed Node.js runtime executed (nodew.exe / IntelDSA.exe masquerade).</description>
+    <mitre>
+      <id>T1036.005</id>
+      <id>T1059.007</id>
+    </mitre>
+  </rule>
+
+  <!-- Scheduled-task persistence names -->
+  <rule id="101547" level="12">
+    <if_sid>60009</if_sid>
+    <field name="win.eventdata.taskName" type="pcre2">(?i)(IntelDriverSupportUpdate|NetSync_)</field>
+    <description>Mirage Kitten scheduled-task persistence created (IntelDriverSupportUpdate / NetSync_&lt;user&gt;).</description>
+    <mitre>
+      <id>T1053.005</id>
+    </mitre>
+  </rule>
+
+  <!-- Run-key persistence for NodeRabbit variant 1 -->
+  <rule id="101548" level="12">
+    <if_sid>594</if_sid>
+    <field name="win.eventdata.targetObject" type="pcre2">(?i)\\CurrentVersion\\Run\\MicrosoftEdgeUpdate$</field>
+    <description>Mirage Kitten NodeRabbit Run-key persistence (MicrosoftEdgeUpdate value pointing at JS implant).</description>
+    <mitre>
+      <id>T1547.001</id>
+    </mitre>
+  </rule>
+
+  <!-- Linux/macOS persistence artifacts (FIM on agent config paths) -->
+  <rule id="101549" level="12">
+    <if_sid>554</if_sid>
+    <field name="file" type="pcre2">(microsoft-edge-update/msedge_update\.js|intel-dsa/idriver_support\.js|com\.microsoft\.edgeupdate\.plist|com\.intel\.dsa\.helper|com\.harsh\.requireobject\.plist|\.node_packages/)</field>
+    <description>Mirage Kitten NodeRabbit/PollCat Linux/macOS persistence artifact created (cron/LaunchAgent implant path).</description>
+    <mitre>
+      <id>T1543.001</id>
+      <id>T1053.003</id>
+    </mitre>
+  </rule>
+
+  <!-- WSL launcher abuse (NodeRabbit v3) -->
+  <rule id="101550" level="10">
+    <if_sid>592</if_sid>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)wscript\.exe.+launcher\.vbs</field>
+    <description>Mirage Kitten NodeRabbit v3 WSL launcher invoked (wscript.exe running launcher.vbs from user profile).</description>
+    <mitre>
+      <id>T1202</id>
+      <id>T1564</id>
+    </mitre>
+  </rule>
+
+</group>

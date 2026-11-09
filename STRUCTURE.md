@@ -19,6 +19,7 @@ iranian-apt-detection/
 │   ├── 0922-iranian-apt-august2026-ics-indicators.xml # August 2026 ICS host indicators (CyberAv3ngers)
 │   ├── 0923-iranian-apt-august2026-host-indicators.xml # August 2026 host indicators (Olalampo)
 │   ├── 0924-iranian-apt-august2026-rustywater.xml    # August 2026 RustyWater host indicators
+│   ├── 0925-iranian-apt-november2026-miragekitten.xml # November 2026 Mirage Kitten NodeRabbit/PollCat host indicators
 │   └── README.md                                     # Wazuh rules documentation
 │
 ├── configurations/
