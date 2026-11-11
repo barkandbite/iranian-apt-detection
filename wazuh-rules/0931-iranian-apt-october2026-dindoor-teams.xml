@@ -1,0 +1,46 @@
+<!--
+  Wazuh rules for MuddyWater DinDoor (Deno RAT) — Microsoft Teams
+  "IT support" vishing delivery variant (Daylight.ai, 2026-09-01).
+  A fake M365 tenant impersonating IT support social-engineers the victim
+  over Teams into running a "patch" that unpacks the Deno-based DinDoor RAT
+  into %AppData%\Roaming\DenoJSEnv and tunnels C2 over a WebSocket to a
+  CloudFront distribution. These rules cover the host-side staging and
+  persistence artifacts; the network side is covered by Suricata SID
+  2000595-2000597.
+
+  ID range 101580-101582 is allocated clear of the September consolidation
+  drafts (Wazuh IDs 101545-101578) so it merges without renumbering.
+-->
+<group name="iranian_apt,muddywater,dindoor,october2026,">
+
+  <rule id="101580" level="13">
+    <if_sid>592</if_sid>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?i)\\AppData\\Roaming\\DenoJSEnv\\</field>
+    <description>MuddyWater DinDoor Deno-runtime staging directory populated under AppData\Roaming\DenoJSEnv - Teams-vishing delivery.</description>
+    <mitre>
+      <id>T1204.002</id>
+      <id>T1105</id>
+    </mitre>
+  </rule>
+
+  <rule id="101581" level="12">
+    <if_sid>592</if_sid>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?i)\\patch0?8078\.b$</field>
+    <description>MuddyWater DinDoor Teams-vishing payload archive (patch08078.b) written to disk.</description>
+    <mitre>
+      <id>T1566.004</id>
+      <id>T1105</id>
+    </mitre>
+  </rule>
+
+  <rule id="101582" level="13">
+    <if_sid>60103,60104</if_sid>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\AppData\\Roaming\\DenoJSEnv\\.*\\deno\.exe$</field>
+    <description>Deno runtime executed from the DinDoor staging directory - MuddyWater DinDoor RAT execution.</description>
+    <mitre>
+      <id>T1059.007</id>
+      <id>T1071</id>
+    </mitre>
+  </rule>
+
+</group>

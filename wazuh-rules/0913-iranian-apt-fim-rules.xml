@@ -10,7 +10,7 @@
 <group name="iranian_apt,fim_detection,">
 
   <!-- Web Shell File Creation -->
-  <rule id="100960" level="15">
+  <rule id="100960" level="13">
     <if_sid>550,553,554</if_sid>
     <field name="file" type="pcre2">(?i)\.(jsp|jspx|aspx|asp|php|cfm)$</field>
     <field name="file" type="pcre2">(?i)(shell|cmd|exec|upload|backdoor|c99|r57|b374k|wso)</field>
@@ -22,7 +22,7 @@
     <group>attack,webshell,pci_dss_11.5,gdpr_IV_35.7.d,iranian_fim,</group>
   </rule>
 
-  <rule id="100961" level="15">
+  <rule id="100961" level="11">
     <if_sid>550,553,554</if_sid>
     <field name="file" type="pcre2">(?i)(wwwroot|inetpub|htdocs|www|public_html|webapps)/.*\.(txt|jpg|png|gif|ico)$</field>
     <match>type="added"</match>
@@ -46,9 +46,14 @@
     <group>attack,malware,pci_dss_11.5,iranian_fim,</group>
   </rule>
 
-  <rule id="100963" level="14">
+  <rule id="100963" level="6">
     <if_sid>550,553,554</if_sid>
     <field name="file" type="pcre2">(?i)(temp|tmp|appdata\\local\\temp|/tmp|/var/tmp).*\.(exe|dll|ps1|bat|cmd|vbs|jar)$</field>
+    <!-- FP PROFILE: every software installer, updater and MSI extracts
+         executables into a temp directory. This is normal Windows behaviour.
+         Correlate with an unsigned binary, an unusual parent process, or a
+         subsequent network connection before treating as malicious.
+         Level 14 -> 6 (see wazuh-rules/README.md severity rubric). -->
     <description>Iranian APT: Executable dropped in temporary directory - $(file)</description>
     <mitre>
       <id>T1105</id>
@@ -70,7 +75,7 @@
   </rule>
 
   <!-- Persistence File Locations -->
-  <rule id="100965" level="14">
+  <rule id="100965" level="8">
     <if_sid>550,553,554</if_sid>
     <field name="file" type="pcre2">(?i)(startup|run|runonce|winlogon|services)</field>
     <field name="file" type="pcre2">(?i)\.(exe|dll|bat|ps1|vbs)$</field>
@@ -83,7 +88,7 @@
   </rule>
 
   <!-- Credential Theft Files -->
-  <rule id="100966" level="15">
+  <rule id="100966" level="11">
     <if_sid>550,553,554</if_sid>
     <field name="file" type="pcre2">(?i)(sam\.save|security\.save|system\.save|ntds\.dit|lsass\.dmp|mimikatz)</field>
     <description>Iranian APT: Credential theft artifact detected - $(file)</description>
@@ -95,7 +100,7 @@
   </rule>
 
   <!-- Log Deletion/Tampering -->
-  <rule id="100967" level="14">
+  <rule id="100967" level="11">
     <if_sid>553,554</if_sid>
     <field name="file" type="pcre2">(?i)(\.log$|\.evtx$|/var/log/|windows\\system32\\winevt\\logs)</field>
     <match>type="deleted"</match>
@@ -108,7 +113,7 @@
   </rule>
 
   <!-- Ransomware Indicators -->
-  <rule id="100968" level="15">
+  <rule id="100968" level="16">
     <if_sid>550,553,554</if_sid>
     <field name="file" type="pcre2">(?i)(readme.*\.txt|decrypt.*\.txt|restore.*\.txt|how.*recover|\.locked|\.encrypted|\.enc)</field>
     <description>Iranian APT: Ransomware indicator file detected - $(file)</description>
@@ -120,7 +125,7 @@
   </rule>
 
   <!-- Shadow Copy Deletion Scripts -->
-  <rule id="100969" level="15">
+  <rule id="100969" level="16">
     <if_sid>550,553,554</if_sid>
     <field name="file" type="pcre2">(?i)\.(bat|cmd|ps1)$</field>
     <match>vssadmin|wbadmin|bcdedit|wmic shadowcopy</match>
@@ -133,7 +138,7 @@
   </rule>
 
   <!-- Staging Directories -->
-  <rule id="100970" level="14">
+  <rule id="100970" level="8">
     <if_sid>550,553,554</if_sid>
     <field name="file" type="pcre2">(?i)(programdata|public|perflogs|recycle\.bin).*\.(zip|rar|7z|tar|gz)$</field>
     <description>Iranian APT: Compressed file in unusual location - possible staging - $(file)</description>
@@ -158,7 +163,7 @@
   </rule>
 
   <!-- Exchange Web Shell Detection -->
-  <rule id="100973" level="15">
+  <rule id="100973" level="13">
     <if_sid>550,553,554</if_sid>
     <field name="file" type="pcre2">(?i)(\\Exchange Server\\|\\inetpub\\wwwroot\\aspnet_client\\|\\owa\\|\\ecp\\).*\.aspx$</field>
     <description>Iranian APT: Suspicious ASPX file in Exchange directory - $(file)</description>
@@ -180,7 +185,7 @@
     <group>attack,outlook,</group>
   </rule>
 
-  <rule id="100975" level="15">
+  <rule id="100975" level="11">
     <if_sid>550,553,554</if_sid>
     <field name="file" type="pcre2">(?i)(lsass.*\.dmp|procdump.*\.exe|out\.dat|debug\.bin)</field>
     <match>type="added"</match>
@@ -193,8 +198,9 @@
   </rule>
 
   <!-- Combined FIM Indicators -->
-  <rule id="100972" level="16" frequency="5" timeframe="300">
+  <rule id="100972" level="14" frequency="5" timeframe="300">
     <if_matched_group>iranian_fim</if_matched_group>
+    <same_location />
     <description>Iranian APT: Multiple suspicious file operations detected</description>
     <mitre>
       <id>T1055</id>
