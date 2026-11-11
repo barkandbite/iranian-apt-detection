@@ -269,3 +269,18 @@
 
 ### Initial Access
 - **T1566.002 - Spearphishing Link**: covered by SIDs 2000613-2000614 (micsinfy.eu served as the campaign's phishing/C2 touchpoint; ESET reports spearphishing links as the dominant Iran-aligned initial-access technique this period at 75%)
+
+## November 2026 Additions — Suspected MuddyWater Israel Tax Authority SimpleHelp Campaign (Cato CTRL)
+
+### Initial Access
+- **T1566.002 - Phishing: Spearphishing Link**: SIDs 2000615-2000616 (`-govil.` gov.il-lookalike DNS/TLS behavioral), 2000617-2000620 (observed delivery domains), Wazuh 101592 (lure archive drop)
+
+### Execution
+- **T1204.002 - User Execution: Malicious File**: SID 2000621 (ZIP fetch from lookalike host), Wazuh 101591 (tax-lure executable launched from download/temp path)
+
+### Defense Evasion
+- **T1036.008 - Masquerade File Type**: SID 2000622 (`Israel_Tax_Authority.zip` transfer), Wazuh 101591 (SimpleHelp client named as tax document)
+
+### Command and Control / Persistence
+- **T1219 - Remote Access Software**: Wazuh 101593 (JWrapper-Remote Access execution), 101594 (SimpleHelp service install); generic SimpleHelp SNI coverage remains SID 2000257/2000350
+- **T1071.001 - Web Protocols**: SID 2000623, Wazuh 101595 (campaign infrastructure 129.121.120[.]121)

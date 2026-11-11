@@ -37,6 +37,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   VeloCloud Orchestrator SQLi) is unattributed mass exploitation and
   was covered in the by-country repo's cross-country file.
 
+## [5.5.0] - 2026-11-11
+
+### Added
+- **Suspected MuddyWater (TA450) Israel Tax Authority SimpleHelp campaign** —
+  SIDs 2000615-2000623 (Suricata) and 101591-101595 (Wazuh, new file
+  `0934-iranian-apt-november2026-simplehelp-campaign.xml`). Phishing
+  impersonating the Israel Tax Authority leads to `-govil.` gov.il-lookalike
+  domains serving a CAPTCHA-gated ZIP (password 123123) containing a
+  SimpleHelp remote-access client disguised as a tax document
+  (`Israel_Tax_Authority.zip`, `document.exe`,
+  Hebrew-named "Israel Tax Authority" executable). Behavioral `-govil.`
+  DNS/TLS rules + four observed delivery domains + campaign infrastructure
+  129.121.120[.]121. Attribution suspected, not confirmed (Cato CTRL,
+  Nov 3 2026). Salvaged from draft PR #78 (originally numbered
+  2000576-2000584 / 101545-101549, renumbered onto the consolidation line;
+  msg prefixes normalized to the linter convention).
+
+### Fixed
+- Draft PR #78's Wazuh rules referenced the nonexistent groups
+  `sysmon_event_1` / `sysmon_event_3`; corrected to `sysmon_event1` /
+  `sysmon_event3` during salvage (the uncorrected rules would load but
+  silently never fire — same defect class as the v5.1.0 P0).
+
+### Maintenance (2026-11-11 session)
+- Adopted the v5.4.0 consolidation line and salvaged stray draft PR #78 onto
+  it; this session's PR supersedes draft PRs #51-#79.
+- Draft PR #79 (Mirage Kitten NodeRabbit/PollCat) audited: fully duplicates
+  the v5.2.0 line's coverage (SIDs 2000576-2000584 there) — dropped, nothing
+  lost.
+- Validation: `suricata -T` exit 0, zero warnings (500 rules, Suricata
+  7.0.3); `tools/lint-rules.py` 0 errors; `xmllint --noout` clean on all 25
+  Wazuh XML files; zero duplicate Wazuh rule IDs (100900-101595).
+- Cross-repo parity with `bb-iran-suricata.rules` verified: byte-identical
+  500-SID set (1000039-2000623).
+- Non-Iranian intel this session (CISA KEV Nov-10: Barracuda ESG chain,
+  Cisco BroadWorks XXE, Outlook NTLM leak, Chromium, Openwave) is covered in
+  the by-country repo.
+
 ## [5.4.0] - 2026-11-06
 
 ### Added

@@ -36,6 +36,13 @@ girlsbags[.]shop
 onlinepettools[.]shop
 web14[.]info
 web27[.]info
+
+# Suspected MuddyWater SimpleHelp campaign (Nov 2026) — gov.il lookalikes
+doc-taxes-govil[.]org
+document-govil[.]com
+doc26-govil[.]org
+document-govil[.]online
+129.121.120[.]121
 ```
 
 ### Dust Specter (April 2026) — Key Indicators
@@ -59,6 +66,15 @@ web27[.]info
 - **HTTP_VIP output endpoints**: URI exactly `/ecmd`, `/esend`, or `/erecv` (SID 2000606)
 - **miniquest C2 real IP**: 159.198.43[.]141 added to SID 2000375 (rev 2)
 - **Host artifacts**: implants written under `C:\Users\Public\` (MicrosoftExcelUser.exe / MicrosoftWordUser.exe / novaservice.exe), `DailyUpdate` scheduled task, `pic.LOG` / `cobe-notes.txt` staging (Wazuh 101583-101585)
+
+### Suspected MuddyWater SimpleHelp Campaign (Nov 2026) — Key Indicators
+- **Lure**: Israel Tax Authority phishing → `-govil.` lookalike domain → CAPTCHA page → ZIP (password `123123`)
+- **Archives**: `Israel_Tax_Authority.zip`, `document.zip`
+- **Executables**: `document.exe`, Hebrew-named "Israel Tax Authority" `.exe`
+- **Payload**: legitimate SimpleHelp remote-access client configured for attacker infrastructure (no CVE involved)
+- **Host artifacts**: `JWrapper-Remote Access` directory/service on hosts with no sanctioned SimpleHelp
+- **Rules**: Suricata SID 2000615-2000623, Wazuh 101591-101595
+- **Attribution**: suspected MuddyWater/TA450 (Cato CTRL, Nov 3 2026) — unconfirmed
 
 ## Investigation Checklist
 

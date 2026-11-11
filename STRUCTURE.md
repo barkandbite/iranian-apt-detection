@@ -28,6 +28,7 @@ iranian-apt-detection/
 │   ├── 0931-iranian-apt-october2026-dindoor-teams.xml # Oct 2026 MuddyWater DinDoor Teams-vishing host indicators
 │   ├── 0932-iranian-apt-october2026-olalampo.xml    # Oct 2026 Olalampo full-report delta host indicators
 │   ├── 0933-iranian-apt-october2026-blindertunnel.xml # Oct 2026 Blinder Tunnel (CL-STA-1178) host indicators
+│   ├── 0934-iranian-apt-november2026-simplehelp-campaign.xml # Nov 2026 SimpleHelp tax-lure campaign
 │   └── README.md                                     # Wazuh rules documentation
 │
 ├── configurations/
@@ -117,6 +118,7 @@ iranian-apt-detection/
 - **101579-101582**: MuddyWater DinDoor Teams-vishing host indicators (0931)
 - **101583-101585**: MuddyWater Olalampo full-report delta host indicators (0932)
 - **101586-101590**: Blinder Tunnel CL-STA-1178 ShelbyLoader/Blackwood host indicators (0933)
+- **101591-101595**: Suspected MuddyWater Israel Tax Authority SimpleHelp campaign — tax-lure executables, SimpleHelp/JWrapper artifacts, campaign infrastructure (0934)
 
 ### Suricata SID Ranges (1000039-2000612)
 - **1000039-2000014**: CVE exploitation signatures
