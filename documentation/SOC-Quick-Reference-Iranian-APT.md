@@ -36,6 +36,13 @@ girlsbags[.]shop
 onlinepettools[.]shop
 web14[.]info
 web27[.]info
+
+# Suspected MuddyWater SimpleHelp campaign (Nov 2026) — gov.il lookalikes
+doc-taxes-govil[.]org
+document-govil[.]com
+doc26-govil[.]org
+document-govil[.]online
+129.121.120[.]121
 ```
 
 ### Dust Specter (April 2026) — Key Indicators
@@ -44,6 +51,41 @@ web27[.]info
 - **DLL sideloading**: Unsigned `libvlc.dll` (TwinTask) and `hostfxr.dll` (TwinTalk)
 - **Registry**: Run keys for `VLC` or `WingetUI` pointing to non-standard paths
 - **Lure**: Fake Webex installer from `meetingapp[.]site/webexdownload`
+
+### Blinder Tunnel / CL-STA-1178 (October 2026) — Key Indicators
+- **Phishing domains**: `g-drive[.]cam`, `googeldrive[.]cam`, `drivegoogel[.]cam`, `meetonline[.]cam`, `googelmeet[.]online`, `asdfafadafg[.]online` (SIDs 2000607-2000608)
+- **C2/tunnel IPs**: 91.107.156[.]29, 65.109.214[.]145, 87.248.129[.]239, 38.180.136[.]127 (Chisel/Blackwood, SID 2000609)
+- **ShelbyC2 V2**: GitHub contents-API polling for `<16-hex MachineId>/Lic.txt|Inf.txt`, repo path `/peakyblinders-tm/` (SIDs 2000610-2000611, priority 1)
+- **Lure archives**: `DubaiAirport_Carrers_IT_Test.zip`, `WarUnPublishedDocuments.zip` (SID 2000612)
+- **Host artifacts**: `RuntimeBroker.exe` under `%LOCALAPPDATA%\Microsoft\RuntimeBrokers\`, `vshost.exe`/`vshost32.exe` outside Visual Studio paths, HKCU Run value `MicrosoftRuntime`, MSBuild spawning from AppData (Wazuh 101586-101590)
+
+### FilthyFeline / OilRig subgroup Europe campaign (added November 2026) — Key Indicators
+- **Campaign domain**: `micsinfy[.]eu` — phishing/C2 touchpoint, campaign window 2026-03-19 → 2026-07-09 (SIDs 2000613-2000614, DNS + TLS SNI; ESET APT Activity Report Q2–Q3 2026)
+
+### Olalampo full-report delta (October 2026)
+- **HTTP_VIP output endpoints**: URI exactly `/ecmd`, `/esend`, or `/erecv` (SID 2000606)
+- **miniquest C2 real IP**: 159.198.43[.]141 added to SID 2000375 (rev 2)
+- **Host artifacts**: implants written under `C:\Users\Public\` (MicrosoftExcelUser.exe / MicrosoftWordUser.exe / novaservice.exe), `DailyUpdate` scheduled task, `pic.LOG` / `cobe-notes.txt` staging (Wazuh 101583-101585)
+
+### Suspected MuddyWater SimpleHelp Campaign (Nov 2026) — Key Indicators
+- **Lure**: Israel Tax Authority phishing → `-govil.` lookalike domain → CAPTCHA page → ZIP (password `123123`)
+- **Archives**: `Israel_Tax_Authority.zip`, `document.zip`
+- **Executables**: `document.exe`, Hebrew-named "Israel Tax Authority" `.exe`
+- **Payload**: legitimate SimpleHelp remote-access client configured for attacker infrastructure (no CVE involved)
+- **Host artifacts**: `JWrapper-Remote Access` directory/service on hosts with no sanctioned SimpleHelp
+- **Rules**: Suricata SID 2000615-2000623, Wazuh 101591-101595
+- **Attribution**: suspected MuddyWater/TA450 (Cato CTRL, Nov 3 2026) — unconfirmed
+
+### DarkBlinders full-report delta (Nov 2026, v5.6.0) — Key Indicators
+- **StarkMeet fake videoconference app**: domains `stark-meet[.]com/.online/.website`, `starkmeet[.]com` (SIDs 2000624-2000625); install dir `%LOCALAPPDATA%\StarkMeet` (Wazuh 101596)
+- **GitHub C2 relay proxy**: Cloudflare Worker `g-prx.itugegape524.workers[.]dev` (SIDs 2000626-2000627) — complements the existing PeakyBlinders GitHub contents-API rules
+- **C2 cluster**: 194.62.249[.]19 / [.]114 (TCP 8001) / [.]53, 77.223.215[.]140 (SID 2000628; Dream Research, observed Jul–Oct 2026)
+- **Attribution**: DarkBlinders = APT34-adjacent cluster (UNC5795/UNC5187, REF8685, CL-STA-1178) — medium confidence
+
+### RustyWater Protos Labs IOC annex (added Nov 2026, v5.6.0)
+- **Cloudflare-fronted staging**: `stratioai[.]org`, `bootcamptg[.]org` (SIDs 2000629-2000631)
+- **Origin servers (medium confidence)**: 159.198.68[.]25, 161.35.228[.]250 (SID 2000632)
+- Complements existing nomercys[.]it[.]com + 159.198.66[.]153 rules and the three `/rw/` behavioral rules
 
 ## Investigation Checklist
 
