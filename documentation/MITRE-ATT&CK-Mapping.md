@@ -284,3 +284,13 @@
 ### Command and Control / Persistence
 - **T1219 - Remote Access Software**: Wazuh 101593 (JWrapper-Remote Access execution), 101594 (SimpleHelp service install); generic SimpleHelp SNI coverage remains SID 2000257/2000350
 - **T1071.001 - Web Protocols**: SID 2000623, Wazuh 101595 (campaign infrastructure 129.121.120[.]121)
+
+## November 2026 Additions (v5.6.0) — DarkBlinders Full-Report Delta + RustyWater IOC Annex
+
+### Initial Access
+- **T1566.002 - Spearphishing Link**: SIDs 2000624-2000625 (StarkMeet fake videoconference domain family stark-meet.com/.online/.website, starkmeet.com); Wazuh 101596 (%LOCALAPPDATA%\StarkMeet install artifact)
+
+### Command and Control
+- **T1102.002 - Web Service: Bidirectional Communication**: SIDs 2000626-2000627 (DarkBlinders GitHub-API C2 relay via Cloudflare Worker g-prx.itugegape524.workers.dev)
+- **T1071.001 - Application Layer Protocol: Web**: SIDs 2000629-2000631 (RustyWater Cloudflare-fronted staging domains stratioai.org / bootcamptg.org, Protos Labs annex)
+- **T1071 - Application Layer Protocol**: SID 2000628 (DarkBlinders C2 cluster 194.62.249.19/.114/.53, 77.223.215.140); SID 2000632 (RustyWater annex origin servers 159.198.68.25, 161.35.228.250 — medium confidence)

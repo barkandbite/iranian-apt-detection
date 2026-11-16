@@ -76,6 +76,17 @@ document-govil[.]online
 - **Rules**: Suricata SID 2000615-2000623, Wazuh 101591-101595
 - **Attribution**: suspected MuddyWater/TA450 (Cato CTRL, Nov 3 2026) — unconfirmed
 
+### DarkBlinders full-report delta (Nov 2026, v5.6.0) — Key Indicators
+- **StarkMeet fake videoconference app**: domains `stark-meet[.]com/.online/.website`, `starkmeet[.]com` (SIDs 2000624-2000625); install dir `%LOCALAPPDATA%\StarkMeet` (Wazuh 101596)
+- **GitHub C2 relay proxy**: Cloudflare Worker `g-prx.itugegape524.workers[.]dev` (SIDs 2000626-2000627) — complements the existing PeakyBlinders GitHub contents-API rules
+- **C2 cluster**: 194.62.249[.]19 / [.]114 (TCP 8001) / [.]53, 77.223.215[.]140 (SID 2000628; Dream Research, observed Jul–Oct 2026)
+- **Attribution**: DarkBlinders = APT34-adjacent cluster (UNC5795/UNC5187, REF8685, CL-STA-1178) — medium confidence
+
+### RustyWater Protos Labs IOC annex (added Nov 2026, v5.6.0)
+- **Cloudflare-fronted staging**: `stratioai[.]org`, `bootcamptg[.]org` (SIDs 2000629-2000631)
+- **Origin servers (medium confidence)**: 159.198.68[.]25, 161.35.228[.]250 (SID 2000632)
+- Complements existing nomercys[.]it[.]com + 159.198.66[.]153 rules and the three `/rw/` behavioral rules
+
 ## Investigation Checklist
 
 ### When Alert Triggers:

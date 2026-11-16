@@ -37,6 +37,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   VeloCloud Orchestrator SQLi) is unattributed mass exploitation and
   was covered in the by-country repo's cross-country file.
 
+## [5.6.0] - 2026-11-16
+
+### Added
+- **DarkBlinders full-report infrastructure delta** — SIDs 2000624-2000628
+  (Suricata) and 101596 (Wazuh, appended to 0933). Dream Research's full
+  DarkBlinders report (2026-10-08; THN coverage 2026-11-02) adds
+  infrastructure beyond the v5.3.0 Blinder Tunnel set: the StarkMeet fake
+  videoconference application domain family (`stark-meet[.]com/.online/
+  .website`, `starkmeet[.]com`), the Cloudflare Worker GitHub-C2 relay
+  `g-prx.itugegape524.workers[.]dev`, and the 194.62.249[.]x /
+  77.223.215[.]140 C2 cluster (observed Jul-Oct 2026). Host side:
+  `%LOCALAPPDATA%\StarkMeet` install artifact. DarkBlinders = APT34-adjacent
+  cluster (UNC5795/UNC5187, REF8685, CL-STA-1178), medium confidence.
+- **RustyWater Protos Labs IOC annex anchors** — SIDs 2000629-2000632.
+  Cloudflare-fronted staging domains `stratioai[.]org` / `bootcamptg[.]org`
+  and origin servers 159.198.68[.]25 / 161.35.228[.]250 (medium confidence,
+  CloudSEK appendix), complementing the existing nomercys[.]it[.]com /
+  159.198.66[.]153 anchors and the three `/rw/` behavioral rules. Note:
+  Rescana has still not published its own annex (checked 2026-11-16).
+
+### Maintenance (2026-11-16 session)
+- Adopted the v5.5.0 consolidation line; this session's PR supersedes draft
+  PRs #51-#80.
+- Tier-2 IOC currency spot-check: 194.11.246.101 still MuddyWater-attributed
+  (SOC Prime/Securitricks); 157.20.182.49 confirmed via Hunt.io
+  state-aligned-clusters report; no reassignment or seizure evidence for
+  157.20.182.75 / 45.80.148.195 — all four rules stay enabled.
+- Validation: `suricata -T` exit 0, zero warnings (509 rules, Suricata
+  7.0.3); `tools/lint-rules.py` 0 errors; `xmllint --noout` clean on all 25
+  Wazuh XMLs; zero duplicate Wazuh IDs; byte-identical parity with
+  `bb-iran-suricata.rules` (SIDs 1000039-2000632); all 9 new SIDs fire in
+  the by-country PCAP test suite.
+
 ## [5.5.0] - 2026-11-11
 
 ### Added

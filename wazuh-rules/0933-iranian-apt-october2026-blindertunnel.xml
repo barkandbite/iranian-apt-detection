@@ -63,4 +63,15 @@
     </mitre>
   </rule>
 
+  <!-- 2026-11-16: DarkBlinders full-report delta (Dream Research) - StarkMeet fake videoconference app install artifact -->
+  <rule id="101596" level="12">
+    <if_group>sysmon_event_11</if_group>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?i)\\AppData\\Local\\StarkMeet\\</field>
+    <description>StarkMeet fake videoconference application artifact written under %LOCALAPPDATA%\StarkMeet - DarkBlinders (APT34-adjacent, CL-STA-1178/REF8685) lure install.</description>
+    <mitre>
+      <id>T1566.002</id>
+      <id>T1204.002</id>
+    </mitre>
+  </rule>
+
 </group>
