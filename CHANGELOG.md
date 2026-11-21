@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 2026-11-21 daily maintenance audit (no rule changes)
+
+- Validation on the v5.6.0 line: `suricata -T` exit 0 on
+  `suricata/iranian-apt-detection.rules` (509 rules, Suricata 7.0.3);
+  `tools/lint-rules.py` 0 errors; `xmllint --noout` clean on all 25
+  Wazuh XML files; zero duplicate Wazuh rule IDs.
+- Cross-repo parity verified byte-identical with
+  `bb-iran-suricata.rules` (509 rules, SID 1000039-2000632).
+- No Iranian-attributed intelligence in the 2026-11-20 → 11-21 window.
+  The day's KEV additions (Apache Roller, vCenter CVE-2026-123890
+  China-nexus zero-day, SAP NetWeaver, Cisco Expressway, LiteLLM,
+  REDCap, Apache Axis, Puppet, Synology) are all non-Iranian and were
+  covered in the by-country repo (release
+  2026.11.21.0619-nov21-backlog-salvage-kev).
+- C2 IOC spot-check carried from 2026-11-20: 194.11.246.101 and
+  157.20.182.49 still publicly attributed to MuddyWater — keep;
+  157.20.182.75 / 45.80.148.195 unverified either way (no VT/AbuseIPDB
+  API in env) — keep active, verify next rotation.
+- This branch adopts v5.6.0 (#81) unchanged and supersedes draft PRs
+  #51-#81 together with by-country #107-#175 (see that repo's TODO.md
+  2026-11-21 session notes, fifth merge escalation).
+
+
 ### 2026-10-27 daily maintenance audit (no rule changes)
 
 - Validation on the v5.2.0 line: `suricata -T` exit 0 on
