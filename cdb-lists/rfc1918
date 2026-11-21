@@ -1,0 +1,8 @@
+# RFC1918 / non-routable source ranges.
+# Used with lookup="not_address_match_key" to express "source is external".
+# Declare in ossec.conf:  <ruleset><list>etc/lists/rfc1918</list></ruleset>
+10.0.0.0/8:internal
+172.16.0.0/12:internal
+192.168.0.0/16:internal
+127.0.0.0/8:internal
+169.254.0.0/16:internal
