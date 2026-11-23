@@ -10,7 +10,7 @@
 <group name="iranian_apt,windows_detection,">
 
   <!-- PowerShell Abuse -->
-  <rule id="100980" level="14">
+  <rule id="100980" level="8">
     <if_sid>91322</if_sid>
     <field name="win.eventdata.scriptBlockText" type="pcre2">(?i)(invoke-webrequest|downloadstring|downloadfile|iex|invoke-expression)</field>
     <field name="win.eventdata.scriptBlockText" type="pcre2">(?i)(http|https|ftp):\/\/</field>
@@ -22,7 +22,7 @@
     <group>attack,powershell,pci_dss_10.6.1,iranian_windows,</group>
   </rule>
 
-  <rule id="100981" level="15">
+  <rule id="100981" level="8">
     <if_sid>91322</if_sid>
     <field name="win.eventdata.scriptBlockText" type="pcre2">(?i)(frombase64string|convertto-securestring|decompress|gzipstream)</field>
     <description>Iranian APT: Encoded/compressed PowerShell payload detected</description>
@@ -34,9 +34,9 @@
   </rule>
 
   <!-- Event Log Clearing -->
-  <rule id="100982" level="15">
+  <rule id="100982" level="11">
     <if_sid>60106</if_sid>
-    <field name="win.system.channel">Security|System</field>
+    <field name="win.system.channel" type="pcre2">Security|System</field>
     <description>Iranian APT: Security/System event log cleared</description>
     <mitre>
       <id>T1070.001</id>
@@ -45,8 +45,8 @@
     <group>attack,log_clear,pci_dss_10.2.7,gdpr_IV_35.7.d,</group>
   </rule>
 
-  <rule id="100983" level="15">
-    <if_group>sysmon_event_1</if_group>
+  <rule id="100983" level="11">
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(wevtutil.*cl|clear-eventlog)</field>
     <description>Iranian APT: Event log clearing command executed</description>
     <mitre>
@@ -57,7 +57,7 @@
   </rule>
 
   <!-- Service Manipulation -->
-  <rule id="100984" level="14">
+  <rule id="100984" level="8">
     <if_sid>60010</if_sid>
     <field name="win.eventdata.serviceName" type="pcre2">(?i)(psexesvc|winvnc|teamviewer|anydesk|meshcentral)</field>
     <description>Iranian APT: Remote access service installed - $(win.eventdata.serviceName)</description>
@@ -68,8 +68,8 @@
     <group>attack,persistence,pci_dss_10.6.1,</group>
   </rule>
 
-  <rule id="100985" level="14">
-    <if_group>sysmon_event_1</if_group>
+  <rule id="100985" level="11">
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)sc\.exe.*(create|config).*binpath</field>
     <description>Iranian APT: Service creation via sc.exe detected</description>
     <mitre>
@@ -80,8 +80,9 @@
   </rule>
 
   <!-- Account Manipulation -->
-  <rule id="100986" level="14">
-    <if_sid>4720</if_sid>
+  <rule id="100986" level="11">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^4720$</field>
     <field name="win.eventdata.targetUserName" type="pcre2">(?i)(admin|svc|service|backup|temp|test)</field>
     <time>22:00-06:00</time>
     <description>Iranian APT: Suspicious account created during off-hours - $(win.eventdata.targetUserName)</description>
@@ -92,9 +93,10 @@
     <group>attack,account_manipulation,pci_dss_10.2.5,</group>
   </rule>
 
-  <rule id="100987" level="15">
-    <if_sid>4732</if_sid>
-    <field name="win.eventdata.targetUserName">Administrators|Domain Admins|Enterprise Admins</field>
+  <rule id="100987" level="11">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^4732$</field>
+    <field name="win.eventdata.targetUserName" type="pcre2">Administrators|Domain Admins|Enterprise Admins</field>
     <description>Iranian APT: User added to privileged group - $(win.eventdata.targetUserName)</description>
     <mitre>
       <id>T1098</id>
@@ -105,9 +107,10 @@
 
   <!-- RDP Activity -->
   <rule id="100988" level="14">
-    <if_sid>4624</if_sid>
-    <field name="win.eventdata.logonType">10</field>
-    <field name="win.eventdata.ipAddress" negate="yes">^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)</field>
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^4624$</field>
+    <field name="win.eventdata.logonType" type="pcre2">10</field>
+    <field name="win.eventdata.ipAddress" negate="yes" type="pcre2">^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)</field>
     <description>Iranian APT: External RDP login from $(win.eventdata.ipAddress)</description>
     <mitre>
       <id>T1021.001</id>
@@ -117,8 +120,8 @@
   </rule>
 
   <!-- Shadow Copy Deletion -->
-  <rule id="100989" level="15">
-    <if_group>sysmon_event_1</if_group>
+  <rule id="100989" level="16">
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(vssadmin.*delete.*shadows|wmic.*shadowcopy.*delete|bcdedit.*recoveryenabled.*no)</field>
     <description>Iranian APT: Shadow copy deletion command detected</description>
     <mitre>
@@ -131,7 +134,7 @@
   <!-- WMI Activity -->
   <rule id="100990" level="14">
     <if_group>sysmon_event_20</if_group>
-    <field name="win.eventdata.destination" negate="yes">localhost|127.0.0.1|::1</field>
+    <field name="win.eventdata.destination" negate="yes" type="pcre2">localhost|127.0.0.1|::1</field>
     <description>Iranian APT: Remote WMI activity detected to $(win.eventdata.destination)</description>
     <mitre>
       <id>T1047</id>
@@ -141,9 +144,9 @@
   </rule>
 
   <!-- Credential Dumping -->
-  <rule id="100991" level="15">
+  <rule id="100991" level="11">
     <if_group>sysmon_event_10</if_group>
-    <field name="win.eventdata.targetImage">lsass.exe</field>
+    <field name="win.eventdata.targetImage" type="pcre2">lsass.exe</field>
     <field name="win.eventdata.grantedAccess" type="pcre2">0x1410|0x1010|0x1438|0x143a|0x1418</field>
     <description>Iranian APT: LSASS memory access detected - possible credential dumping</description>
     <mitre>
@@ -154,7 +157,7 @@
   </rule>
 
   <!-- Registry Persistence -->
-  <rule id="100992" level="14">
+  <rule id="100992" level="11">
     <if_group>sysmon_event_13</if_group>
     <field name="win.eventdata.targetObject" type="pcre2">(?i)\\CurrentVersion\\Run|\\CurrentVersion\\RunOnce|\\CurrentVersion\\RunServices</field>
     <field name="win.eventdata.details" type="pcre2">(?i)(powershell|rundll32|regsvr32|mshta|wscript|cscript)</field>
@@ -167,8 +170,8 @@
   </rule>
 
   <!-- Process Injection -->
-  <rule id="100993" level="15">
-    <if_group>sysmon_event_8</if_group>
+  <rule id="100993" level="13">
+    <if_group>sysmon_event8</if_group>
     <field name="win.eventdata.sourceImage" negate="yes" type="pcre2">(?i)(chrome|firefox|teams|outlook|system32)</field>
     <field name="win.eventdata.targetImage" type="pcre2">(?i)(explorer\.exe|svchost\.exe|winlogon\.exe|services\.exe)</field>
     <description>Iranian APT: Process injection detected into $(win.eventdata.targetImage)</description>
@@ -183,7 +186,7 @@
   <rule id="100994" level="15">
     <if_sid>5104</if_sid>
     <field name="win.eventdata.serviceName" type="pcre2">(?i)(defender|sense|antimalware|symantec|mcafee|kaspersky|sophos)</field>
-    <field name="win.eventdata.state">stopped</field>
+    <field name="win.eventdata.state" type="pcre2">stopped</field>
     <description>Iranian APT: Security service stopped - $(win.eventdata.serviceName)</description>
     <mitre>
       <id>T1562.001</id>
@@ -193,9 +196,9 @@
   </rule>
 
   <!-- Exchange/Outlook Specific Detections -->
-  <rule id="100996" level="15">
+  <rule id="100996" level="13">
     <if_sid>18103</if_sid>
-    <field name="win.eventdata.application">MSExchange</field>
+    <field name="win.eventdata.application" type="pcre2">MSExchange</field>
     <match>Set-OabVirtualDirectory</match>
     <description>Iranian APT: Exchange OAB virtual directory modification detected</description>
     <mitre>
@@ -205,8 +208,8 @@
     <group>attack,exchange,persistence,pci_dss_10.6.1,</group>
   </rule>
 
-  <rule id="100997" level="15">
-    <if_group>sysmon_event_1</if_group>
+  <rule id="100997" level="13">
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.parentImage" type="pcre2">(?i)w3wp\.exe</field>
     <field name="win.eventdata.parentCommandLine" type="pcre2">MSExchangeOWAAppPool|MSExchangeECPAppPool</field>
     <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)csc\.exe|cvtres\.exe|conhost\.exe</field>
@@ -218,8 +221,9 @@
     <group>attack,webshell,exchange,</group>
   </rule>
 
-  <rule id="100998" level="14">
-    <if_sid>4698</if_sid>
+  <rule id="100998" level="8">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^4698$</field>
     <field name="win.eventdata.taskName" type="pcre2">(?i)outlook|exchange|update|windows</field>
     <field name="win.eventdata.command" type="pcre2">(?i)(powershell|cmd|rundll32|regsvr32|mshta)</field>
     <description>Iranian APT: Suspicious scheduled task created - $(win.eventdata.taskName)</description>
@@ -231,8 +235,9 @@
   </rule>
 
   <!-- Combined Windows Indicators -->
-  <rule id="100995" level="16" frequency="3" timeframe="300">
+  <rule id="100995" level="14" frequency="3" timeframe="300">
     <if_matched_group>iranian_windows</if_matched_group>
+    <same_location />
     <description>Iranian APT: Multiple Windows attack techniques detected - active compromise</description>
     <mitre>
       <id>T1486</id>
