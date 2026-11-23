@@ -1123,9 +1123,9 @@ alert ip $HOME_NET any -> 45.80.149.3 any (msg:"Bark&Bite IRANIAN-APT Infy - Ton
 # Infy/Prince of Persia — Dynamic DNS C2 domains (Tonnerre v12-16 / Foudre v34)
 # f13.ddnsking.com = Foudre C2, t13.ddnsking.com = Tonnerre C2
 # Registered Jan 25, 2026, resolving to 45.80.149.3
-alert dns $HOME_NET any -> any any (msg:"Bark&Bite IRANIAN-APT Infy - Foudre C2 DNS f13.ddnsking.com"; dns.query; content:"f13.ddnsking.com"; nocase; classtype:command-and-control; sid:2000487; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_09, updated_at 2026_04_09;)
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite IRANIAN-APT Infy/Prince of Persia - Foudre/Tonnerre C2 DNS f<N>.ddnsking.com (f13 2025, f21 active Sept 2026)"; dns.query; content:"ddnsking.com"; nocase; pcre:"/^f\d{1,3}\.ddnsking\.com$/i"; reference:url,semperis.com/blog/prince-of-persia-threat-group-hiding-in-plain-sight/; classtype:command-and-control; sid:2000487; rev:2; metadata:policy max-detect-ips drop, created_at 2026_04_09, updated_at 2026_11_23;)
 
-alert dns $HOME_NET any -> any any (msg:"Bark&Bite IRANIAN-APT Infy - Tonnerre C2 DNS t13.ddnsking.com"; dns.query; content:"t13.ddnsking.com"; nocase; classtype:command-and-control; sid:2000488; rev:1; metadata:policy max-detect-ips drop, created_at 2026_04_09, updated_at 2026_04_09;)
+alert dns $HOME_NET any -> any any (msg:"Bark&Bite IRANIAN-APT Infy/Prince of Persia - Foudre/Tonnerre C2 DNS t<N>.ddnsking.com (t13 2025, t21 active Sept 2026)"; dns.query; content:"ddnsking.com"; nocase; pcre:"/^t\d{1,3}\.ddnsking\.com$/i"; reference:url,semperis.com/blog/prince-of-persia-threat-group-hiding-in-plain-sight/; classtype:command-and-control; sid:2000488; rev:2; metadata:policy max-detect-ips drop, created_at 2026_04_09, updated_at 2026_11_23;)
 
 # Infy/Prince of Persia — Earlier C2 domains (conningstone/hbmc)
 # Domains uiavuflyjqodj.conningstone.net and uiavuflyjqodj.hbmc.net
@@ -2391,3 +2391,22 @@ alert dns $HOME_NET any -> any any (msg:"Bark&Bite IRANIAN-APT MuddyWater - Rust
 alert dns $HOME_NET any -> any any (msg:"Bark&Bite IRANIAN-APT MuddyWater - RustyWater Cloudflare-Fronted Staging Domain bootcamptg.org DNS Query 2026"; flow:to_server; dns.query; content:"bootcamptg.org"; nocase; endswith; reference:url,protoslabs.io/resources/rustywater-rust-rat-campaign; reference:url,attack.mitre.org/techniques/T1071/001/; classtype:command-and-control; sid:2000630; rev:1; metadata:policy max-detect-ips drop, created_at 2026_11_16, updated_at 2026_11_16;)
 alert tls $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite IRANIAN-APT MuddyWater - RustyWater Staging Domain Family TLS SNI 2026"; flow:established,to_server; tls.sni; content:".org"; nocase; pcre:"/(stratioai|bootcamptg)\.org$/i"; reference:url,protoslabs.io/resources/rustywater-rust-rat-campaign; reference:url,attack.mitre.org/techniques/T1071/001/; classtype:command-and-control; sid:2000631; rev:1; metadata:policy max-detect-ips drop, created_at 2026_11_16, updated_at 2026_11_16;)
 alert ip $HOME_NET any -> [159.198.68.25,161.35.228.250] any (msg:"Bark&Bite IRANIAN-APT MuddyWater - RustyWater Annex Origin Server Direct Contact (Medium Confidence) 2026"; threshold:type limit, track by_src, count 1, seconds 600; reference:url,protoslabs.io/resources/rustywater-rust-rat-campaign; reference:url,attack.mitre.org/techniques/T1071/; classtype:command-and-control; sid:2000632; rev:1; metadata:policy max-detect-ips drop, created_at 2026_11_16, updated_at 2026_11_16;)
+
+# =============================================================================
+# 2026-11-23: Prince of Persia (Infy/Foudre/Tonnerre/Tornado) infrastructure
+# rebuild - Semperis Threat Research, Oct 22 2026. Group stood up new C2 after
+# the Feb 2026 SafeBreach exposure (old 45.80.148.0/24 / 45.80.149.0/24 /
+# 45.80.151.0/24 ranges retired Feb 9 2026 - existing 45.80.148.x rules kept
+# for retro-hunt). Active since Sept 1 2026: 185.244.129.123 (HOSTGW SRL,
+# Tornado 1st-stage + Tonnerre + Foudre), 185.244.129.70 (AS204641, May-Aug
+# 2026), 68.65.122.203 (Namecheap, Tornado 2nd-stage). DGA families covered
+# by existing 2000490 (hbmc.net), 2000487/2000488 rev:2 (ddnsking counters).
+# =============================================================================
+alert ip $HOME_NET any -> [185.244.129.123,185.244.129.70,68.65.122.203] any (msg:"Bark&Bite IRANIAN-APT Prince of Persia - Rebuilt C2 Infrastructure Outbound Sept 2026"; threshold:type limit, track by_src, count 1, seconds 3600; reference:url,semperis.com/blog/prince-of-persia-threat-group-hiding-in-plain-sight/; reference:url,attack.mitre.org/techniques/T1071/; classtype:command-and-control; sid:2000633; rev:1; metadata:policy max-detect-ips drop, created_at 2026_11_23, updated_at 2026_11_23;)
+# Foudre/Tonnerre C2 protocol: POST to fdir.php returns the exfil file
+# listing. URI artifact is stable across C2 rebuilds - behavioral, survives
+# infrastructure rotation.
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite IRANIAN-APT Prince of Persia - Foudre/Tonnerre C2 fdir.php Exfil File Listing POST 2026"; flow:to_server,established; http.method; content:"POST"; http.uri; content:"fdir.php"; fast_pattern; reference:url,semperis.com/blog/prince-of-persia-threat-group-hiding-in-plain-sight/; reference:url,attack.mitre.org/techniques/T1041/; classtype:command-and-control; sid:2000634; rev:1; metadata:policy max-detect-ips drop, created_at 2026_11_23, updated_at 2026_11_23;)
+# Tonnerre fetches tga.adr from the 2nd-stage server: a file holding the
+# Telegram bot API key used as exfil/fallback channel.
+alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"Bark&Bite IRANIAN-APT Prince of Persia - Tonnerre tga.adr Telegram Bot Key Fetch 2026"; flow:to_server,established; http.uri; content:"tga.adr"; fast_pattern; reference:url,semperis.com/blog/prince-of-persia-threat-group-hiding-in-plain-sight/; reference:url,attack.mitre.org/techniques/T1102/002/; classtype:command-and-control; sid:2000635; rev:1; metadata:policy max-detect-ips drop, created_at 2026_11_23, updated_at 2026_11_23;)

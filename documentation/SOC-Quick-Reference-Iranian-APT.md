@@ -223,6 +223,15 @@ Count alerts by signature:
 grep "Iranian APT" /var/log/suricata/fast.log | cut -d'"' -f2 | sort | uniq -c
 ```
 
+## Prince of Persia (Infy/Foudre/Tonnerre/Tornado) — Nov 2026 Rebuild
+
+**Active C2 (since Sept 2026, Semperis):** 185.244.129[.]123, 185.244.129[.]70 (HOSTGW SRL AS204641), 68.65.122[.]203 (Namecheap)
+**Counter domains:** f21.ddnsking[.]com (Tonnerre v17), t21.ddnsking[.]com (Foudre v34) — rules now match any f<N>/t<N>
+**DGA families:** 8-13 char pseudo-random labels under hbmc[.]net / privatedns[.]org / .space / .site
+**Protocol tells:** POST `fdir.php` (exfil listing), GET `tga.adr` (Telegram bot key), exfil filenames `L<YYMMDDHHMMSS><zeroed-IP>`
+**Retired (retro-hunt only):** 45.80.148.0/24, 45.80.149.0/24, 45.80.151.0/24 (abandoned Feb 9 2026)
+**SIDs:** 2000633-2000635, 2000487/2000488 rev:2, 2000490
+
 ## Quick Wins
 
 1. **Patch these NOW**: Check Point, Palo Alto, Citrix, F5, Ivanti devices, Exchange servers

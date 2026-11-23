@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.7.0] - 2026-11-23
+
+### Added
+- **Prince of Persia (Infy/Foudre/Tonnerre/Tornado) infrastructure rebuild**
+  (Semperis Threat Research, Oct 22 2026): SID 2000633 rebuilt C2 IPs
+  185.244.129[.]123 / 185.244.129[.]70 / 68.65.122[.]203 (active since
+  Sept 1 2026); SID 2000634 Foudre/Tonnerre `fdir.php` exfil file-listing
+  POST (behavioral, survives C2 rotation); SID 2000635 Tonnerre `tga.adr`
+  Telegram-bot-key fetch.
+
+### Changed
+- SID 2000487 / 2000488 rev:2: generalized the Foudre/Tonnerre ddnsking
+  counter domains from fixed `f13`/`t13` to `f<N>`/`t<N>` pcre (the group
+  rotated to `f21`/`t21` in the Sept 2026 rebuild).
+
+### IOC currency notes
+- 45.80.148[.]195 (and the 45.80.148-151.0/24 ranges) confirmed Prince of
+  Persia but retired Feb 9 2026 per Semperis - existing rules kept for
+  retro-hunt; active-C2 alerting moves to SID 2000633.
+- 157.20.182[.]75 flagged: no public attribution found (only same-/24 as the
+  well-attributed .49). Downgrade candidate at next audit.
+- 194.11.246[.]101 and 157.20.182[.]49 re-verified still attributed; keep.
+
+### Validation
+- `suricata -T` exit 0 (512 rules, Suricata 7.0.3); `tools/lint-rules.py`
+  0 errors; cross-repo parity byte-identical with `bb-iran-suricata.rules`.
+
+
 ### 2026-11-21 daily maintenance audit (no rule changes)
 
 - Validation on the v5.6.0 line: `suricata -T` exit 0 on
