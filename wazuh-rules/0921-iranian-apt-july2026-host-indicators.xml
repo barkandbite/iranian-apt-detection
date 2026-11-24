@@ -31,7 +31,7 @@
        %SystemRoot%\System32 / SysWOW64; a copy loaded from ProgramData or
        any user-writable directory alongside WinDirStat is the Cavern
        sideload. (T1574.002) -->
-  <rule id="101528" level="14">
+  <rule id="101528" level="11">
     <if_group>sysmon_event7</if_group>
     <field name="win.eventdata.image" type="pcre2">(?i)\\windirstat\.exe$</field>
     <field name="win.eventdata.imageLoaded" type="pcre2">(?i)^(?!.*\\Windows\\(System32|SysWOW64)\\).*\\uxtheme\.dll$</field>
@@ -47,8 +47,8 @@
        This directory is the Cavern deployment path and does not exist on
        clean systems — ProgramData\WinDir masquerades as a Windows path.
        (T1036.005) -->
-  <rule id="101529" level="13">
-    <if_group>sysmon_event_1</if_group>
+  <rule id="101529" level="11">
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.image" type="pcre2">(?i)\\ProgramData\\WinDir\\</field>
     <description>Iranian APT: Cavern Manticore - process execution from C:\ProgramData\WinDir\ masquerade directory</description>
     <mitre>
@@ -60,7 +60,7 @@
 
 
   <rule id="101532" level="13">
-    <if_group>syscheck,sysmon_event_11</if_group>
+    <if_group>syscheck|sysmon_event_11</if_group>
     <field name="file" type="pcre2">(?i)\\logAzure\.txt$</field>
     <description>Iranian APT: Cavern HollowGraph - logAzure.txt Graph credential store dropped to disk</description>
     <mitre>
@@ -70,7 +70,7 @@
     <group>attack,credential_access,cavern_manticore,hollowgraph,pci_dss_10.6.1,</group>
   </rule>
 
-  <rule id="101533" level="13">
+  <rule id="101533" level="15">
     <if_group>sysmon_event_22</if_group>
     <field name="win.eventdata.queryName" type="pcre2">(?i)(^|\.)cloudlanecdn\.com$</field>
     <description>Iranian APT: Cavern HollowGraph - host DNS query to C2 domain cloudlanecdn.com</description>

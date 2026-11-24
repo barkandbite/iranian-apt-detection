@@ -19,12 +19,22 @@ iranian-apt-detection/
 │   ├── 0922-iranian-apt-august2026-ics-indicators.xml # August 2026 ICS host indicators (CyberAv3ngers)
 │   ├── 0923-iranian-apt-august2026-host-indicators.xml # August 2026 host indicators (Olalampo)
 │   ├── 0924-iranian-apt-august2026-rustywater.xml    # August 2026 RustyWater host indicators
+│   ├── 0925-ioc-list-matching.xml                    # CDB IOC list matching (generated lists in cdb-lists/)
+│   ├── 0926-iranian-apt-september2026-noderabbit.xml # Sept 2026 UNC1549 NodeRabbit host indicators
+│   ├── 0927-iranian-apt-september2026-unc1549.xml    # Sept 2026 Nimbus Manticore SSH-tunneler host indicators
+│   ├── 0928-iranian-apt-september2026-chosenbrick.xml # Sept 2026 MOIS CHOSEN BRICK HEAVYGRAM host indicators
+│   ├── 0929-iranian-apt-september2026-darkcomp.xml   # Sept 2026 MuddyWater Darkcomp host indicators
+│   ├── 0930-iranian-apt-october2026-minifast.xml     # Oct 2026 Nimbus Manticore MiniFast host indicators
+│   ├── 0931-iranian-apt-october2026-dindoor-teams.xml # Oct 2026 MuddyWater DinDoor Teams-vishing host indicators
+│   ├── 0932-iranian-apt-october2026-olalampo.xml    # Oct 2026 Olalampo full-report delta host indicators
+│   ├── 0933-iranian-apt-october2026-blindertunnel.xml # Oct 2026 Blinder Tunnel (CL-STA-1178) host indicators
+│   ├── 0934-iranian-apt-november2026-simplehelp-campaign.xml # Nov 2026 SimpleHelp tax-lure campaign
 │   └── README.md                                     # Wazuh rules documentation
 │
 ├── configurations/
 │   ├── sysmon-config-iranian-apt.xml                # Sysmon configuration
 │   ├── ossec-agent-iranian-apt.conf                 # Wazuh agent config
-│   ├── iranian-apt-active-response.xml              # Active response config
+│   ├── iranian-apt-active-response.xml.example      # Active response config (template)
 │   └── README.md                                     # Configuration guide
 │
 ├── suricata/
@@ -99,8 +109,18 @@ iranian-apt-detection/
 - **101534-101535**: CyberAv3ngers ICS host indicators — Schneider project-file access, Siemens S7 binary path (0922)
 - **101536-101539**: MuddyWater Olalampo host indicators — CHAR, GhostFetch, service masquerade, FMAPP.dll SOCKS5 (0923)
 - **101540-101544**: MuddyWater RustyWater host indicators — Rust agent binary drop, service persistence, Templates state artifacts (0924)
+- **101545-101549**: UNC1549/Mirage Kitten NodeRabbit host indicators (0926)
+- **101550-101556**: CDB IOC list matching — egress-weighted T1/T2 block + T3 detect-only tiers (0925)
+- **101557-101560**: UNC1549 Nimbus Manticore SSH-tunneler host indicators (0927)
+- **101561-101568**: MOIS CHOSEN BRICK HEAVYGRAM host indicators (0928)
+- **101569-101573**: MuddyWater Darkcomp/Stagecomp host indicators (0929)
+- **101574-101578**: Nimbus Manticore MiniFast host indicators (0930)
+- **101579-101582**: MuddyWater DinDoor Teams-vishing host indicators (0931)
+- **101583-101585**: MuddyWater Olalampo full-report delta host indicators (0932)
+- **101586-101590**: Blinder Tunnel CL-STA-1178 ShelbyLoader/Blackwood host indicators (0933)
+- **101591-101595**: Suspected MuddyWater Israel Tax Authority SimpleHelp campaign — tax-lure executables, SimpleHelp/JWrapper artifacts, campaign infrastructure (0934)
 
-### Suricata SID Ranges (1000039-2000561)
+### Suricata SID Ranges (1000039-2000612)
 - **1000039-2000014**: CVE exploitation signatures
 - **2000015-2000030**: C2 infrastructure, post-exploitation, exfiltration
 - **2000031-2000050**: Reconnaissance, web shells, ICS/SCADA, correlation

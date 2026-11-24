@@ -18,6 +18,86 @@ This directory contains modular Wazuh SIEM rules for detecting Iranian APT activ
 | 0918-iranian-apt-march2026-updates.xml | 101200-101299 | March 2026 threat updates | 11 rules |
 | 0919-iranian-apt-march2026-expansion.xml | 101300-101450 | March 2026 expansion (deep research) | 45 rules |
 
+## PREREQUISITE: Sysmon is load-bearing
+
+Most rules in this directory depend on Sysmon event groups
+(`sysmon_event_1/3/6/7/8/10/11/13/20/22`). Without Sysmon deployed on your
+Windows endpoints **and** the Wazuh Sysmon decoders present, the majority of
+this ruleset cannot fire at all.
+
+Sysmon-dominant files, effectively inert without it: `0911`, `0914`, `0915`,
+`0917`, `0918`, `0919`, `0920`, `0921`, `0923`, `0924`.
+
+Deploy `configurations/sysmon-config-iranian-apt.xml` to endpoints first, then
+verify decoding:
+
+```bash
+/var/ossec/bin/wazuh-logtest -v
+# paste a Sysmon EventChannel event; Phase 2 must show
+#   win.system.providerName: 'Microsoft-Windows-Sysmon'
+```
+
+## PREREQUISITE: CDB lists
+
+Rules 100947, 101004, 101013, 101148, 101149 and all of `0925` reference CDB
+lists and will not match until those are installed and declared. See
+[../cdb-lists/README.md](../cdb-lists/README.md).
+
+## Severity rubric
+
+Before this release nearly every rule here was level 14 or 15, which made
+level meaningless: level 12+ is conventionally "attack in progress, act now"
+and is a common paging and active-response trigger, so grading routine
+activity at 14 meant normal sysadmin work could drive automated response.
+
+| Level | Meaning | Example |
+|-------|---------|---------|
+| 3-6 | Ambient / enrichment. Correlation input only. | Farsi language preference in a web request (101004, level 3) |
+| 7-9 | Suspicious, needs correlation. | Executable dropped in a temp directory (100963) |
+| 10-11 | Strong single indicator. | Registry hive export, LSASS dump, shadow copy deletion |
+| 12-13 | High-confidence attack behaviour. | ProxyLogon exploitation, C2 beacon, ICS/OT write commands |
+| 14-15 | Confirmed IOC or named-actor infrastructure; multi-stage correlation. | Hardcoded C2 domain/IP hits, attack-chain rules |
+| 16 | Destructive action in progress. | Wiper execution, ransomware encryption, mass deletion |
+
+### Re-grading method and remaining backlog
+
+184 rules were re-graded by category: destructive action, confirmed IOC,
+correlation/multi-stage, exploitation/C2, ICS/OT, strong single indicator,
+needs-correlation.
+
+**78 rules were deliberately left at their original level.** They could not be
+confidently classified from their description, and demoting an unclassified
+rule into a generic middle band buries a working detection just as badly as
+over-grading inflates a noisy one. A first-pass classifier was demoting
+"Multiple attack stages detected" from 16 to 10 and "Credential theft
+artifact" from 15 to 10; it was made conservative rather than allowed to
+finish. These 78 are a manual-review backlog, not a finished grading.
+
+### False-positive profiles
+
+13 rules that match routine activity carry an explicit `FP PROFILE` comment
+naming exactly what benign behaviour triggers them. Read it before enabling
+active response on any of them:
+
+```bash
+grep -A4 'FP PROFILE' wazuh-rules/*.xml
+```
+
+## Validation
+
+XML well-formedness is necessary but **not sufficient**. Wazuh's `OS_XML`
+parser is stricter than standard XML (no CDATA) and `analysisd` rejects
+constructs no XML parser sees. Always test against a real manager:
+
+```bash
+xmllint --noout wazuh-rules/*.xml          # necessary
+python3 tools/lint-rules.py                # known defect classes
+sudo /var/ossec/bin/wazuh-analysisd -t     # authoritative
+```
+
+A single invalid rule aborts loading of its entire file, and an invalid
+`level` aborts manager startup entirely, taking every rule offline.
+
 ## Deployment Options
 
 ### Option 1: Deploy Individual Files (Recommended)
@@ -136,7 +216,7 @@ grep -h "rule id=" /var/ossec/etc/rules/09*.xml | sort | uniq -d
 
 ## Integration with Active Response
 
-Enable active response by adding configuration from `configurations/iranian-apt-active-response.xml` to your `ossec.conf`.
+Enable active response by adding configuration from `configurations/iranian-apt-active-response.xml.example` to your `ossec.conf`.
 
 ## Performance Considerations
 
