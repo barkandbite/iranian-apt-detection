@@ -35,6 +35,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   0 errors; cross-repo parity byte-identical with `bb-iran-suricata.rules`.
 
 
+### 2026-11-24 daily maintenance audit (no rule changes)
+
+- Validation on the v5.7.0 line: `suricata -T` exit 0 on
+  `suricata/iranian-apt-detection.rules` (512 rules, Suricata 7.0.3);
+  `tools/lint-rules.py` 0 errors; `xmllint --noout` clean on all Wazuh
+  XML files.
+- Cross-repo parity verified identical with `bb-iran-suricata.rules`
+  (512 SIDs, 1000039–2000635).
+- No Iranian-attributed intelligence in the 2026-11-23 → 11-24 window.
+  The day's items (CISA KEV Nov-23: N-able MailAssure CVE-2026-134624,
+  MONAI Label CVE-2026-133968; Mandiant CVE-2026-131914 Idunno.AntiCsrf;
+  Kaspersky ShadowCloud GraphDoor part 2) are all non-Iranian and were
+  handled in the by-country repo (release
+  2026.11.24.0700-nov24-shadowcloud-kev).
+- 157.20.182.75 attribution still unresolved (flagged 2026-11-23); kept
+  active pending next IOC rotation audit.
+- This branch adopts v5.7.0 (#83) unchanged and supersedes draft PRs
+  #51–#83 together with by-country #111–#178 (see that repo's TODO.md
+  2026-11-24 session notes, seventh merge escalation).
+
 ### 2026-11-21 daily maintenance audit (no rule changes)
 
 - Validation on the v5.6.0 line: `suricata -T` exit 0 on
