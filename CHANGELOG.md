@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 2026-11-26 daily maintenance audit (no rule changes)
+
+- Validation on the v5.7.0 line: `suricata -T` exit 0 on
+  `suricata/iranian-apt-detection.rules` (512 rules, Suricata 7.0.3);
+  `xmllint --noout` clean on all 25 Wazuh XML files, no duplicate rule IDs.
+- Cross-repo parity verified identical with `bb-iran-suricata.rules`
+  (512 SIDs, 1000039–2000635).
+- No Iranian-attributed intelligence in the 2026-11-25 → 11-26 window. The
+  day's items are all non-Iranian and were handled in the by-country repo
+  (release 2026.11.26.0630-nov25-kev-icssweep): CISA KEV 2026-11-25 batch
+  (Danfoss AK-SM 800A ICS CVE-2023-25914/25915 + CVE-2025-41450, HPE Juniper
+  SSR CVE-2026-103406, Mitel MiCollab 5-CVE AWV chain, Vates Xen Orchestra
+  CVE-2026-133469) plus the Drupal CVE-2026-132165 and Lazarus EIP-7702
+  rules salvaged from stray by-country draft #180.
+- 157.20.182.75 attribution still unresolved (flagged 2026-11-23); kept
+  active pending next IOC rotation audit. Tier 2 IOC currency audit remains
+  >90 days overdue across both repos — priority for the next idle session.
+- This branch adopts v5.7.0 (#84) unchanged and supersedes draft PRs
+  #51–#84 together with by-country #111–#180 (see that repo's TODO.md
+  2026-11-26 session notes, eighth merge escalation).
+
 ## [5.7.0] - 2026-11-23
 
 ### Added
