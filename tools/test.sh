@@ -1,7 +1,7 @@
 #!/bin/bash
 # Test script for Iranian APT detection rules
-# Version: 0.6.0
-# This script validates Wazuh rules and Suricata signatures
+# Version: 5.0.0
+# Validates Wazuh rules, Suricata signatures, and runs detection tests
 
 set -e
 

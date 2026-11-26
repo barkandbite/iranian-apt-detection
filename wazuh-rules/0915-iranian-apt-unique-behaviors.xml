@@ -10,9 +10,9 @@
 <group name="iranian_apt,unique_behaviors,">
 
   <!-- DNS Hijacking Detection -->
-  <rule id="101000" level="14">
+  <rule id="101000" level="16">
     <if_group>sysmon_event_22</if_group>
-    <field name="win.eventdata.queryName">acme-v02.api.letsencrypt.org</field>
+    <field name="win.eventdata.queryName" type="pcre2">acme-v02.api.letsencrypt.org</field>
     <description>Iranian APT: Let's Encrypt query - possible DNS hijacking preparation</description>
     <mitre>
       <id>T1584.002</id>
@@ -21,7 +21,7 @@
     <group>attack,dns_hijacking,iranian_unique,</group>
   </rule>
 
-  <rule id="101001" level="15">
+  <rule id="101001" level="16">
     <if_sid>101000</if_sid>
     <field name="win.eventdata.queryName" type="pcre2">(?i)(microsoft|google|outlook|office365|gov)\.</field>
     <description>Iranian APT: Suspicious domain resolution after Let's Encrypt - DNS hijacking likely</description>
@@ -36,8 +36,8 @@
   <rule id="101002" level="13">
     <if_group>authentication_success</if_group>
     <time>02:00-10:00</time>
-    <weekday>monday|tuesday|wednesday|thursday</weekday>
-    <field name="win.eventdata.ipAddress" negate="yes">^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)</field>
+    <weekday>monday,tuesday,wednesday,thursday</weekday>
+    <field name="win.eventdata.ipAddress" negate="yes" type="pcre2">^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)</field>
     <description>Iranian APT: External authentication during Tehran business hours (9 AM - 5 PM IRST)</description>
     <mitre>
       <id>T1078</id>
@@ -58,10 +58,21 @@
   </rule>
 
   <!-- Persian/Farsi Language Artifacts -->
-  <rule id="101004" level="14">
-    <if_group>web_log</if_group>
-    <regex>Accept-Language:.*fa-IR|Accept-Language:.*fa</regex>
-    <field name="srcip" negate="yes">^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)</field>
+  <rule id="101004" level="3">
+    <if_group>web</if_group>
+    <regex type="pcre2">Accept-Language:.*fa-IR|Accept-Language:.*fa</regex>
+    <!-- "source is external". <srcip> accepts a single CIDR only and rejects
+         regex and comma lists, so RFC1918 exclusion uses a CDB list. Requires
+         <ruleset><list>etc/lists/rfc1918</list></ruleset> in ossec.conf.
+         NOTE: behind NAT the external source IP is often translated or absent,
+         so treat this as a secondary signal. -->
+    <list field="srcip" lookup="not_address_match_key">etc/lists/rfc1918</list>
+    <!-- FP PROFILE: matches any visitor whose browser advertises Persian. That is
+         a language preference, not an indicator of compromise; Persian speakers,
+         diaspora users and translators all trigger it. Deliberately kept at
+         enrichment level: alerting on a human language is noisy and a poor basis
+         for attribution. Use as a correlation field only.
+         Level 14 -> 3 (see wazuh-rules/README.md severity rubric). -->
     <description>Iranian APT: Farsi language preference in web request from external IP</description>
     <mitre>
       <id>T1071.001</id>
@@ -71,7 +82,7 @@
 
   <rule id="101005" level="15">
     <if_group>sysmon_event_11</if_group>
-    <field name="win.eventdata.targetFilename" type="pcre2">[\u0600-\u06FF]</field>
+    <field name="win.eventdata.targetFilename" type="pcre2">[\xD8-\xDB][\x80-\xBF]</field>
     <description>Iranian APT: File created with Persian/Farsi characters - $(win.eventdata.targetFilename)</description>
     <mitre>
       <id>T1027</id>
@@ -82,8 +93,8 @@
 
   <!-- Cryptocurrency Mining Detection -->
   <rule id="101006" level="14">
-    <if_group>sysmon_event_3</if_group>
-    <field name="win.eventdata.destinationPort">3333|5555|7777|8888|9999|14444|45560|45700</field>
+    <if_group>sysmon_event3</if_group>
+    <field name="win.eventdata.destinationPort" type="pcre2">3333|5555|7777|8888|9999|14444|45560|45700</field>
     <field name="win.eventdata.image" type="pcre2">(?i)(xmrig|minerd|cpuminer|WinRing0x64)</field>
     <description>Iranian APT: Cryptocurrency mining connection detected - $(win.eventdata.image)</description>
     <mitre>
@@ -93,7 +104,7 @@
   </rule>
 
   <rule id="101007" level="15">
-    <if_group>sysmon_event_1</if_group>
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(--donate-level\s*0|--cpu-priority|--threads|pool\.minexmr|xmrpool)</field>
     <description>Iranian APT: XMRig cryptocurrency miner execution with specific parameters</description>
     <mitre>
@@ -104,10 +115,10 @@
   </rule>
 
   <!-- DNS Tunneling with Iranian Patterns -->
-  <rule id="101008" level="14">
+  <rule id="101008" level="13">
     <if_group>sysmon_event_22</if_group>
     <field name="win.eventdata.queryName" type="pcre2">^(cmd|exec|download|upload)[0-9]{2,8}\.</field>
-    <field name="win.eventdata.queryType">16</field>
+    <field name="win.eventdata.queryType" type="pcre2">16</field>
     <description>Iranian APT: DNS TXT record C2 pattern detected (Lyceum/Hexane)</description>
     <mitre>
       <id>T1071.004</id>
@@ -117,7 +128,7 @@
   </rule>
 
   <rule id="101009" level="15" frequency="20" timeframe="300">
-    <if_group>sysmon_event_22</if_group>
+    <if_matched_group>sysmon_event_22</if_matched_group>
     <field name="win.eventdata.queryName" type="pcre2">^[a-f0-9]{8}\.[a-f0-9]{8}\.[a-f0-9]{8}\.</field>
     <same_source_ip />
     <description>Iranian APT: DNS A record data exfiltration pattern detected</description>
@@ -130,10 +141,10 @@
 
   <!-- HYPERSCRAPE Email Theft Tool -->
   <rule id="101010" level="15">
-    <if_group>web_log</if_group>
+    <if_group>web</if_group>
     <url>mail.google.com|mail.yahoo.com|outlook.live.com</url>
-    <regex>ui=html</regex>
-    <regex>User-Agent:.*MSIE [56]\.|Firefox/[1-3]\.|Chrome/[1-2][0-9]\.</regex>
+    <regex type="pcre2">ui=html</regex>
+    <regex type="pcre2">User-Agent:.*MSIE [56]\.|Firefox/[1-3]\.|Chrome/[1-2][0-9]\.</regex>
     <description>Iranian APT: HYPERSCRAPE tool accessing webmail with outdated browser</description>
     <mitre>
       <id>T1114.002</id>
@@ -143,7 +154,7 @@
   </rule>
 
   <rule id="101011" level="15">
-    <if_group>sysmon_event_3</if_group>
+    <if_group>sysmon_event3</if_group>
     <field name="win.eventdata.destinationHostname" type="pcre2">(?i)(mail\.google\.com|mail\.yahoo\.com|outlook\.live\.com)</field>
     <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)(chrome|firefox|msedge|outlook|iexplore)</field>
     <description>Iranian APT: Non-browser process accessing webmail - possible HYPERSCRAPE</description>
@@ -154,9 +165,9 @@
   </rule>
 
   <!-- PowerLess Backdoor Detection -->
-  <rule id="101012" level="15">
-    <if_group>sysmon_event_7</if_group>
-    <field name="win.eventdata.image" negate="yes">powershell.exe</field>
+  <rule id="101012" level="13">
+    <if_group>sysmon_event7</if_group>
+    <field name="win.eventdata.image" negate="yes" type="pcre2">powershell.exe</field>
     <field name="win.eventdata.imageLoaded" type="pcre2">(?i)(system\.management\.automation\.dll|microsoft\.powershell)</field>
     <description>Iranian APT: PowerShell loaded by non-PowerShell process - PowerLess backdoor</description>
     <mitre>
@@ -167,14 +178,23 @@
   </rule>
 
   <!-- Passive Implant Detection (No Outbound C2) -->
-  <rule id="101013" level="14">
+  <rule id="101013" level="5">
     <if_group>firewall</if_group>
     <action>allow</action>
     <protocol>tcp</protocol>
-    <srcip negate="yes">^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)</srcip>
+    <!-- "source is external". <srcip> accepts a single CIDR only and rejects
+         regex and comma lists, so RFC1918 exclusion uses a CDB list. Requires
+         <ruleset><list>etc/lists/rfc1918</list></ruleset> in ossec.conf.
+         NOTE: behind NAT the external source IP is often translated or absent,
+         so treat this as a secondary signal. -->
+    <list field="srcip" lookup="not_address_match_key">etc/lists/rfc1918</list>
     <dstport>80|443|8080|8443</dstport>
-    <direction>inbound</direction>
+    <field name="direction" type="pcre2">inbound</field>
     <time>22:00-06:00</time>
+    <!-- FP PROFILE: any internet-facing web service receives inbound connections
+         at night: crawlers, monitoring, CDN health checks, real users. Also
+         depends on a decoder-supplied "direction" field.
+         Level 14 -> 5 (see wazuh-rules/README.md severity rubric). -->
     <description>Iranian APT: Inbound connection to web service during off-hours - passive implant check</description>
     <mitre>
       <id>T1571</id>
@@ -197,8 +217,8 @@
   </rule>
 
   <rule id="101015" level="15">
-    <if_group>sysmon_event_3</if_group>
-    <field name="win.eventdata.destinationHostname">api.telegram.org</field>
+    <if_group>sysmon_event3</if_group>
+    <field name="win.eventdata.destinationHostname" type="pcre2">api.telegram.org</field>
     <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)telegram</field>
     <description>Iranian APT: Non-Telegram process accessing Telegram API - data theft likely</description>
     <mitre>
@@ -210,8 +230,8 @@
 
   <!-- Email-Based C2 (BladedFeline) -->
   <rule id="101016" level="15">
-    <if_group>sysmon_event_3</if_group>
-    <field name="win.eventdata.destinationPort">25|587|465</field>
+    <if_group>sysmon_event3</if_group>
+    <field name="win.eventdata.destinationPort" type="pcre2">25|587|465</field>
     <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)(outlook|thunderbird|mail)</field>
     <description>Iranian APT: Non-email client making SMTP connection - possible email C2</description>
     <mitre>
@@ -222,8 +242,8 @@
   </rule>
 
   <!-- Wiper Preparation Detection -->
-  <rule id="101017" level="14">
-    <if_group>sysmon_event_1</if_group>
+  <rule id="101017" level="16">
+    <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(wmic.*shadowcopy.*get|vssadmin.*list.*shadows|Get-WmiObject.*Win32_ShadowCopy)</field>
     <description>Iranian APT: Shadow copy enumeration - possible wiper preparation</description>
     <mitre>
@@ -233,8 +253,9 @@
     <group>attack,wiper_prep,iranian_cloud,</group>
   </rule>
 
-  <rule id="101018" level="15" frequency="5" timeframe="300">
+  <rule id="101018" level="16" frequency="5" timeframe="300">
     <if_matched_sid>101017</if_matched_sid>
+    <same_location />
     <description>Iranian APT: Multiple shadow copy operations - wiper attack imminent</description>
     <mitre>
       <id>T1490</id>
@@ -245,9 +266,9 @@
 
   <!-- Supply Chain and Watering Hole -->
   <rule id="101019" level="14">
-    <if_group>web_log</if_group>
+    <if_group>web</if_group>
     <status>302</status>
-    <regex>Location:.*\/(news|khabar|irna|fars|tasnim|presstv)</regex>
+    <regex type="pcre2">Location:.*\/(news|khabar|irna|fars|tasnim|presstv)</regex>
     <description>Iranian APT: Redirect to Persian news site - possible watering hole</description>
     <mitre>
       <id>T1189</id>
@@ -258,8 +279,8 @@
 
   <!-- Log4Shell with Mining Payloads -->
   <rule id="101020" level="15">
-    <if_group>web_log</if_group>
-    <regex>\${jndi:ldap://|${jndi:rmi://|\${jndi:dns://</regex>
+    <if_group>web</if_group>
+    <regex type="pcre2">\$\{jndi:(ldap|rmi|dns)://</regex>
     <url>/dana-na/|/api/v1/|/clients/MyCRL|/ssl-vpn/</url>
     <description>Iranian APT: Log4Shell attempt on known Iranian-targeted services</description>
     <mitre>
@@ -269,7 +290,7 @@
     <group>attack,log4shell,</group>
   </rule>
 
-  <rule id="101021" level="16">
+  <rule id="101021" level="15">
     <if_matched_sid>101020</if_matched_sid>
     <match>51.89.181.64|185.174.100|91.92.109</match>
     <description>Iranian APT: Log4Shell with known Iranian C2 infrastructure</description>
@@ -281,8 +302,9 @@
   </rule>
 
   <!-- Behavioral Correlation Rules -->
-  <rule id="101022" level="16" frequency="3" timeframe="3600">
+  <rule id="101022" level="14" frequency="3" timeframe="3600">
     <if_matched_group>iranian_unique</if_matched_group>
+    <same_location />
     <description>Iranian APT: Multiple unique Iranian techniques detected - active campaign</description>
     <mitre>
       <id>T1204</id>
@@ -290,8 +312,9 @@
     <group>attack,correlation,campaign,</group>
   </rule>
 
-  <rule id="101023" level="17" frequency="2" timeframe="7200">
+  <rule id="101023" level="14" frequency="2" timeframe="7200">
     <if_matched_group>iranian_unique</if_matched_group>
+    <same_location />
     <description>Iranian APT: Time-correlated multi-stage attack - nation-state activity confirmed</description>
     <mitre>
       <id>T1204</id>
